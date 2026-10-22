@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 
@@ -9,7 +10,7 @@ export function CtaBanner() {
           <h2 className="text-[length:var(--font-size-h3)] font-semibold">Getting started is easy.</h2>
           <p className="mt-[var(--space-sm)] max-w-sm text-text-muted">Connect your data and bring trusted answers to every team.</p>
           <div className="mt-[var(--space-lg)] flex flex-wrap gap-[var(--space-sm)]">
-            <Button>Get started for free</Button>
+            <Link className="inline-flex min-h-9 items-center justify-center rounded-[var(--radius-button)] border border-button-primary bg-button-primary px-[var(--space-md)] text-[length:var(--font-size-small)] font-medium text-button-primary-text hover:bg-text-muted" href="/signup">Get started for free</Link>
             <Button variant="secondary">Talk to us</Button>
           </div>
         </div>

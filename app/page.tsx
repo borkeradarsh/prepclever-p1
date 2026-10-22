@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
@@ -34,7 +35,7 @@ export default function Home() {
             <span>{topViewportData.heroSupportingText}</span>
           </div>
           <div className="mt-[var(--space-xl)] flex flex-wrap justify-center gap-[var(--space-sm)]">
-            <Button>{topViewportData.primaryAction}</Button>
+            <Link className="inline-flex min-h-9 items-center justify-center rounded-[var(--radius-button)] border border-button-primary bg-button-primary px-[var(--space-md)] text-[length:var(--font-size-small)] font-medium text-button-primary-text hover:bg-text-muted" href="/signup">{topViewportData.primaryAction}</Link>
             <Button variant="secondary">{topViewportData.secondaryAction}</Button>
           </div>
         </Container>

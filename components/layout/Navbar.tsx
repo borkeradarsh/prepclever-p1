@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
 import { topViewportData } from "@/lib/placeholder-data";
 
 export function Navbar() {
@@ -28,9 +27,9 @@ export function Navbar() {
             </Link>
           ))}
         </div>
-        <a className="absolute left-[var(--container-padding)] whitespace-nowrap font-[Formula] text-xl font-extrabold tracking-[-0.1em] text-text-primary md:static md:col-start-2 md:justify-self-center" href="#" aria-label={topViewportData.brand}>
+        <Link className="absolute left-[var(--container-padding)] whitespace-nowrap font-[Formula] text-xl font-extrabold tracking-[-0.1em] text-text-primary md:static md:col-start-2 md:justify-self-center" href="/" aria-label={topViewportData.brand}>
           {topViewportData.brand}
-        </a>
+        </Link>
         <div className="hidden items-center justify-self-start gap-4 md:flex">
           {topViewportData.navItems.slice(3).map((item) => (
             <Link className="whitespace-nowrap text-sm text-text-primary hover:text-text-muted" href={item === "Log in" ? "/login" : "#"} key={item}>
@@ -54,11 +53,11 @@ export function Navbar() {
         <div id="mobile-navigation" className="border-t border-border bg-surface px-[var(--container-padding)] py-[var(--space-md)] md:hidden">
           <div className="flex flex-col gap-[var(--space-sm)]">
             {topViewportData.navItems.map((item) => (
-              <a className="min-h-11 border-b border-border py-[var(--space-sm)] text-text-primary" href="#" key={item}>
+              <Link className="min-h-11 border-b border-border py-[var(--space-sm)] text-text-primary" href={item === "Log in" ? "/login" : "#"} key={item}>
                 {item}
-              </a>
+              </Link>
             ))}
-            <Button className="mt-[var(--space-sm)] w-full">{topViewportData.primaryAction}</Button>
+            <Link className="mt-[var(--space-sm)] inline-flex min-h-9 w-full items-center justify-center rounded-[var(--radius-button)] border border-button-primary bg-button-primary px-[var(--space-md)] text-[length:var(--font-size-small)] font-medium text-button-primary-text hover:bg-text-muted" href="/signup">{topViewportData.primaryAction}</Link>
           </div>
         </div>
       ) : null}
