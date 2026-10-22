@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { topViewportData } from "@/lib/placeholder-data";
 
@@ -22,9 +23,9 @@ export function Navbar() {
       <nav className="relative mx-auto grid min-h-20 w-full max-w-[72rem] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-x-10 px-[var(--container-padding)]" aria-label="Main navigation">
         <div className="hidden items-center justify-self-end gap-4 md:flex">
           {topViewportData.navItems.slice(0, 3).map((item) => (
-            <a className="whitespace-nowrap text-sm text-text-primary hover:text-text-muted" href="#" key={item}>
+            <Link className="whitespace-nowrap text-sm text-text-primary hover:text-text-muted" href={item === "Log in" ? "/login" : "#"} key={item}>
               {item}
-            </a>
+            </Link>
           ))}
         </div>
         <a className="absolute left-[var(--container-padding)] whitespace-nowrap font-[Formula] text-xl font-extrabold tracking-[-0.1em] text-text-primary md:static md:col-start-2 md:justify-self-center" href="#" aria-label={topViewportData.brand}>
@@ -32,11 +33,11 @@ export function Navbar() {
         </a>
         <div className="hidden items-center justify-self-start gap-4 md:flex">
           {topViewportData.navItems.slice(3).map((item) => (
-            <a className="whitespace-nowrap text-sm text-text-primary hover:text-text-muted" href="#" key={item}>
+            <Link className="whitespace-nowrap text-sm text-text-primary hover:text-text-muted" href={item === "Log in" ? "/login" : "#"} key={item}>
               {item}
-            </a>
+            </Link>
           ))}
-          <Button className="whitespace-nowrap px-3 text-xs">Get started</Button>
+          <Link className="inline-flex min-h-9 items-center justify-center whitespace-nowrap rounded-[var(--radius-button)] border border-button-primary bg-button-primary px-3 text-xs font-medium text-button-primary-text hover:bg-text-muted" href="/signup">Get started</Link>
         </div>
         <button
           className="absolute right-[var(--container-padding)] inline-flex size-11 items-center justify-center rounded-[var(--radius-button)] border border-border text-lg md:hidden"

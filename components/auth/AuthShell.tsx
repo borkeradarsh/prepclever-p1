@@ -1,0 +1,34 @@
+import type { ReactNode } from "react";
+import Link from "next/link";
+import { topViewportData } from "@/lib/placeholder-data";
+
+type AuthShellProps = {
+  children: ReactNode;
+  title: string;
+  subtitle?: string;
+  aside?: ReactNode;
+  showLegal?: boolean;
+};
+
+export function AuthShell({ children, title, subtitle, aside, showLegal = true }: AuthShellProps) {
+  return (
+    <main className="auth-page">
+      <Link className="auth-brand" href="/" aria-label="Return to homepage">
+        {topViewportData.brand}
+      </Link>
+      <div className="auth-content">
+        <section className="auth-form-column">
+          <header className="auth-heading">
+            <h1>{title}</h1>
+            {subtitle ? <p>{subtitle}</p> : null}
+          </header>
+          {children}
+          {showLegal ? <footer className="auth-legal">
+            By continuing, you agree to our <a href="#terms">Terms</a> and <a href="#privacy">Privacy Policy</a>.
+          </footer> : null}
+        </section>
+        {aside ? <aside className="auth-aside">{aside}</aside> : null}
+      </div>
+    </main>
+  );
+}

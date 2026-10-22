@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PrepClever
 
-## Getting Started
+Responsive analytics landing page with screenshot-matched Firebase authentication pages.
 
-First, run the development server:
+## Run locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Auth routes:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `http://localhost:3000/login`
+- `http://localhost:3000/signup`
 
-## Learn More
+## Environment variables
 
-To learn more about Next.js, take a look at the following resources:
+Copy `.env.example` to `.env.local` and add the Firebase web app values:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```text
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=
+CLOUDFLARE_TURNSTILE_SECRET_KEY=
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Firebase browser configuration values are public by design. The Turnstile secret is server-only and must never be prefixed with `NEXT_PUBLIC_` or committed.
 
-## Deploy on Vercel
+## Firebase setup
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Create or open a Firebase project at `https://console.firebase.google.com`.
+2. Add a Web app and copy its configuration into `.env.local`.
+3. In Authentication > Sign-in method, enable:
+   - Google
+   - Email/password
+   - Phone
+4. In Authentication > Settings > Authorized domains, add `localhost` and the production hostname.
+5. For phone auth, use Firebase test phone numbers during development. Firebase phone auth uses its own reCAPTCHA verifier in addition to Cloudflare Turnstile.
+6. Add the production domain to the OAuth consent/configuration settings required by Google.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Without Firebase values, the pages still render and show a configuration error when an auth action is attempted.
+
+## Cloudflare Turnstile setup
+
+1. Open the Cloudflare dashboard and go to Turnstile.
+2. Create a widget for the application.
+3. Add `localhost` and the production hostname to the widget hostnames.
+4. Copy the site key into `NEXT_PUBLIC_TURNSTILE_SITE_KEY`.
+5. Copy the secret key into `CLOUDFLARE_TURNSTILE_SECRET_KEY`.
+6. Set both values in the local and production environments.
+
+The browser renders Turnstile on the auth forms. The server route at `/api/turnstile/verify` sends the token to Cloudflare using the secret key. Production requests fail closed when the token or secret is missing. Local development bypasses verification only when no Turnstile site key is configured.
+
+## Validate
+
+```bash
+pnpm lint
+pnpm build
+pnpm start
+```
+
+The production build includes the static landing page, `/login`, `/signup`, and the dynamic `/api/turnstile/verify` route.
