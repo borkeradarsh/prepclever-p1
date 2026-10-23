@@ -13,8 +13,12 @@ type AppTopBarProps = {
   user: User | null;
 };
 
+// No display utility here on purpose: `hidden` and `inline-flex` are both
+// unprefixed display rules, and Tailwind's emission order would let inline-flex
+// win over hidden no matter how the classes are ordered. The caller supplies the
+// display utility instead.
 const upgradeButton =
-  "inline-flex min-h-11 items-center justify-center rounded-[var(--radius-soft-sm)] border border-button-primary bg-button-primary px-[var(--space-md)] text-[length:var(--font-size-small)] font-medium text-button-primary-text transition-colors duration-200 ease-out hover:bg-text-muted";
+  "min-h-11 items-center justify-center rounded-[var(--radius-soft-sm)] border border-button-primary bg-button-primary px-[var(--space-md)] text-[length:var(--font-size-small)] font-medium text-button-primary-text transition-colors duration-200 ease-out hover:bg-text-muted";
 
 export function AppTopBar({ user }: AppTopBarProps) {
   const isPro = user?.plan === "pro";
@@ -42,9 +46,11 @@ export function AppTopBar({ user }: AppTopBarProps) {
 
           <div className="ml-auto flex items-center gap-[var(--space-sm)] md:ml-0">
             {user ? (
-              <Badge className="hidden sm:inline-flex">
-                {isPro ? dashboardCopy.greeting.planPro : dashboardCopy.greeting.planFree}
-              </Badge>
+              <span className="hidden md:contents">
+                <Badge>
+                  {isPro ? dashboardCopy.greeting.planPro : dashboardCopy.greeting.planFree}
+                </Badge>
+              </span>
             ) : null}
             {user && !isPro ? (
               <Link href={routes.upgrade} className={`${upgradeButton} hidden md:inline-flex`}>
