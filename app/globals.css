@@ -1149,14 +1149,25 @@ body {
 
 .logo-chip {
   display: inline-flex;
+  min-width: 7rem;
   min-height: 2.6rem;
   flex-shrink: 0;
   align-items: center;
+  justify-content: center;
   margin-right: var(--space-sm);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-card);
-  padding: 0 var(--space-md);
-  background: #fdfcfb;
+  padding: 0 var(--space-sm);
+}
+
+.logo-mark {
+  display: block;
+  width: 5.5rem;
+  height: 1.75rem;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.logo-chip-text {
   color: var(--text-muted);
   font-size: 0.82rem;
   font-weight: 500;
@@ -1744,18 +1755,28 @@ body {
    scrolls straight past the padding and breaks the page grid. */
 .testimonial-scroller {
   margin-top: clamp(2rem, 5vw, 3.5rem);
-  overflow-x: auto;
+  overflow: hidden;
   padding-bottom: var(--space-sm);
-  scroll-snap-type: x mandatory;
-  scroll-padding-inline-start: var(--scroller-gutter);
-  -webkit-overflow-scrolling: touch;
 }
 
 .testimonial-track {
   display: flex;
   width: max-content;
+  animation: testimonial-marquee 60s linear infinite;
+}
+
+.testimonial-track-set {
+  display: flex;
+  flex-shrink: 0;
   gap: var(--space-sm);
-  padding-inline: var(--scroller-gutter);
+}
+
+.testimonial-track-set:first-child {
+  padding-left: var(--scroller-gutter);
+}
+
+.testimonial-track-set:last-child {
+  padding-right: var(--scroller-gutter);
 }
 
 .testimonial-card {
@@ -1767,7 +1788,12 @@ body {
   border-radius: var(--radius-card);
   padding: var(--space-lg);
   background: var(--section-alt);
-  scroll-snap-align: start;
+}
+
+@keyframes testimonial-marquee {
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 .testimonial-mark {
@@ -1806,12 +1832,6 @@ body {
 }
 
 .testimonial-company {
-  color: var(--text-subtle);
-  font-size: var(--font-size-small);
-}
-
-.testimonial-note {
-  margin: var(--space-md) 0 0;
   color: var(--text-subtle);
   font-size: var(--font-size-small);
 }
@@ -2025,8 +2045,12 @@ body {
     transition: none;
   }
 
-  .testimonial-scroller {
-    scroll-behavior: auto;
+  .testimonial-track {
+    animation: none;
+  }
+
+  .testimonial-track-set[aria-hidden="true"] {
+    display: none;
   }
 }
 

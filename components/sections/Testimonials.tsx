@@ -10,32 +10,27 @@ export function Testimonials() {
           <h2 className="section-title">{testimonials.title}</h2>
         </div>
       </Container>
-      {/* Horizontally scrollable: a region so keyboard users can reach it. */}
-      <div
-        className="testimonial-scroller"
-        tabIndex={0}
-        role="group"
-        aria-label={testimonials.title}
-      >
+      <div className="testimonial-scroller" role="group" aria-label={testimonials.title}>
         <div className="testimonial-track">
-          {testimonials.items.map((item) => (
-            <figure className="testimonial-card" key={item.quote}>
-              <span className="testimonial-mark" aria-hidden="true">
-                &ldquo;
-              </span>
-              <blockquote>{item.quote}</blockquote>
-              <figcaption>
-                <span className="testimonial-name">{item.name}</span>
-                <span className="testimonial-journey">{item.journey}</span>
-                <span className="testimonial-company">{item.company}</span>
-              </figcaption>
-            </figure>
+          {[false, true].map((duplicate) => (
+            <div className="testimonial-track-set" aria-hidden={duplicate} key={duplicate ? "duplicate" : "primary"}>
+              {testimonials.items.map((item) => (
+                <figure className="testimonial-card" key={item.quote}>
+                  <span className="testimonial-mark" aria-hidden="true">
+                    &ldquo;
+                  </span>
+                  <blockquote>{item.quote}</blockquote>
+                  <figcaption>
+                    <span className="testimonial-name">{item.name}</span>
+                    <span className="testimonial-journey">{item.journey}</span>
+                    <span className="testimonial-company">{item.company}</span>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
           ))}
         </div>
       </div>
-      <Container>
-        <p className="testimonial-note">Scroll for more →</p>
-      </Container>
     </section>
   );
 }
