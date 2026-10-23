@@ -18,7 +18,7 @@ export function WhyGcc() {
         <div className="mx-auto max-w-2xl text-center">
           <p className="section-eyebrow">{pillarsIntro.eyebrow}</p>
           <h2 className="section-title">{pillarsIntro.title}</h2>
-          <p className="section-lede mx-auto">{pillarsIntro.description}</p>
+          <p className="section-lede section-lede-centered">{pillarsIntro.description}</p>
         </div>
 
         <div className="pillar-list">

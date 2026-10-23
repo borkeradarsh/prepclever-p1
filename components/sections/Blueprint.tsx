@@ -11,7 +11,7 @@ export function Blueprint() {
         <div className="mx-auto max-w-2xl text-center">
           <p className="section-eyebrow">{blueprint.eyebrow}</p>
           <h2 className="section-title">{blueprint.title}</h2>
-          <p className="section-lede mx-auto">{blueprint.description}</p>
+          <p className="section-lede section-lede-centered">{blueprint.description}</p>
         </div>
 
         <ol className="blueprint-grid">

@@ -9,7 +9,7 @@ export function GrowthStory() {
         <div className="mx-auto max-w-2xl text-center">
           <p className="section-eyebrow">{growth.eyebrow}</p>
           <h2 className="section-title">{growth.title}</h2>
-          <p className="section-lede mx-auto">{growth.description}</p>
+          <p className="section-lede section-lede-centered">{growth.description}</p>
         </div>
 
         <dl className="growth-stats">
