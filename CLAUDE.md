@@ -31,7 +31,7 @@ Verified against the repo. Every claim here is traceable to a file; correct it i
   - start: `pnpm start`
   - lint: `pnpm lint`
   - typecheck: `pnpm typecheck` (`tsc --noEmit`)
-  - test: **none yet.** No test runner is installed, so the unit tests section 6 requires cannot run. Adding one is a dependency decision — raise it first.
+  - test: `pnpm test` (Vitest, `vitest run`). Config in `vitest.config.mts`, which re-declares the `@/*` alias because Vitest does not read `tsconfig.json` paths. Environment is `node` — add `jsdom` and `@testing-library/react` only when a component test actually needs them.
   - e2e: none yet. Say so rather than assuming a command exists.
 - `.gitignore` covers `/node_modules`, `/.next/`, `*.tsbuildinfo` and `.env*`, with an explicit `!.env.example` exception so the example env file can be committed.
 
