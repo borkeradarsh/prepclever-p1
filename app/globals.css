@@ -91,6 +91,28 @@
   --radius-button: 0.125rem;
   --radius-pill: 999px;
   --announcement-offset: 1.75rem;
+
+  /* App shell and dashboard: the "soft" scale, continuing the onboarding card
+     language. The marketing pages keep the sharp --radius-card above. */
+  --radius-soft-lg: 1.25rem;
+  --radius-soft-md: 0.65rem;
+  --radius-soft-sm: 0.45rem;
+  --border-soft: rgb(140 123 138 / 18%);
+  --border-soft-strong: rgb(140 123 138 / 32%);
+  --surface-card: rgb(253 252 251 / 98%);
+  --shadow-soft: 0 0.25rem 0.75rem rgb(49 38 59 / 4%);
+  --shadow-soft-hover: 0 0.5rem 1rem rgb(49 38 59 / 8%);
+  --shadow-soft-raised: 0 1.5rem 4rem rgb(49 38 59 / 8%);
+  --accent-ink: #8b5c71;
+  --accent-ink-strong: #6f5362;
+  --danger-ink: #b34545;
+  --focus-ring: rgb(162 103 131 / 30%);
+  --app-max-width: 1120px;
+  --reading-max-width: 720px;
+  --app-nav-height: 4rem;
+  --app-tabbar-height: 3.75rem;
+  --font-size-page-title: clamp(1.75rem, 4.5vw, 2.25rem);
+  --line-height-page-title: 1.12;
 }
 
 @theme inline {
@@ -110,11 +132,28 @@
   --color-button-primary: var(--button-primary);
   --color-button-primary-text: var(--button-primary-text);
   --color-button-secondary: var(--button-secondary);
+  --color-border-soft: var(--border-soft);
+  --color-border-soft-strong: var(--border-soft-strong);
+  --color-surface-card: var(--surface-card);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-ink-strong: var(--accent-ink-strong);
+  --color-danger-ink: var(--danger-ink);
   --font-sans: "Cinetype", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Cinetype", ui-monospace, monospace;
   --font-display: "Editorial", Georgia, serif;
+  /* Formula, the face the onboarding headings actually use. --font-display stays
+     Editorial: both are used deliberately on the marketing pages. */
+  --font-heading: "Formula", ui-sans-serif, sans-serif;
   --shadow-card: var(--shadow-card);
   --shadow-elevated: var(--shadow-elevated);
+  --shadow-soft: var(--shadow-soft);
+  --shadow-soft-hover: var(--shadow-soft-hover);
+  --shadow-soft-raised: var(--shadow-soft-raised);
+  --radius-soft-lg: var(--radius-soft-lg);
+  --radius-soft-md: var(--radius-soft-md);
+  --radius-soft-sm: var(--radius-soft-sm);
+  --container-app: var(--app-max-width);
+  --container-reading: var(--reading-max-width);
 }
 
 * {
@@ -134,6 +173,17 @@ body {
   font-size: var(--font-size-body);
   line-height: var(--line-height-body);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Keeps page content clear of the mobile bottom tab bar, which is fixed. */
+.app-body {
+  padding-bottom: calc(var(--app-tabbar-height) + env(safe-area-inset-bottom, 0px) + 1rem);
+}
+
+@media (min-width: 768px) {
+  .app-body {
+    padding-bottom: 0;
+  }
 }
 
 .navbar-shell {
