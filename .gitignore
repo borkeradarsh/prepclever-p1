@@ -43,3 +43,7 @@ next-env.d.ts
 
 # Playwright screenshot output (see scripts/screenshots.mjs)
 /screenshots/
+
+# Boundary source data for the India map. Large, re-downloadable, and pinned by
+# SHA-256 in docs/research/map-source.md. The generated path file is committed.
+/data/source/
