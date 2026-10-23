@@ -1,16 +1,27 @@
 import { Container } from "@/components/ui/Container";
 import { logoWall } from "@/content/landing.config";
 
-const logoSlugs: Record<string, string> = {
-  Walmart: "walmart",
-  Target: "target",
-  "Goldman Sachs": "goldmansachs",
-  Shell: "shell",
-  "Wells Fargo": "wellsfargo",
-  Ericsson: "ericsson",
-  DAZN: "dazn",
-  "McDonald's": "mcdonalds",
-  "Southwest Airlines": "southwestairlines",
+const logoDomains: Record<string, string> = {
+  Walmart: "walmart.com",
+  Target: "target.com",
+  "JPMorgan Chase": "jpmorganchase.com",
+  "Goldman Sachs": "goldmansachs.com",
+  Shell: "shell.com",
+  "Lowe's": "lowes.com",
+  "Wells Fargo": "wellsfargo.com",
+  UBS: "ubs.com",
+  Vanguard: "vanguard.com",
+  Costco: "costco.com",
+  "Eli Lilly": "lilly.com",
+  Medtronic: "medtronic.com",
+  "Best Buy": "bestbuy.com",
+  Ericsson: "ericsson.com",
+  Zeiss: "zeiss.com",
+  DAZN: "dazn.com",
+  "McDonald's": "mcdonalds.com",
+  Truist: "truist.com",
+  "Southwest Airlines": "southwest.com",
+  ArcelorMittal: "arcelormittal.com",
 };
 
 // Two rows drifting in opposite directions. Each row's list is duplicated so
@@ -20,18 +31,14 @@ function Row({ companies, reverse }: { companies: string[]; reverse?: boolean })
     <div className="logo-row-group" aria-hidden={group === "duplicate"}>
       {companies.map((company) => (
         <span className="logo-chip" key={`${group}-${company}`}>
-          {logoSlugs[company] ? (
-            <span
-              className="logo-mark"
-              role="img"
-              aria-label={company}
-              style={{
-                backgroundImage: `url(https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/${logoSlugs[company]}.svg)`,
-              }}
-            />
-          ) : (
-            <span className="logo-chip-text">{company}</span>
-          )}
+          <span
+            className="logo-mark"
+            role="img"
+            aria-label={company}
+            style={{
+              backgroundImage: `url(https://www.google.com/s2/favicons?domain=${logoDomains[company]}&sz=128)`,
+            }}
+          />
           <span className="sr-only">{company}</span>
         </span>
       ))}
