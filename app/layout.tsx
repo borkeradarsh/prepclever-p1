@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Placeholder Analytics Platform",
-  description: "A responsive placeholder analytics platform prototype.",
+  title: "PrepClever",
+  description: "Courses and roadmaps for AI engineering roles at GCCs in India.",
 };
 
 export default function RootLayout({
