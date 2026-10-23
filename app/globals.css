@@ -1363,6 +1363,53 @@ body {
   line-height: 1.6;
 }
 
+.growth-city-list {
+  display: grid;
+  gap: 0.55rem;
+  max-width: 36rem;
+  margin: var(--space-lg) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.growth-city-list li {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr) 5rem;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.growth-city-name {
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.growth-city-bar {
+  display: block;
+  height: 0.5rem;
+  border-radius: var(--radius-pill);
+  background: rgb(140 123 138 / 16%);
+}
+
+.growth-city-bar span {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--accent-ink);
+}
+
+.growth-city-share {
+  color: var(--text-muted);
+  font-size: var(--font-size-small);
+  text-align: right;
+}
+
+.growth-city-share em {
+  color: var(--text-subtle);
+  font-style: normal;
+}
+
 .growth-legend {
   display: grid;
   gap: 0.4rem;
@@ -1409,6 +1456,22 @@ body {
 }
 
 @media (min-width: 900px) {
+  .growth-map {
+    grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+    align-items: center;
+  }
+
+  .growth-map-copy {
+    min-width: 0;
+  }
+
+  .india-map-figure {
+    width: 100%;
+    max-width: 32rem;
+    justify-self: end;
+    padding: var(--space-sm);
+  }
+
   .growth-stats {
     grid-template-columns: repeat(6, minmax(0, 1fr));
   }
@@ -1976,6 +2039,7 @@ body {
 
 .india-map-figure {
   display: grid;
+  min-width: 0;
   gap: var(--space-md);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
