@@ -1,166 +1,206 @@
-// A stylised map of India with the GCC hiring hotspots.
+// The India GCC hiring map. See docs/india-map-spec.md.
 //
-// The outline is a 173-point trace of the real boundary — the Ladakh salient,
-// the Sikkim notch, the north-east arm, the Sundarbans, the Konkan and Kerala
-// coasts, Saurashtra and Kutch — projected from lon/lat into a 320 x 368 box,
-// so the coastline and the city dots share one coordinate space. It is drawn
-// as a polyline rather than a smoothed curve: at this point density each
-// segment is a couple of pixels long, and smoothing only rounded real features
-// away. The island territories come from the same projection, which is the
-// only way they land in the right place relative to the mainland. That box is
-// then inset inside a wider viewBox to leave room for the label columns.
+// The outline is generated — see india-map.paths.ts for its source, licence and
+// projection — and every mark is positioned by the same project() function, so
+// dots and coastline cannot drift apart. All placement maths lives in
+// india-map.layout.ts, which the tests exercise directly. Nothing in this file
+// is hand-drawn, and nothing in it should be: section 2 of the spec requires
+// the boundary to come from the documented source only.
 //
-// Labels sit in two tidy columns joined to their dot by a leader line, rather
-// than floating next to the dot: Mumbai and Pune are nine units apart and would
-// otherwise overlap. Decorative — the same figures are rendered as a real list
-// beside the map, which is what assistive technology reads.
+// Two SVGs share one copy of the path data through <use>: a wide one with
+// labelled columns, and a narrow one that drops the labels and numbers the dots
+// instead, so the map can use the full card width on a phone. CSS shows exactly
+// one of them, so only one is ever in the accessibility tree. The ranked list
+// below is the text alternative at every width.
 
-import type { MapHotspot } from "@/content/landing.config";
+import type { growth } from "@/content/landing.config";
+import { INDIA_LAND_PATH } from "./india-map.paths";
+import { layoutCities, leaderPoints, NARROW, WIDE, type PlacedCity } from "./india-map.layout";
 
-const INDIA_OUTLINE =
-  "M96.7 21.9 L107.3 21.9 L112.5 32.1 L118.9 35.5 L125.2 34.4 L129.4 45.8 L123.1 50.3 L121 57.2 L116.8 54.9 L116.8 62.8 L121 68.5 L129.4 74.2 L132.6 77.6 L131.5 84.5 L134.7 87.9 L135.7 94.7 L141 98.1 L150.5 102.7 L158.9 106.1 L166.3 108.3 L173.7 112.9 L179 115.2 L185.3 120.9 L193.8 123.1 L204.3 125.4 L214.8 125.4 L215.9 116.3 L221.2 106.1 L224.3 115.2 L226.5 120.9 L235.9 120.9 L246.5 120.9 L257 119.7 L258.1 118.6 L264.4 112.9 L272.9 100.4 L283.4 92.4 L292.9 95.8 L301.3 93.6 L306.6 101.5 L314 103.8 L308.7 110.6 L302.4 116.3 L291.8 122 L289.7 128.8 L284.5 136.8 L284.5 144.8 L281.3 151.6 L271.8 153.9 L271.8 164.1 L268.6 173.2 L266.5 176.6 L260.2 174.3 L250.7 164.1 L248.6 153.9 L252.8 151.6 L258.1 142.5 L246.5 139.1 L235.9 139.1 L233.8 137.9 L231.7 130 L225.4 127.7 L220.1 124.3 L217 126.5 L215.9 135.7 L220.1 139.1 L215.9 147 L222.2 150.4 L214.8 158.4 L222.2 161.8 L224.3 173.2 L213.8 178.9 L204.3 181.2 L200.1 194.8 L191.6 200.5 L185.3 202.8 L179 208.5 L172.7 217.6 L165.3 222.1 L161.1 226.7 L154.7 233.5 L151.6 236.9 L145.2 240.3 L141 246 L136.8 246 L131.5 252.8 L131.5 261.9 L132.6 271 L133.6 276.7 L129.4 287 L128.4 292.6 L128.4 297.2 L125.2 302.9 L123.1 308.6 L125.2 313.1 L121 317.7 L118.9 319.9 L113.6 321.1 L111.5 324.5 L108.3 329 L104.1 333.6 L99.9 331.3 L96.7 325.6 L93.5 319.9 L90.4 313.1 L87.2 302.9 L85.1 294.9 L81.9 290.4 L79.8 284.7 L75.6 279 L73.5 272.2 L71.4 264.2 L68.2 257.4 L66.1 250.6 L61.9 243.7 L59.8 236.9 L58.7 228.9 L55.6 221 L54.5 210.7 L53.5 203.9 L53.5 195.9 L55.6 188 L52.4 182.3 L55.6 177.7 L51.4 177.7 L48.2 184.6 L40.8 188 L34.5 189.1 L26 186.8 L20.8 181.2 L15.5 175.5 L13.4 170.9 L19.7 169.8 L27.1 166.4 L31.3 165.2 L26 161.8 L16.5 164.1 L10.2 159.5 L6 157.3 L6 152.7 L13.4 149.3 L20.8 149.3 L27.1 148.2 L31.3 149.3 L35.5 144.8 L34.5 139.1 L31.3 133.4 L26 130 L20.8 124.3 L25 118.6 L26 111.8 L31.3 109.5 L38.7 108.3 L45 108.3 L49.2 103.8 L55.6 98.1 L60.8 89 L66.1 83.3 L72.5 76.5 L73.5 71.9 L77.7 67.4 L73.5 62.8 L72.5 56 L70.3 52.6 L68.2 48.1 L66.1 42.4 L69.3 36.7 L66.1 32.1 L70.3 29.9 L77.7 32.1 L86.2 32.1 L91.4 25.3 L94.6 23 Z";
+type MapData = typeof growth.map;
 
-// The northern boundary continues west through the Kashmir region. It is
-// layered over the older simplified segment so the territory reads as one
-// continuous silhouette without changing the map's existing visual treatment.
-const NORTHWEST_EXTENSION =
-  "M96.7 22 L84 15 L70 14 L57 18 L47 25 L40 34 L42 43 L50 51 L61 57 L72 67 L77 78 L96 78 Z";
-const NORTHWEST_EXTENSION_EDGE =
-  "M96.7 22 L84 15 L70 14 L57 18 L47 25 L40 34 L42 43 L50 51 L61 57 L72 67 L77 78";
+const LAND_ID = "india-land-path";
 
-// The island groups, centred on the mainland's own projection. Traced true to
-// shape they come out a pixel or two wide and read as specks of dirt, so each
-// archipelago is drawn as one slim ellipse on its real centre instead.
-const ISLANDS = [
-  { cx: 266.5, cy: 276.5, rx: 2.8, ry: 5.5 }, // North and Middle Andaman
-  { cx: 264.2, cy: 291, rx: 2.8, ry: 5.5 }, // South Andaman
-  { cx: 274.8, cy: 341, rx: 2.4, ry: 4.6 }, // Nicobar
-];
+/**
+ * The two layouts render the same 320-unit map box at very different sizes —
+ * roughly 1100 px on a desktop card against 310 px on a phone — so a mark sized
+ * in SVG units comes out twice as large on the desktop one. Everything drawn on
+ * top of the land is therefore scaled per layout: dots and tooltips here, type
+ * and stroke widths in the matching CSS.
+ */
+const WIDE_SCALE = 0.68;
+const NARROW_SCALE = 1;
 
-/** Lakshadweep, far off the Kerala coast: a scatter, not an outline. */
-const LAKSHADWEEP = [
-  [52.4, 305.2],
-  [48.2, 297.2],
-  [56.6, 309.7],
-];
+/**
+ * Rough text width in SVG units, for sizing the tooltip box. Deliberately
+ * generous: Cinetype plus an em dash runs wider than a naive average, and an
+ * over-wide box is invisible where a too-narrow one clips the text.
+ */
+const textWidth = (text: string, size: number) => text.length * size * 0.6;
 
-/** Where the map box sits inside the wider viewBox. */
-const MAP_X = 92;
-const MAP_Y = 6;
-/** Where each label column starts, and where its leader line turns. */
-const LEFT_TEXT = 80;
-const RIGHT_TEXT = 424;
-const ELBOW = 24;
-
-/** Dot radius from share of hiring; tier-2 cities (share 0) get the floor. */
-const radiusFor = (share: number) => (share === 0 ? 3.5 : 4 + Math.sqrt(share) * 1.15);
-
-export function IndiaMapGraphic({ hotspots }: { hotspots: MapHotspot[] }) {
-  const shift = `translate(${MAP_X} ${MAP_Y})`;
+function Tooltip({ city, source, scale }: { city: PlacedCity; source: string; scale: number }) {
+  const headline = city.tier2
+    ? `${city.city} — tier 2`
+    : `${city.city} — ${city.share}% of hiring`;
+  const head = 9 * scale;
+  const sub = 8 * scale;
+  const width = Math.max(textWidth(headline, head), textWidth(source, sub)) + 20 * scale;
+  const height = 30 * scale;
+  // Clamped so a tooltip near the edge of the map does not fall outside it.
+  const x = Math.min(Math.max(city.x - width / 2, 2), NARROW.width - width - 2);
+  const y = city.y - city.r * scale - height - 6 * scale;
 
   return (
-    <svg
-      className="india-map"
-      viewBox="0 0 490 380"
-      role="presentation"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <defs>
-        <pattern id="map-grid" width="16" height="16" patternUnits="userSpaceOnUse">
-          <path d="M16 0 H0 V16" fill="none" stroke="var(--border)" strokeOpacity="0.5" strokeWidth="0.6" />
-        </pattern>
-        <clipPath id="map-clip">
-          <path d={INDIA_OUTLINE} transform={shift} />
-        </clipPath>
-      </defs>
+    <g className="map-tip" aria-hidden="true">
+      <rect x={x} y={y} width={width} height={height} rx={3 * scale} />
+      <text className="map-tip-head" x={x + 10 * scale} y={y + 13 * scale}>
+        {headline}
+      </text>
+      <text className="map-tip-source" x={x + 10 * scale} y={y + 24 * scale}>
+        {source}
+      </text>
+    </g>
+  );
+}
 
-      <g clipPath="url(#map-clip)">
-        <rect width="490" height="380" fill="var(--surface-muted)" />
-        <rect width="490" height="380" fill="url(#map-grid)" />
-      </g>
-      <path d={NORTHWEST_EXTENSION} transform={shift} fill="var(--surface-muted)" />
-      <path d={NORTHWEST_EXTENSION} transform={shift} fill="url(#map-grid)" />
-      <path
-        d={INDIA_OUTLINE}
-        transform={shift}
-        fill="none"
-        stroke="var(--border-strong)"
-        strokeOpacity="0.75"
-        strokeWidth="1.25"
-        strokeLinejoin="round"
+function Dot({ city, withRank, scale }: { city: PlacedCity; withRank: boolean; scale: number }) {
+  return (
+    <>
+      <circle
+        className={city.tier2 ? "map-dot map-dot-tier2" : "map-dot"}
+        cx={city.x}
+        cy={city.y}
+        r={city.r * scale}
       />
-      <path
-        d={NORTHWEST_EXTENSION_EDGE}
-        transform={shift}
-        fill="none"
-        stroke="var(--border-strong)"
-        strokeOpacity="0.75"
-        strokeWidth="1.25"
-        strokeLinejoin="round"
-      />
+      {withRank && city.rank !== null ? (
+        <text className="map-dot-rank" x={city.x} y={city.y}>
+          {city.rank}
+        </text>
+      ) : null}
+    </>
+  );
+}
 
-      <g transform={shift}>
-        {ISLANDS.map((island) => (
-          <ellipse
-            cx={island.cx}
-            cy={island.cy}
-            rx={island.rx}
-            ry={island.ry}
-            key={`${island.cx}-${island.cy}`}
-            fill="var(--surface-muted)"
-            stroke="var(--border-strong)"
-            strokeOpacity="0.75"
-            strokeWidth="1"
-          />
-        ))}
-        {LAKSHADWEEP.map(([x, y]) => (
-          <circle cx={x} cy={y} r="1.8" fill="var(--border-strong)" fillOpacity="0.7" key={`${x}-${y}`} />
-        ))}
+function cityLabel(city: PlacedCity) {
+  return city.tier2
+    ? `${city.city}, a tier-2 city. Tier-2 cities account for 15% of GCC hiring combined.`
+    : `${city.city}, ${city.share}% of GCC hiring in the first half of 2026.`;
+}
+
+export function IndiaMapGraphic({ map }: { map: MapData }) {
+  const cities = layoutCities(map.hotspots);
+  // Painted north to south so a tooltip, which sits above its dot, is never
+  // covered by a dot drawn later. SVG has no z-index.
+  const northToSouth = [...cities].sort((a, b) => a.y - b.y);
+  const ranked = [...cities]
+    .filter((c) => !c.tier2)
+    .sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0));
+  const topShare = Math.max(...cities.map((c) => c.share));
+
+  const cityGroups = (withRank: boolean, scale: number) =>
+    northToSouth.map((city) => (
+      <g className="map-city" key={city.city} tabIndex={0} role="img" aria-label={cityLabel(city)}>
+        <Dot city={city} withRank={withRank} scale={scale} />
+        <Tooltip city={city} source={map.tooltipSource} scale={scale} />
       </g>
+    ));
 
-      {hotspots.map((spot) => {
-        const cx = spot.x + MAP_X;
-        const cy = spot.y + MAP_Y;
-        const r = radiusFor(spot.share);
-        const tier2 = spot.share === 0;
-        const left = spot.side === "left";
-        const textX = left ? LEFT_TEXT : RIGHT_TEXT;
-        const turn = left ? textX + ELBOW : textX - ELBOW;
-        const exit = left ? cx - r - 3 : cx + r + 3;
+  return (
+    <div className="india-map-figure">
+      {/* One copy of the path data, referenced by both layouts. */}
+      <svg className="india-map-defs" aria-hidden="true" focusable="false">
+        <defs>
+          <path id={LAND_ID} d={INDIA_LAND_PATH} />
+        </defs>
+      </svg>
 
-        return (
-          <g key={spot.city}>
-            <path
-              d={`M${exit} ${cy} L${turn} ${spot.labelY} L${left ? textX - 2 : textX + 2} ${spot.labelY}`}
-              fill="none"
-              stroke="var(--border-strong)"
-              strokeOpacity="0.55"
-              strokeWidth="0.8"
-            />
-            {!tier2 ? (
-              <circle cx={cx} cy={cy} r={r + 5} fill="var(--accent-ink)" fillOpacity="0.12" />
-            ) : null}
-            <circle
-              cx={cx}
-              cy={cy}
-              r={r}
-              fill={tier2 ? "var(--surface-card)" : "var(--accent-ink)"}
-              fillOpacity={tier2 ? 1 : 0.9}
-              stroke={tier2 ? "var(--accent-ink)" : "none"}
-              strokeOpacity="0.75"
-              strokeWidth="1"
-              strokeDasharray={tier2 ? "2 2" : undefined}
-            />
-            <text x={textX} y={spot.labelY + 1} className="map-city" textAnchor={left ? "end" : "start"}>
-              {spot.city}
-            </text>
-            <text x={textX} y={spot.labelY + 12} className="map-share" textAnchor={left ? "end" : "start"}>
-              {spot.share > 0 ? `${spot.share}% of hiring` : "tier 2"}
-            </text>
-          </g>
-        );
-      })}
-    </svg>
+      {/* Wide: labelled columns either side of the map. */}
+      <svg
+        className="india-map india-map-wide"
+        viewBox={`0 0 ${WIDE.width} ${WIDE.height}`}
+        role="img"
+        aria-labelledby="india-map-wide-title india-map-wide-desc"
+      >
+        <title id="india-map-wide-title">{map.alt.title}</title>
+        <desc id="india-map-wide-desc">{map.alt.description}</desc>
+
+        <g transform={`translate(${WIDE.mapX} ${WIDE.mapY})`}>
+          <use href={`#${LAND_ID}`} className="map-land" />
+        </g>
+
+        {cities.map((city) => {
+          const [x1, y1, x2, y2, x3, y3] = leaderPoints(city, WIDE_SCALE);
+          const left = city.side === "left";
+          const textX = left ? WIDE.leftText : WIDE.rightText;
+          return (
+            <g className="map-label" key={city.city}>
+              <path className="map-leader" d={`M${x1} ${y1}L${x2} ${y2}L${x3} ${y3}`} />
+              <text
+                className="map-city-name"
+                x={textX}
+                y={city.labelY}
+                textAnchor={left ? "end" : "start"}
+              >
+                {city.city}
+              </text>
+              <text
+                className="map-city-share"
+                x={textX}
+                y={city.labelY + 12}
+                textAnchor={left ? "end" : "start"}
+              >
+                {city.tier2 ? "tier 2" : `${city.share}% of hiring`}
+              </text>
+            </g>
+          );
+        })}
+
+        <g transform={`translate(${WIDE.mapX} ${WIDE.mapY})`}>{cityGroups(false, WIDE_SCALE)}</g>
+      </svg>
+
+      {/* Narrow: the map alone, dots numbered to match the list below. */}
+      <svg
+        className="india-map india-map-narrow"
+        viewBox={`0 0 ${NARROW.width} ${NARROW.height}`}
+        role="img"
+        aria-labelledby="india-map-narrow-title india-map-narrow-desc"
+      >
+        <title id="india-map-narrow-title">{map.alt.title}</title>
+        <desc id="india-map-narrow-desc">{map.alt.description}</desc>
+        <use href={`#${LAND_ID}`} className="map-land" />
+        {cityGroups(true, NARROW_SCALE)}
+      </svg>
+
+      {/* The text alternative: shown below the map at narrow widths, and kept
+          for screen readers once the labelled columns carry the same figures. */}
+      <ol className="map-rank-list">
+        {ranked.map((city) => (
+          <li key={city.city}>
+            <span className="map-rank-number" aria-hidden="true">
+              {city.rank}
+            </span>
+            <span className="map-rank-city">{city.city}</span>
+            <span className="map-rank-bar" aria-hidden="true">
+              <span style={{ width: `${(city.share / topShare) * 100}%` }} />
+            </span>
+            <span className="map-rank-share">
+              {city.share}%{city.growth ? <em> {city.growth}</em> : null}
+            </span>
+          </li>
+        ))}
+        <li className="map-rank-tier2">
+          <span className="map-rank-city">
+            Tier 2 —{" "}
+            {cities
+              .filter((c) => c.tier2)
+              .map((c) => c.city)
+              .join(", ")}
+          </span>
+          <span className="map-rank-share">15% combined</span>
+        </li>
+      </ol>
+
+      <p className="map-caption">{map.caption}</p>
+    </div>
   );
 }

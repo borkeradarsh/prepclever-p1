@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { topViewportData } from "@/lib/placeholder-data";
+import { marketingNavCopy } from "@/content/marketing-nav.config";
 
 type AuthShellProps = {
   children: ReactNode;
@@ -15,7 +15,7 @@ export function AuthShell({ children, title, subtitle, aside, showLegal = true, 
   return (
     <main className="auth-page">
       <Link className="auth-brand" href="/" aria-label="Return to homepage">
-        {topViewportData.brand}
+        {marketingNavCopy.brand}
       </Link>
       <div className={`auth-content ${contentClassName}`.trim()}>
         <section className="auth-form-column">

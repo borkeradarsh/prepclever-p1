@@ -1,66 +1,185 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import type { KeyboardEvent } from "react";
+import { ChevronDown, Menu, X } from "lucide-react";
 import Link from "next/link";
-import { topViewportData } from "@/lib/placeholder-data";
+import { marketingNav, marketingNavCopy } from "@/content/marketing-nav.config";
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
+  // A mouse entering a trigger opens its menu, so the click that follows must
+  // not toggle it straight back shut. Only a menu opened by click or keyboard
+  // closes on a second press.
+  const openedByHover = useRef(false);
 
   useEffect(() => {
     const updateScrollState = () => setScrolled(window.scrollY > 72);
-
     updateScrollState();
     window.addEventListener("scroll", updateScrollState, { passive: true });
     return () => window.removeEventListener("scroll", updateScrollState);
   }, []);
 
+  // A pointer press anywhere outside the bar closes whatever is open.
+  useEffect(() => {
+    if (!openMenu && !menuOpen) return;
+    const close = (event: PointerEvent) => {
+      if (!navRef.current?.contains(event.target as Node)) {
+        setOpenMenu(null);
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, [openMenu, menuOpen]);
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key !== "Escape") return;
+    setOpenMenu(null);
+    setMenuOpen(false);
+  };
+
   return (
-    <header className={`navbar-shell ${scrolled ? "navbar-shell-scrolled" : "navbar-shell-hero"}`}>
-      <nav className="relative mx-auto grid min-h-20 w-full max-w-[72rem] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-x-10 px-[var(--container-padding)]" aria-label="Main navigation">
-        <div className="hidden items-center justify-self-end gap-4 md:flex">
-          {topViewportData.navItems.slice(0, 3).map((item) => (
-            <Link className="whitespace-nowrap text-sm text-text-primary hover:text-text-muted" href={item === "Log in" ? "/login" : "#"} key={item}>
-              {item}
-            </Link>
-          ))}
-        </div>
-        <Link className="absolute left-[var(--container-padding)] whitespace-nowrap font-[Formula] text-xl font-extrabold tracking-[-0.1em] text-text-primary md:static md:col-start-2 md:justify-self-center" href="/" aria-label={topViewportData.brand}>
-          {topViewportData.brand}
+    <header
+      ref={navRef}
+      className={`navbar-shell ${scrolled ? "navbar-shell-scrolled" : "navbar-shell-hero"}`}
+      onKeyDown={handleKeyDown}
+    >
+      <nav className="marketing-nav" aria-label={marketingNavCopy.primaryNavLabel}>
+        <Link className="marketing-nav-brand" href="/" aria-label={marketingNavCopy.brandAriaLabel}>
+          {marketingNavCopy.brand}
         </Link>
-        <div className="hidden items-center justify-self-start gap-4 md:flex">
-          {topViewportData.navItems.slice(3).map((item) => (
-            <Link className="whitespace-nowrap text-sm text-text-primary hover:text-text-muted" href={item === "Log in" ? "/login" : "#"} key={item}>
-              {item}
-            </Link>
-          ))}
-          <Link className="inline-flex min-h-9 items-center justify-center whitespace-nowrap rounded-[var(--radius-button)] border border-button-primary bg-button-primary px-3 text-xs font-medium text-button-primary-text hover:bg-text-muted" href="/signup">Get started</Link>
+
+        <ul className="marketing-nav-list">
+          {marketingNav.map((item) =>
+            item.kind === "link" ? (
+              <li key={item.label}>
+                <Link className="marketing-nav-link" href={item.href}>
+                  {item.label}
+                </Link>
+              </li>
+            ) : (
+              <li
+                key={item.id}
+                className="marketing-nav-menu"
+                onMouseEnter={() => {
+                  openedByHover.current = true;
+                  setOpenMenu(item.id);
+                }}
+                onMouseLeave={() => setOpenMenu((current) => (current === item.id ? null : current))}
+              >
+                <button
+                  className="marketing-nav-link marketing-nav-trigger"
+                  type="button"
+                  aria-expanded={openMenu === item.id}
+                  aria-controls={`nav-menu-${item.id}`}
+                  onClick={() => {
+                    setOpenMenu((current) => {
+                      if (current !== item.id) return item.id;
+                      return openedByHover.current ? current : null;
+                    });
+                    openedByHover.current = false;
+                  }}
+                >
+                  {item.label}
+                  <ChevronDown
+                    className={openMenu === item.id ? "is-open" : ""}
+                    size={13}
+                    strokeWidth={1.8}
+                    aria-hidden="true"
+                  />
+                </button>
+                <div
+                  className="marketing-nav-panel"
+                  id={`nav-menu-${item.id}`}
+                  hidden={openMenu !== item.id}
+                >
+                  <ul>
+                    {item.items.map((entry) => (
+                      <li key={entry.href}>
+                        <Link href={entry.href} onClick={() => setOpenMenu(null)}>
+                          <span className="marketing-nav-panel-label">{entry.label}</span>
+                          {entry.description ? (
+                            <span className="marketing-nav-panel-detail">{entry.description}</span>
+                          ) : null}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </li>
+            ),
+          )}
+        </ul>
+
+        <div className="marketing-nav-actions">
+          <Link className="marketing-nav-link" href={marketingNavCopy.login.href}>
+            {marketingNavCopy.login.label}
+          </Link>
+          <Link className="marketing-nav-cta" href={marketingNavCopy.getStarted.href}>
+            {marketingNavCopy.getStarted.label}
+          </Link>
         </div>
+
         <button
-          className="absolute right-[var(--container-padding)] inline-flex size-11 items-center justify-center rounded-[var(--radius-button)] border border-border text-lg md:hidden"
+          className="marketing-nav-toggle"
           type="button"
           aria-expanded={menuOpen}
           aria-controls="mobile-navigation"
-          aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-label={menuOpen ? marketingNavCopy.closeMenu : marketingNavCopy.openMenu}
           onClick={() => setMenuOpen((open) => !open)}
         >
           {menuOpen ? <X size={18} strokeWidth={1.8} /> : <Menu size={18} strokeWidth={1.8} />}
         </button>
       </nav>
-      {menuOpen ? (
-        <div id="mobile-navigation" className="border-t border-border bg-surface px-[var(--container-padding)] py-[var(--space-md)] md:hidden">
-          <div className="flex flex-col gap-[var(--space-sm)]">
-            {topViewportData.navItems.map((item) => (
-              <Link className="min-h-11 border-b border-border py-[var(--space-sm)] text-text-primary" href={item === "Log in" ? "/login" : "#"} key={item}>
-                {item}
-              </Link>
-            ))}
-            <Link className="mt-[var(--space-sm)] inline-flex min-h-9 w-full items-center justify-center rounded-[var(--radius-button)] border border-button-primary bg-button-primary px-[var(--space-md)] text-[length:var(--font-size-small)] font-medium text-button-primary-text hover:bg-text-muted" href="/signup">{topViewportData.primaryAction}</Link>
-          </div>
+
+      <div className="marketing-nav-sheet" id="mobile-navigation" hidden={!menuOpen}>
+        {marketingNav.map((item) =>
+          item.kind === "link" ? (
+            <Link
+              className="marketing-nav-sheet-link"
+              href={item.href}
+              key={item.label}
+              onClick={() => setMenuOpen(false)}
+            >
+              {item.label}
+            </Link>
+          ) : (
+            <div className="marketing-nav-sheet-group" key={item.id}>
+              <p className="marketing-nav-sheet-title">{item.label}</p>
+              {item.items.map((entry) => (
+                <Link
+                  className="marketing-nav-sheet-link"
+                  href={entry.href}
+                  key={entry.href}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {entry.label}
+                </Link>
+              ))}
+            </div>
+          ),
+        )}
+        <div className="marketing-nav-sheet-actions">
+          <Link
+            className="marketing-nav-sheet-login"
+            href={marketingNavCopy.login.href}
+            onClick={() => setMenuOpen(false)}
+          >
+            {marketingNavCopy.login.label}
+          </Link>
+          <Link
+            className="marketing-nav-cta"
+            href={marketingNavCopy.getStarted.href}
+            onClick={() => setMenuOpen(false)}
+          >
+            {marketingNavCopy.getStarted.label}
+          </Link>
         </div>
-      ) : null}
+      </div>
     </header>
   );
 }

@@ -20,6 +20,10 @@ const WIDTHS = [375, 768, 1280];
 const LESSON_COURSE = "python-for-ai-engineers";
 
 const PAGES = [
+  { name: "landing", url: "/" },
+  { name: "companies", url: "/companies" },
+  { name: "roles", url: "/roles" },
+  { name: "resume-evaluate", url: "/tools/resume-evaluate" },
   { name: "dashboard", url: "/dashboard" },
   { name: "path", url: "/path" },
   { name: "courses", url: "/courses" },
