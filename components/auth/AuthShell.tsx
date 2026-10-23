@@ -4,24 +4,25 @@ import { topViewportData } from "@/lib/placeholder-data";
 
 type AuthShellProps = {
   children: ReactNode;
-  title: string;
+  title?: string;
   subtitle?: string;
   aside?: ReactNode;
   showLegal?: boolean;
+  contentClassName?: string;
 };
 
-export function AuthShell({ children, title, subtitle, aside, showLegal = true }: AuthShellProps) {
+export function AuthShell({ children, title, subtitle, aside, showLegal = true, contentClassName = "" }: AuthShellProps) {
   return (
     <main className="auth-page">
       <Link className="auth-brand" href="/" aria-label="Return to homepage">
         {topViewportData.brand}
       </Link>
-      <div className="auth-content">
+      <div className={`auth-content ${contentClassName}`.trim()}>
         <section className="auth-form-column">
-          <header className="auth-heading">
+          {title ? <header className="auth-heading">
             <h1>{title}</h1>
             {subtitle ? <p>{subtitle}</p> : null}
-          </header>
+          </header> : null}
           {children}
           {showLegal ? <footer className="auth-legal">
             By continuing, you agree to our <a href="#terms">Terms</a> and <a href="#privacy">Privacy Policy</a>.

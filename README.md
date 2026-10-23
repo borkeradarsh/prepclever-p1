@@ -1,6 +1,6 @@
 # PrepClever
 
-Responsive analytics landing page with screenshot-matched Firebase authentication pages.
+Responsive analytics landing page with Supabase authentication pages.
 
 ## Run locally
 
@@ -18,34 +18,54 @@ Auth routes:
 
 ## Environment variables
 
-Copy `.env.example` to `.env.local` and add the Firebase web app values:
+Copy `.env.example` to `.env.local` and add the Supabase values:
 
 ```text
-NEXT_PUBLIC_FIREBASE_API_KEY=
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
-NEXT_PUBLIC_FIREBASE_APP_ID=
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
 NEXT_PUBLIC_TURNSTILE_SITE_KEY=
 CLOUDFLARE_TURNSTILE_SECRET_KEY=
 ```
 
-Firebase browser configuration values are public by design. The Turnstile secret is server-only and must never be prefixed with `NEXT_PUBLIC_` or committed.
+The Supabase URL and anon key are public browser values. The Turnstile secret is server-only and must never be prefixed with `NEXT_PUBLIC_` or committed.
 
-## Firebase setup
+## Supabase setup
 
-1. Create or open a Firebase project at `https://console.firebase.google.com`.
-2. Add a Web app and copy its configuration into `.env.local`.
-3. In Authentication > Sign-in method, enable:
+Authentication is temporarily disabled by default so the onboarding flow can be developed independently. Keep this value in `.env.local`:
+
+```text
+NEXT_PUBLIC_AUTH_ENABLED=false
+```
+
+When Supabase authentication is ready, set it to `true` and restart the development server:
+
+```text
+NEXT_PUBLIC_AUTH_ENABLED=true
+```
+
+With authentication disabled, `/login` and `/signup` open the onboarding flow directly. The Supabase auth implementation remains in place.
+
+1. Create or open a project at `https://supabase.com/dashboard`.
+2. Copy the project URL and anon key from Project Settings > API into `.env.local`.
+3. In Authentication > Providers, enable:
    - Google
    - Email/password
-   - Phone
-4. In Authentication > Settings > Authorized domains, add `localhost` and the production hostname.
-5. For phone auth, use Firebase test phone numbers during development. Firebase phone auth uses its own reCAPTCHA verifier in addition to Cloudflare Turnstile.
-6. Add the production domain to the OAuth consent/configuration settings required by Google.
+4. In Authentication > URL Configuration, set:
+   - Site URL: `https://your-domain.com`
+   - Redirect URLs: `http://localhost:3000/auth/callback` and `https://your-domain.com/auth/callback`
+5. In Google Cloud Console, add the Supabase callback URL shown in Supabase's Google provider settings to the OAuth client's authorized redirect URIs.
+6. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in local and production environments.
 
-Without Firebase values, the pages still render and show a configuration error when an auth action is attempted.
+The app redirects OAuth results to your own `/auth/callback` route and exchanges the code for a Supabase session there.
+
+### Removing the Supabase hostname from the OAuth address bar
+
+There are two different URLs involved:
+
+- The Google provider must redirect to Supabase's callback endpoint. This normally contains `https://<project-ref>.supabase.co/auth/v1/callback`.
+- After authentication, the app redirects back to your domain at `/auth/callback`.
+
+To remove the `supabase.co` hostname from the provider redirect itself, enable Supabase Custom Domains for the project and use the resulting auth domain in the Google provider configuration. A normal DNS alias or changing only `redirectTo` cannot remove the Supabase callback hostname.
 
 ## Cloudflare Turnstile setup
 

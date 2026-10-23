@@ -1229,7 +1229,7 @@ body {
   font-family: "Formula", sans-serif;
   font-size: 1.25rem;
   font-weight: 800;
-  letter-spacing: -0.1em;
+  letter-spacing: 0;
 }
 
 .auth-content,
@@ -1247,8 +1247,7 @@ body {
 .auth-heading h1 { color: var(--text-primary); font-size: clamp(2.15rem, 5vw, 2.7rem); letter-spacing: -0.065em; }
 .auth-heading h1::after { display: block; width: 2.75rem; height: 0.2rem; margin: 0.9rem auto 0; border-radius: 999px; background: var(--brand); content: ""; }
 .auth-heading p { color: #6b7772; font-size: 0.8rem; }
-.auth-form-card,
-.onboarding-card {
+.auth-form-card {
   width: 100%;
   border: 1px solid rgb(140 123 138 / 32%);
   border-top: 3px solid var(--brand);
@@ -1292,40 +1291,13 @@ body {
 .auth-resend:disabled { color: #9aa5a1; }
 .auth-otp-icon { display: grid; width: 2rem; height: 2rem; margin: 1.25rem 0 0.75rem; place-items: center; border-radius: 50%; color: #8b5c71; background: var(--brand-soft); }
 .auth-form-title { margin: 0; color: #1f2927; font-family: "Formula", sans-serif; font-size: 1.15rem; letter-spacing: -0.03em; }
-.auth-form-copy,
-.onboarding-copy { margin: 0.4rem 0 1.1rem; color: #77837e; font-size: 0.75rem; line-height: 1.45; }
+.auth-form-copy { margin: 0.4rem 0 1.1rem; color: #77837e; font-size: 0.75rem; line-height: 1.45; }
 .auth-adaptive-note { margin: -0.15rem 0 0.1rem; color: #77837e; font-size: 0.7rem; }
-.onboarding-card h2 { margin: 1.1rem 0 0; color: #1f2927; font-family: "Formula", sans-serif; font-size: 1.3rem; letter-spacing: -0.04em; line-height: 1.1; }
-.onboarding-topline { display: flex; justify-content: space-between; color: #84908b; font-size: 0.68rem; }
-.onboarding-progress { height: 0.25rem; margin-top: 0.7rem; overflow: hidden; border-radius: 1rem; background: #edf0ee; }
-.onboarding-progress span { display: block; height: 100%; border-radius: inherit; background: var(--brand); transition: width 180ms ease; }
-.role-search { display: flex; align-items: center; gap: 0.5rem; padding: 0 0.75rem; color: #73807a; }
-.role-search input { width: 100%; border: 0; outline: 0; color: #1f2927; background: transparent; font: inherit; font-size: 0.75rem; }
-.role-recommendations { display: grid; gap: 0.35rem; margin-top: 0.55rem; }
-.role-recommendations button,
-.experience-grid button { border: 1px solid #e0e6e3; border-radius: 0.4rem; color: #35423e; background: #fbfcfb; font: inherit; text-align: left; }
-.role-recommendations button { display: flex; min-height: 2.2rem; align-items: center; justify-content: space-between; padding: 0 0.7rem; font-size: 0.74rem; }
-.role-recommendations button:hover,
-.role-recommendations button.is-selected,
-.experience-grid button:hover,
-.experience-grid button.is-selected { border-color: var(--brand); color: var(--text-primary); background: var(--brand-soft); }
-.experience-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
-.experience-grid button { position: relative; display: flex; min-height: 4.15rem; flex-direction: column; justify-content: center; gap: 0.25rem; padding: 0.7rem; }
-.experience-grid button span { font-size: 0.75rem; font-weight: 700; }
-.experience-grid button small { color: #84908b; font-size: 0.68rem; }
-.experience-grid button svg { position: absolute; top: 0.65rem; right: 0.6rem; }
-.onboarding-actions { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-top: 1rem; }
 
 @media (max-width: 480px) {
   .auth-brand { top: 1rem; left: 1rem; }
   .auth-content,
   .auth-page-login .auth-content,
   .auth-page-signup .auth-content { width: min(100% - 1.5rem, 25rem); padding-top: 4.5rem; padding-bottom: 2rem; }
-  .auth-form-card,
-  .onboarding-card { padding: 1rem; }
-  .onboarding-card h2 { font-size: 1.2rem; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .onboarding-progress span { transition: none; }
+  .auth-form-card { padding: 1rem; }
 }

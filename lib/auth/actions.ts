@@ -1,20 +1,38 @@
-import {
-  createUserWithEmailAndPassword,
-  GoogleAuthProvider,
-  RecaptchaVerifier,
-  signInWithEmailAndPassword,
-  signInWithPhoneNumber,
-  signInWithPopup,
-  sendEmailVerification,
-  type ConfirmationResult,
-} from "firebase/auth";
-import { firebaseAuth, firebaseConfigured } from "@/lib/firebase/client";
+import { supabase, supabaseConfigured } from "@/lib/supabase/client";
 
-export function requireFirebaseAuth() {
-  if (!firebaseConfigured || !firebaseAuth) {
-    throw new Error("Firebase authentication is not configured yet. Add the Firebase values to .env.local.");
+function requireSupabase() {
+  if (!supabaseConfigured || !supabase) {
+    throw new Error("Supabase authentication is not configured yet. Add the Supabase values to .env.local.");
   }
-  return firebaseAuth;
+  return supabase;
+}
+
+export async function signInWithGoogle() {
+  const { error } = await requireSupabase().auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${window.location.origin}/auth/callback`,
+    },
+  });
+  if (error) throw error;
+}
+
+export async function signInWithEmail(email: string, password: string) {
+  const { data, error } = await requireSupabase().auth.signInWithPassword({ email, password });
+  if (error) throw error;
+  return data;
+}
+
+export async function signUpWithEmail(email: string, password: string) {
+  const { data, error } = await requireSupabase().auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: `${window.location.origin}/auth/callback`,
+    },
+  });
+  if (error) throw error;
+  return data;
 }
 
 export async function verifyTurnstile(token: string) {
@@ -27,31 +45,4 @@ export async function verifyTurnstile(token: string) {
   });
   const result = (await response.json()) as { success?: boolean };
   return response.ok && result.success === true;
-}
-
-export async function signInWithGoogle() {
-  const auth = requireFirebaseAuth();
-  return signInWithPopup(auth, new GoogleAuthProvider());
-}
-
-export async function signInWithEmail(email: string, password: string) {
-  return signInWithEmailAndPassword(requireFirebaseAuth(), email, password);
-}
-
-export async function signUpWithEmail(email: string, password: string) {
-  return createUserWithEmailAndPassword(requireFirebaseAuth(), email, password);
-}
-
-export async function sendVerificationEmail() {
-  const user = requireFirebaseAuth().currentUser;
-  if (!user) throw new Error("Your account session expired. Please start again.");
-  return sendEmailVerification(user);
-}
-
-export function createPhoneVerifier(containerId: string) {
-  return new RecaptchaVerifier(requireFirebaseAuth(), containerId, { size: "invisible" });
-}
-
-export async function requestPhoneCode(phone: string, verifier: RecaptchaVerifier): Promise<ConfirmationResult> {
-  return signInWithPhoneNumber(requireFirebaseAuth(), phone, verifier);
 }
