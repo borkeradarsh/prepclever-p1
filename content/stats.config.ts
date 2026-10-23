@@ -1,6 +1,7 @@
-// GCC proof stats, drawn from docs/01 · GCC Landscape in India and the research
-// base. These are the only numbers the product shows a user, so each one carries
-// its source and the date it was checked.
+// GCC proof stats, drawn from docs/research/01-gcc-landscape-in-india.md and
+// docs/research/gcc-ai-careers-india-research-base.md. These are the only numbers
+// the product shows a user, so each one carries its source and the date it was
+// checked.
 //
 // Every figure here comes from staffing-firm trackers and industry reports. The
 // research notes warn that counts differ by source and that launch trackers mix

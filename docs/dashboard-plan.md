@@ -123,7 +123,7 @@ are switched by setting the cookie manually in devtools until the next session.
 
 ## 3. Content configs
 
-- **`content/stats.config.ts`** — ~7 GCC stats from `docs/01 · GCC Landscape…md`, typed
+- **`content/stats.config.ts`** — ~7 GCC stats from `docs/research/01-gcc-landscape-in-india.md`, typed
   `GccStat = PulseItem & { id: string }`, each with `sourceLabel`, ISO `checkedOn`,
   `verified`, and a `// TODO(verify)`. Includes `talent_gap` with `verified: false` so the
   later "Unverified" dev marker has something to show. Also `pulseStatIdsByRole`

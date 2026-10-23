@@ -3,8 +3,8 @@
 // Stage names and outcomes are read from components/auth/onboarding/config.ts so
 // the dashboard can never show a different roadmap from the one the onboarding
 // payoff screen promised. The courses and lessons below are written from the GCC
-// research in docs/ to make the structure legible; they are placeholders for real
-// content and will be replaced wholesale.
+// research in docs/research/ to make the structure legible; they are placeholders
+// for real content and will be replaced wholesale.
 // TODO(cms): move this to the CMS and delete this file.
 
 import { paths, roles, situationLabels } from "@/components/auth/onboarding/config";

@@ -1,6 +1,7 @@
-// PLACEHOLDER CONTENT — the profile-readiness checklist, keyed to the research
-// base's "Profile Prep: Resume, GitHub, LinkedIn, Interviews" segment. These are
-// the four items the build spec names; whether each is done is mock state.
+// PLACEHOLDER CONTENT — the profile-readiness checklist, keyed to the "Profile
+// Prep: Resume, GitHub, LinkedIn, Interviews" segment of
+// docs/research/gcc-ai-careers-india-research-base.md. These are the four items
+// the build spec names; whether each is done is mock state.
 // TODO(cms): real readiness tracking once profiles exist.
 
 import type { ReadinessItem } from "@/types/domain";
