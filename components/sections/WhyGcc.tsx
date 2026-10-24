@@ -13,7 +13,10 @@ const graphics: Record<PillarGraphic, () => ReactNode> = {
 
 export function WhyGcc() {
   return (
-    <section className="why-gcc border-b border-border py-[var(--section-padding)]" id="why-gcc">
+    <section
+      className="why-gcc border-b border-border pb-[var(--section-padding)] pt-[clamp(2rem,4vw,3rem)]"
+      id="why-gcc"
+    >
       <Container>
         <div className="mx-auto max-w-2xl text-center">
           <p className="section-eyebrow">{pillarsIntro.eyebrow}</p>

@@ -4,7 +4,10 @@ import { growth } from "@/content/landing.config";
 
 export function GrowthStory() {
   return (
-    <section className="growth-story border-b border-border py-[var(--section-padding)]" id="growth">
+    <section
+      className="growth-story border-b border-border pb-[clamp(2rem,4vw,3rem)] pt-[var(--section-padding)]"
+      id="growth"
+    >
       <Container>
         <div className="mx-auto max-w-2xl text-center">
           <p className="section-eyebrow">{growth.eyebrow}</p>

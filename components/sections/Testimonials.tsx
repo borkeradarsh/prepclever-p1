@@ -3,7 +3,7 @@ import { testimonials } from "@/content/landing.config";
 
 export function Testimonials() {
   return (
-    <section className="testimonials border-b border-border py-[var(--section-padding)]">
+    <section className="testimonials border-b border-border pb-[clamp(2rem,4vw,3rem)] pt-[clamp(2rem,4vw,3rem)]">
       <Container>
         <div className="mx-auto max-w-2xl text-center">
           <p className="section-eyebrow">{testimonials.eyebrow}</p>

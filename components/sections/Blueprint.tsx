@@ -6,7 +6,10 @@ import { blueprint } from "@/content/landing.config";
 
 export function Blueprint() {
   return (
-    <section className="blueprint border-b border-border py-[var(--section-padding)]" id={blueprint.id}>
+    <section
+      className="blueprint border-b border-border pb-[clamp(2rem,4vw,3rem)] pt-[clamp(2rem,4vw,3rem)]"
+      id={blueprint.id}
+    >
       <Container>
         <div className="mx-auto max-w-2xl text-center">
           <p className="section-eyebrow">{blueprint.eyebrow}</p>
