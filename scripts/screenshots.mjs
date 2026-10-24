@@ -56,6 +56,19 @@ const PAGES = [
   { name: "upgrade", url: "/upgrade" },
   { name: "lesson-locked", url: LESSON },
   { name: "lesson-pro", url: LESSON, cookies: { "prepclever-dev": "plan:pro" } },
+  // Jobs, in each of the list's five states. Example ids hash the posting URL.
+  { name: "jobs", url: "/jobs?role=all" },
+  { name: "jobs-own-role", url: "/jobs", cookies: { "prepclever-onboarding": onboarding({ currentStep: "done", roleId: "genai_llm" }) } },
+  { name: "jobs-dev-sample", url: "/jobs?role=all&devSample=1" },
+  { name: "jobs-dev-sample-page-3", url: "/jobs?role=all&devSample=1&page=3" },
+  { name: "jobs-empty", url: "/jobs?role=all&q=no-such-job" },
+  { name: "jobs-first-run", url: "/jobs", cookies: { "prepclever-dev": "scenario:first-run" } },
+  { name: "jobs-error", url: "/jobs", cookies: { "prepclever-dev": "fail:jobs" } },
+  // Captured mid-load, before the slow mock data arrives.
+  { name: "jobs-loading", url: "/jobs?role=all", cookies: { "prepclever-dev": "slow:1" }, loading: true },
+  { name: "job-careers-site", url: "/jobs/example-8as8v8" },
+  { name: "job-linkedin", url: "/jobs/example-lfdvin" },
+  { name: "job-dev-sample-closed", url: "/jobs/dev-sample-19" },
 ];
 
 /** Runs in the page: the checks that need real layout, not markup. */
@@ -120,8 +133,10 @@ for (const width of WIDTHS) {
       );
     }
     const tab = await context.newPage();
-    const response = await tab.goto(`${BASE_URL}${page.url}`, { waitUntil: "networkidle" });
+    const response = await tab.goto(`${BASE_URL}${page.url}`, { waitUntil: page.loading ? "commit" : "networkidle" });
     const status = response?.status() ?? 0;
+    // Loading captures: give the shell and the skeleton a moment to paint, no more.
+    if (page.loading) await tab.waitForSelector("main [role=status]", { timeout: 5000 });
 
     // Scroll to the bottom first: that is where a fixed tab bar overlaps.
     await tab.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
