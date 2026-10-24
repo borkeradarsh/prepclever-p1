@@ -8,6 +8,7 @@ import {
   itemNeighbours,
   lessonNeighbours,
   nextRecommended,
+  resolveLastItem,
   resolveBlocks,
 } from "@/lib/journey";
 import { conceptKey, emptyProgress, itemKey } from "@/lib/progress";
@@ -112,7 +113,7 @@ describe("itemNeighbours", () => {
   });
 
   it("links the last item of the last block to the dashboard", () => {
-    expect(itemNeighbours(blocks, "interviews", "interview-pillars").next.href).toBe("/dashboard");
+    expect(itemNeighbours(blocks, "interviews", "dos-and-donts").next.href).toBe("/dashboard");
   });
 
   it("never sends Next to a coming-soon item", () => {
@@ -138,7 +139,7 @@ describe("itemNeighbours", () => {
   it("titles Next after what it opens", () => {
     expect(itemNeighbours(blocks, "market", "landscape").next.title).toBe("Your target role");
     expect(itemNeighbours(blocks, "market", "target-companies").next.title).toBe(blocks[1].title);
-    expect(itemNeighbours(blocks, "interviews", "interview-pillars").next.title).toBe("Home");
+    expect(itemNeighbours(blocks, "interviews", "dos-and-donts").next.title).toBe("Home");
   });
 
   it("walks every available item in order, then the next block, ending at the dashboard", () => {
@@ -194,7 +195,7 @@ describe("block views", () => {
       locked: false,
       done: true,
     });
-    expect(buildBlockItemView(views, "interviews", "prep-by-round", "free", emptyProgress())?.locked).toBe(true);
+    expect(buildBlockItemView(views, "interviews", "interview-companies", "free", emptyProgress())?.locked).toBe(true);
     expect(buildBlockItemView(views, "market", "nope", "free", emptyProgress())).toBeNull();
   });
 });
@@ -239,5 +240,29 @@ describe("lessonNeighbours", () => {
     const { previous, next } = lessonNeighbours(lessons, "practice-project", concept, nextConcept);
     expect(previous.href).toBe("/roadmap/upskilling/math/linalg/b");
     expect(next).toBe(nextConcept);
+  });
+});
+
+describe("resolveLastItem", () => {
+  it("links a block item, with its block as context", () => {
+    expect(resolveLastItem("market/your-role", blocks)).toEqual({
+      title: "Your target role",
+      href: "/roadmap/market/your-role",
+      context: "Block 1 · Market and role",
+    });
+  });
+
+  it("links a concept, with its domain as context", () => {
+    expect(resolveLastItem("concept:linalg", blocks)).toEqual({
+      title: "Linear Algebra",
+      href: "/roadmap/upskilling/math/linalg",
+      context: expect.stringMatching(/^Block 3 · /),
+    });
+  });
+
+  it("gives null for nothing, a retired item or an unknown concept", () => {
+    expect(resolveLastItem(null, blocks)).toBeNull();
+    expect(resolveLastItem("interviews/interview-pillars", blocks)).toBeNull();
+    expect(resolveLastItem("concept:nope", blocks)).toBeNull();
   });
 });

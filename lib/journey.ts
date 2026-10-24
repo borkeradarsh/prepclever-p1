@@ -2,7 +2,7 @@
 // recommended step (docs/dashboard-v2-spec.md sections 5, 6 and 8). Pure.
 
 import { blocks as blockConfigs, type BlockConfig } from "@/content/blocks.config";
-import { getConceptById } from "@/content/concepts";
+import { getConceptById, getDomain } from "@/content/concepts";
 import { ACCESS_RULES, canAccess, resolveAccess } from "@/lib/access";
 import { blockProgress, conceptKey, itemKey } from "@/lib/progress";
 import { routes } from "@/lib/routes";
@@ -14,6 +14,7 @@ import type {
   BlockItemView,
   BlockView,
   ItemLink,
+  LastStudied,
   NextRecommended,
   Plan,
   Progress,
@@ -131,6 +132,28 @@ export function lessonNeighbours(
     previous: before ? lessonLink(before) : { title: concept.title, href: routes.concept(concept.domain, concept.id) },
     next: after ? lessonLink(after) : nextConcept,
   };
+}
+
+/**
+ * Turns a progress key into something to link to: `block/item` or
+ * `concept:<id>`. Unknown keys (an item since removed) give null.
+ */
+export function resolveLastItem(key: string | null, blocks: Block[]): LastStudied | null {
+  if (!key) return null;
+  if (key.startsWith("concept:")) {
+    const concept = getConceptById(key.slice("concept:".length));
+    if (!concept) return null;
+    return {
+      title: concept.title,
+      href: routes.concept(concept.domain, concept.id),
+      context: `Block 3 · ${getDomain(concept.domain)?.title ?? concept.domain}`,
+    };
+  }
+  const [blockSlug, itemSlug] = key.split("/");
+  const block = blocks.find((entry) => entry.slug === blockSlug);
+  const item = block?.items.find((entry) => entry.slug === itemSlug);
+  if (!block || !item) return null;
+  return { title: item.title, href: routes.blockItem(block.slug, item.slug), context: `Block ${block.order} · ${block.shortTitle}` };
 }
 
 export function buildBlockItemView(

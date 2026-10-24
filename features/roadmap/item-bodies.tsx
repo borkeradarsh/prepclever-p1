@@ -6,6 +6,9 @@ import type { ComponentType } from "react";
 import { ConceptMapSection } from "@/features/concept-map/ConceptMapSection";
 import { GapReportSection } from "@/features/gap/GapReportSection";
 import { SkillAuditSection } from "@/features/gap/SkillAuditSection";
+import { CompanyProcesses } from "@/features/interviews/CompanyProcesses";
+import { DosAndDonts } from "@/features/interviews/DosAndDonts";
+import { InterviewMap } from "@/features/interviews/InterviewMap";
 import { itemKey } from "@/lib/progress";
 import type { BlockId } from "@/types/domain";
 
@@ -19,7 +22,13 @@ const bodies: Record<string, ItemBody> = {
   [itemKey("gap-analysis", "skill-audit")]: { Body: SkillAuditSection, width: "reading" },
   [itemKey("gap-analysis", "gap-report")]: { Body: GapReportSection, width: "reading" },
   [itemKey("upskilling", "concept-map")]: { Body: ConceptMapSection, width: "app" },
+  [itemKey("interviews", "interview-process")]: { Body: InterviewMap, width: "app" },
+  [itemKey("interviews", "interview-companies")]: { Body: CompanyProcesses, width: "app" },
+  [itemKey("interviews", "dos-and-donts")]: { Body: DosAndDonts, width: "app" },
 };
+
+/** The item keys that have a body, for the config tests. */
+export const itemBodyKeys = (): string[] => Object.keys(bodies);
 
 export function itemBody(blockId: BlockId, itemSlug: string): ItemBody | null {
   return bodies[itemKey(blockId, itemSlug)] ?? null;

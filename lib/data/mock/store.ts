@@ -23,16 +23,42 @@ const ONBOARDING_COOKIE = "prepclever-onboarding";
 export const PROGRESS_COOKIE = "prepclever-progress";
 const MAX_AGE = 60 * 60 * 24 * 90;
 
+/**
+ * Item keys as they were when the progress cookie format shipped. Cookies store
+ * indexes into this list, so it must never be reordered or shortened: removed
+ * items stay here (unused), and new ones go in ITEM_KEYS_ADDED.
+ */
+export const ITEM_KEYS_V1: string[] = [
+  ...["landscape", "your-role", "target-companies"].map((slug) => itemKey("market", slug)),
+  ...["skill-audit", "gap-report"].map((slug) => itemKey("gap-analysis", slug)),
+  ...["concept-map", "track-plan"].map((slug) => itemKey("upskilling", slug)),
+  ...["resume", "linkedin", "github", "resume-evaluate"].map((slug) => itemKey("positioning", slug)),
+  ...["where-to-apply", "referral-outreach", "application-tracker"].map((slug) => itemKey("referrals", slug)),
+  // Retired in the Block 6 rewrite; kept so later indexes do not move.
+  ...["interview-loop", "prep-by-round", "star-stories", "interview-pillars"].map((slug) => itemKey("interviews", slug)),
+  ...concepts.map((concept) => conceptKey(concept.id)),
+];
+
+/** Keys added after v1, appended in the order they were introduced. */
+const ITEM_KEYS_ADDED: string[] = ["interview-process", "interview-companies", "dos-and-donts"].map((slug) =>
+  itemKey("interviews", slug),
+);
+
 /** The catalogues the progress cookie indexes into. Append-only. */
 export const codecSpace: CodecSpace = {
   conceptIds: concepts.map((concept) => concept.id),
   lessonIds: allLessons.map((lesson) => lesson.id),
   checklistIds: allChecklistItemIds,
-  itemKeys: [
-    ...resolveBlocks().flatMap((block) => block.items.map((item) => itemKey(block.slug, item.slug))),
-    ...concepts.map((concept) => conceptKey(concept.id)),
-  ],
+  itemKeys: [...ITEM_KEYS_V1, ...ITEM_KEYS_ADDED],
 };
+
+/** Every current block item must have a cookie index (tested). */
+export function missingItemKeys(): string[] {
+  const known = new Set(codecSpace.itemKeys);
+  return resolveBlocks()
+    .flatMap((block) => block.items.map((item) => itemKey(block.slug, item.slug)))
+    .filter((key) => !known.has(key));
+}
 
 export async function readDevFlags(): Promise<DevFlags> {
   const store = await cookies();

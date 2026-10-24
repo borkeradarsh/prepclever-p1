@@ -162,11 +162,12 @@ export const blocks: BlockConfig[] = [
       },
     ],
     items: [
-      item("interview-loop", "The interview loop", "guide"),
-      item("prep-by-round", "Prep by round", "guide"),
-      item("star-stories", "STAR stories", "guide", "available", [{ label: "STAR builder", status: "coming_soon" }]),
-      // ASSUMPTION: the three pillars from 10-90-day-upskilling.md are their own guide.
-      item("interview-pillars", "Three pillars of the GCC AI interview", "guide"),
+      // The owner's Block 6 pages (content/interviews.config.ts). The earlier
+      // interview-loop, prep-by-round, star-stories and interview-pillars items
+      // were retired; their progress keys stay in RETIRED_ITEM_KEYS.
+      item("interview-process", "Interview process (general)", "guide"),
+      item("interview-companies", "Interview process (specific)", "guide"),
+      item("dos-and-donts", "Do's and don'ts", "guide"),
     ],
   },
 ];

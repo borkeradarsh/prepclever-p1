@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { codecSpace, PROGRESS_COOKIE } from "@/lib/data/mock/store";
+import { codecSpace, ITEM_KEYS_V1, missingItemKeys, PROGRESS_COOKIE } from "@/lib/data/mock/store";
 import { decodeProgress, encodeProgress, type StoredProgress } from "@/lib/progress-codec";
 import type { Rating } from "@/types/domain";
 
@@ -59,5 +59,33 @@ describe("progress codec", () => {
     };
     const cookie = `${PROGRESS_COOKIE}=${encodeProgress(worst, "in-progress", codecSpace)}`;
     expect(new TextEncoder().encode(cookie).length).toBeLessThan(3.5 * 1024);
+  });
+});
+
+describe("item key catalogue", () => {
+  it("gives every current block item a cookie index", () => {
+    expect(missingItemKeys()).toEqual([]);
+  });
+
+  it("only ever grows: the v1 keys keep their positions", () => {
+    expect(codecSpace.itemKeys.slice(0, ITEM_KEYS_V1.length)).toEqual(ITEM_KEYS_V1);
+  });
+
+  it("still reads a cookie written before Block 6 changed", () => {
+    // Encoded against the v1 catalogue alone, as an older deploy would have.
+    const v1Space = { ...codecSpace, itemKeys: ITEM_KEYS_V1 };
+    const before = {
+      ...empty,
+      doneItems: ["market/landscape", "gap-analysis/skill-audit", "interviews/interview-pillars", ITEM_KEYS_V1.at(-1)!],
+    };
+    const cookie = encodeProgress(before, "in-progress", v1Space);
+    expect(decodeProgress(cookie, codecSpace)?.progress.doneItems).toEqual(before.doneItems);
+  });
+
+  it("round-trips the new Block 6 keys", () => {
+    const after = { ...empty, doneItems: ["interviews/interview-process", "interviews/dos-and-donts"] };
+    expect(decodeProgress(encodeProgress(after, "complete", codecSpace), codecSpace)?.progress.doneItems).toEqual(
+      after.doneItems,
+    );
   });
 });
