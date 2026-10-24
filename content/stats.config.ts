@@ -1,5 +1,5 @@
-// GCC proof stats, drawn from docs/research/01-gcc-landscape-in-india.md and
-// docs/research/gcc-ai-careers-india-research-base.md. These are the only numbers
+// GCC proof stats, drawn from docs/research/01-gcc-landscape.md,
+// 02-roles.md and 05-role-tracks.md. These are the only numbers
 // the product shows a user, so each one carries its source and the date it was
 // checked.
 //
@@ -66,6 +66,24 @@ export const gccStats: GccStat[] = [
     verified: true,
   },
   {
+    // TODO(verify): foundit Insights Tracker, H1 2026 (05-role-tracks.md):
+    // 4–6 years 34% plus 7–10 years 22%. Wording fixed by the v2 spec.
+    id: "experience_share",
+    text: "56% of GCC hiring is for 4 to 10 years of experience.",
+    sourceLabel: "Source: foundit, H1 2026",
+    checkedOn: "2026-10-20",
+    verified: true,
+  },
+  {
+    // TODO(verify): Zyoin vendor data via CXO Digital Pulse (02-roles.md).
+    // Approximate, and attributed to Zyoin until verified.
+    id: "pay_premium",
+    text: "GCCs pay about 15 to 22% more than IT services (approximate).",
+    sourceLabel: "Source: Zyoin, vendor data",
+    checkedOn: "2026-10-20",
+    verified: false,
+  },
+  {
     // TODO(verify): foundit via Business Today.
     id: "hiring_volume",
     text: "About 5.1 lakh GCC hires are projected across India in 2026.",
@@ -80,11 +98,13 @@ export const gccStats: GccStat[] = [
  * user keeps seeing the same framing rather than a shuffle on every visit.
  */
 export const pulseStatIdsByRole: Record<RoleId, string[]> = {
+  ml_engineer: ["hiring_ai_growth", "talent_gap", "hiring_volume"],
   genai_llm: ["ai_skill_share", "hiring_ai_growth", "fresher_share"],
-  ml_mlops: ["hiring_ai_growth", "talent_gap", "hiring_volume"],
-  ai_platform: ["talent_gap", "gcc_count", "city_mix"],
-  ai_data: ["hiring_ai_growth", "gcc_count", "talent_gap"],
-  backend_to_ai: ["ai_skill_share", "hiring_ai_growth", "city_mix", "fresher_share"],
+  ai_platform_mlops: ["talent_gap", "gcc_count", "city_mix"],
+  ai_data_engineer: ["hiring_ai_growth", "gcc_count", "talent_gap"],
+  applied_scientist: ["ai_skill_share", "hiring_ai_growth", "talent_gap"],
+  ai_backend: ["ai_skill_share", "experience_share", "pay_premium", "city_mix"],
+  ai_architect: ["gcc_count", "experience_share", "pay_premium"],
 };
 
 /**

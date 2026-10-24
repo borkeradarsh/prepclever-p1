@@ -9,7 +9,7 @@ import {
   onboardingProofStatId,
   pulseStatIdsByRole,
 } from "@/content/stats.config";
-import { roles } from "@/components/auth/onboarding/config";
+import { roles } from "@/content/roles.config";
 
 describe("gccStats", () => {
   it("has unique ids", () => {
@@ -41,6 +41,17 @@ describe("pulseStatIdsByRole", () => {
       for (const id of ids) expect(getStat(id)).not.toBeNull();
       expect(getStatsForRole(role.id)).toHaveLength(ids.length);
     }
+  });
+});
+
+describe("v2 wording", () => {
+  it("words the experience statistic as the spec requires", () => {
+    expect(getStat("experience_share")?.text).toBe("56% of GCC hiring is for 4 to 10 years of experience.");
+  });
+
+  it("keeps the Zyoin pay premium approximate and unverified", () => {
+    expect(getStat("pay_premium")).toMatchObject({ verified: false, sourceLabel: expect.stringContaining("Zyoin") });
+    expect(getStat("pay_premium")?.text).toContain("approximate");
   });
 });
 
