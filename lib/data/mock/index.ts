@@ -258,14 +258,23 @@ export async function markItemDone(key: string, done = true): Promise<Progress> 
   }));
 }
 
+/** Completing a concept's last lesson also marks the concept done, for Block 3's progress. */
 export async function markLessonComplete(lessonId: string): Promise<Progress> {
   if (!codecSpace.lessonIds.includes(lessonId)) throw new Error(`Unknown lesson ${lessonId}`);
   const conceptId = lessonId.replace(/-(l\d+|project)$/, "");
-  return updateProgress((progress) => ({
-    ...progress,
-    completedLessonIds: [...new Set([...progress.completedLessonIds, lessonId])],
-    lastItem: conceptKey(conceptId),
-  }));
+  const concept = getConceptById(conceptId);
+  return updateProgress((progress) => {
+    const completedLessonIds = [...new Set([...progress.completedLessonIds, lessonId])];
+    const conceptDone = concept
+      ? buildLessons(concept).every((lesson) => completedLessonIds.includes(lesson.id))
+      : false;
+    return {
+      ...progress,
+      completedLessonIds,
+      doneItems: conceptDone ? [...new Set([...progress.doneItems, conceptKey(conceptId)])] : progress.doneItems,
+      lastItem: conceptKey(conceptId),
+    };
+  });
 }
 
 export async function setWeeklyGoal(sessions: number): Promise<Progress> {

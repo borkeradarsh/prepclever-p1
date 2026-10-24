@@ -9,6 +9,8 @@ import { routes } from "@/lib/routes";
 import type {
   Block,
   BlockId,
+  Concept,
+  Lesson,
   BlockItemView,
   BlockView,
   ItemLink,
@@ -86,6 +88,51 @@ export function itemNeighbours(blocks: Block[], blockId: BlockId, itemSlug: stri
   return { previous, next };
 }
 
+/**
+ * Previous and Next between concepts, in the role's learning order. After the
+ * last concept, Next is Block 4. A concept outside the role has no Previous,
+ * and Next returns to the Block 3 overview.
+ */
+export function conceptNeighbours(order: string[], conceptId: string): { previous: ItemLink | null; next: ItemLink } {
+  const link = (id: string | undefined): ItemLink | null => {
+    const concept = id ? getConceptById(id) : null;
+    return concept ? { title: concept.title, href: routes.concept(concept.domain, concept.id) } : null;
+  };
+  const index = order.indexOf(conceptId);
+  if (index === -1) return { previous: null, next: { title: "Block 3 overview", href: routes.block("upskilling") } };
+
+  const after = blockConfigs[blockConfigs.findIndex((block) => block.slug === "upskilling") + 1];
+  return {
+    previous: link(order[index - 1]),
+    next:
+      link(order[index + 1]) ??
+      (after ? { title: after.title, href: routes.block(after.slug) } : { title: "Home", href: routes.dashboard }),
+  };
+}
+
+/**
+ * Previous and Next for a lesson: the neighbouring lesson, else the concept
+ * page before the first lesson, and the next concept after the last.
+ */
+export function lessonNeighbours(
+  lessons: Pick<Lesson, "slug" | "title">[],
+  lessonSlug: string,
+  concept: Pick<Concept, "id" | "domain" | "title">,
+  nextConcept: ItemLink,
+): { previous: ItemLink; next: ItemLink } {
+  const index = lessons.findIndex((lesson) => lesson.slug === lessonSlug);
+  const before = index > 0 ? lessons[index - 1] : null;
+  const after = index >= 0 ? lessons[index + 1] : undefined;
+  const lessonLink = (lesson: Pick<Lesson, "slug" | "title">): ItemLink => ({
+    title: lesson.title,
+    href: routes.conceptLesson(concept.domain, concept.id, lesson.slug),
+  });
+  return {
+    previous: before ? lessonLink(before) : { title: concept.title, href: routes.concept(concept.domain, concept.id) },
+    next: after ? lessonLink(after) : nextConcept,
+  };
+}
+
 export function buildBlockItemView(
   views: BlockView[],
   blockId: string,
@@ -103,6 +150,16 @@ export function buildBlockItemView(
     done: progress.doneItems.includes(itemKey(block.slug, item.slug)),
     ...itemNeighbours(views, block.slug, item.slug),
   };
+}
+
+/**
+ * The audit is finished once it is marked done or every concept in the role's
+ * syllabus has a rating, whichever comes first: autosaving means people rarely
+ * press a button at the end.
+ */
+export function auditComplete(progress: Progress, learningOrder: string[]): boolean {
+  if (progress.doneItems.includes(itemKey("gap-analysis", "skill-audit"))) return true;
+  return learningOrder.length > 0 && learningOrder.every((id) => progress.auditRatings[id] !== undefined);
 }
 
 /**
@@ -142,7 +199,9 @@ export function nextRecommended(input: {
   };
 
   const fromBlocks =
-    firstOpen("market") ?? firstOpen("gap-analysis", ["skill-audit"]) ?? firstOpen("gap-analysis", ["gap-report"]);
+    firstOpen("market") ??
+    (auditComplete(progress, learningOrder) ? null : firstOpen("gap-analysis", ["skill-audit"])) ??
+    firstOpen("gap-analysis", ["gap-report"]);
   if (fromBlocks) return fromBlocks;
 
   const gapId = learningOrder.find((id) => ratings[id] !== "confident" && !done.has(conceptKey(id)));

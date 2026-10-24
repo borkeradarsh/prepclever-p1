@@ -1,6 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { learningOrder } from "@/lib/syllabus";
-import { buildBlockItemView, buildBlockViews, itemNeighbours, nextRecommended, resolveBlocks } from "@/lib/journey";
+import {
+  auditComplete,
+  buildBlockItemView,
+  buildBlockViews,
+  conceptNeighbours,
+  itemNeighbours,
+  lessonNeighbours,
+  nextRecommended,
+  resolveBlocks,
+} from "@/lib/journey";
 import { conceptKey, emptyProgress, itemKey } from "@/lib/progress";
 import type { Plan, Progress, Rating } from "@/types/domain";
 
@@ -48,6 +57,40 @@ describe("nextRecommended", () => {
     const positioning = ["resume", "linkedin", "github"].map((slug) => itemKey("positioning", slug));
     const later = { ...progress, doneItems: [...progress.doneItems, ...positioning] };
     expect(recommend(later)).toMatchObject({ blockId: "referrals", itemSlug: "where-to-apply", locked: true });
+  });
+
+  it("counts the audit as finished once every syllabus concept is rated, without Mark as done", () => {
+    const allRated = Object.fromEntries(order.map((id) => [id, "learning" as Rating]));
+    const progress = { ...withDone(...block1), auditRatings: allRated };
+    expect(auditComplete(progress, order)).toBe(true);
+    expect(recommend(progress)).toMatchObject({ blockId: "gap-analysis", itemSlug: "gap-report" });
+  });
+
+  it("keeps recommending the audit while any syllabus concept is unrated", () => {
+    const partial = Object.fromEntries(order.slice(1).map((id) => [id, "confident" as Rating]));
+    const progress = { ...withDone(...block1), auditRatings: partial };
+    expect(auditComplete(progress, order)).toBe(false);
+    expect(recommend(progress)).toMatchObject({ itemSlug: "skill-audit" });
+  });
+
+  it("starts the gaps with the first one still open, and skips concepts already done", () => {
+    const progress = withDone(...block1, ...block2, conceptKey(order[0]));
+    expect(recommend(progress, "pro")).toMatchObject({ kind: "concept", conceptId: order[1], locked: false });
+    expect(recommend(progress, "pro")?.href).toMatch(new RegExp(`^/roadmap/upskilling/[a-z]+/${order[1]}$`));
+  });
+
+  it("sends a free user past the gap report to their role's first concept, locked, for any role", () => {
+    for (const roleId of ["ml_engineer", "ai_architect", "ai_data_engineer"] as const) {
+      const roleOrder = learningOrder(roleId).map((concept) => concept.id);
+      const next = nextRecommended({
+        blocks,
+        progress: withDone(...block1, ...block2),
+        plan: "free",
+        learningOrder: roleOrder,
+        ratings: {},
+      });
+      expect(next).toMatchObject({ kind: "concept", conceptId: roleOrder[0], locked: true });
+    }
   });
 
   it("returns null when everything is done", () => {
@@ -153,5 +196,48 @@ describe("block views", () => {
     });
     expect(buildBlockItemView(views, "interviews", "prep-by-round", "free", emptyProgress())?.locked).toBe(true);
     expect(buildBlockItemView(views, "market", "nope", "free", emptyProgress())).toBeNull();
+  });
+});
+
+describe("conceptNeighbours", () => {
+  it("walks the role's learning order", () => {
+    const { previous, next } = conceptNeighbours(order, order[1]);
+    expect(previous?.href).toMatch(new RegExp(`/${order[0]}$`));
+    expect(next.href).toMatch(new RegExp(`/${order[2]}$`));
+  });
+
+  it("has no Previous on the first concept and sends the last one to Block 4", () => {
+    expect(conceptNeighbours(order, order[0]).previous).toBeNull();
+    expect(conceptNeighbours(order, order.at(-1)!).next.href).toBe("/roadmap/positioning");
+  });
+
+  it("returns a concept outside the role to the Block 3 overview", () => {
+    expect(conceptNeighbours(order, "not-in-role")).toEqual({
+      previous: null,
+      next: { title: "Block 3 overview", href: "/roadmap/upskilling" },
+    });
+  });
+});
+
+describe("lessonNeighbours", () => {
+  const concept = { id: "linalg", domain: "math" as const, title: "Linear Algebra" };
+  const lessons = [
+    { slug: "a", title: "A" },
+    { slug: "b", title: "B" },
+    { slug: "practice-project", title: "Practice project" },
+  ];
+  const nextConcept = { title: "Calculus", href: "/roadmap/upskilling/math/calc" };
+
+  it("goes back to the concept page from the first lesson", () => {
+    expect(lessonNeighbours(lessons, "a", concept, nextConcept)).toEqual({
+      previous: { title: "Linear Algebra", href: "/roadmap/upskilling/math/linalg" },
+      next: { title: "B", href: "/roadmap/upskilling/math/linalg/b" },
+    });
+  });
+
+  it("goes on to the next concept from the last lesson", () => {
+    const { previous, next } = lessonNeighbours(lessons, "practice-project", concept, nextConcept);
+    expect(previous.href).toBe("/roadmap/upskilling/math/linalg/b");
+    expect(next).toBe(nextConcept);
   });
 });

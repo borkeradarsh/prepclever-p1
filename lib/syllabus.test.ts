@@ -35,6 +35,23 @@ describe("learningOrder on the real concept map", () => {
     }
   });
 
+  it.each(ROLE_IDS)("never picks good to know while a core concept is ready, for %s", (roleId) => {
+    const order = learningOrder(roleId);
+    const relevant = new Set(order.map((item) => item.id));
+    const placed = new Set<string>();
+    for (const item of order) {
+      const ready = order.filter(
+        (candidate) =>
+          !placed.has(candidate.id) &&
+          candidate.prerequisites.every((pre) => !relevant.has(pre) || placed.has(pre)),
+      );
+      if (ready.some((candidate) => candidate.levels[roleId] === 2)) {
+        expect(item.levels[roleId], `${item.id} chosen over a ready core concept`).toBe(2);
+      }
+      placed.add(item.id);
+    }
+  });
+
   it("puts a core concept first when nothing blocks it", () => {
     for (const roleId of ROLE_IDS) {
       const first = learningOrder(roleId)[0];
@@ -116,6 +133,26 @@ describe("gap report scoring", () => {
     expect(full.readiness).toBe(1);
     expect(full.gaps).toHaveLength(0);
     for (const domain of full.domains) expect(domain.readiness).toBe(1);
+  });
+
+  it("scores each domain on its own concepts only", () => {
+    const syllabus = buildSyllabus("genai_llm", {});
+    const [firstDomain, secondDomain] = syllabus.domains;
+    const ratings = Object.fromEntries(firstDomain.concepts.map((entry) => [entry.concept.id, "confident" as Rating]));
+    const report = buildGapReport(buildSyllabus("genai_llm", ratings), ratings);
+    const byDomain = new Map(report.domains.map((domain) => [domain.domain.id, domain]));
+    expect(byDomain.get(firstDomain.domain.id)).toMatchObject({ readiness: 1, confident: firstDomain.concepts.length });
+    expect(byDomain.get(secondDomain.domain.id)).toMatchObject({ readiness: 0, confident: 0 });
+    expect(report.readiness).toBeGreaterThan(0);
+    expect(report.readiness).toBeLessThan(1);
+  });
+
+  it("ignores ratings for concepts outside the role", () => {
+    const outside = concepts.find((item) => item.levels.genai_llm === 0)!;
+    const ratings: Record<string, Rating> = { [outside.id]: "confident" };
+    const report = buildGapReport(buildSyllabus("genai_llm", ratings), ratings);
+    expect(report.readiness).toBe(0);
+    expect(report.ratedCount).toBe(0);
   });
 
   it("lists gaps in learning order, skipping confident concepts", () => {
