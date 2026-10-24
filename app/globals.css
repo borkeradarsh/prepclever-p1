@@ -110,6 +110,12 @@
   --reading-max-width: 720px;
   --app-nav-height: 4rem;
   --app-tabbar-height: 3.75rem;
+  /* App sidebar, persistent from 1024px; below that it is a drawer. */
+  --sidebar-width: 280px;
+  --sidebar-width-collapsed: 72px;
+  --drawer-width: min(280px, 85vw);
+  /* One /roadmap block card; the loading skeleton reserves the same height. */
+  --roadmap-card-min-height: 11rem;
   /* Job cards and their skeletons share this, so loading never shifts the grid.
      Just above the tallest real card (five wrapped tags at 1024px, 468px). */
   --job-card-min-height: 29.5rem;
@@ -182,7 +188,7 @@ body {
   padding-bottom: calc(var(--app-tabbar-height) + env(safe-area-inset-bottom, 0px) + 1rem);
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .app-body {
     padding-bottom: 0;
   }
