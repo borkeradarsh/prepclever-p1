@@ -82,3 +82,6 @@ A task is done when:
 - Do not fetch paid content in client components without going through the access check.
 - Do not invent course or company data in components; mock data lives only in `lib/data/mock/` and is clearly named as placeholder.
 - Do not change the onboarding flow or its data model while working on the dashboard.
+
+## Git
+Work and commit directly on master. Do not create branches. Never push or force-push unless the user asks explicitly.

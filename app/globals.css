@@ -950,6 +950,15 @@ body {
   position: relative;
 }
 
+.marketing-nav-menu::after {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  height: 0.5rem;
+  content: "";
+}
+
 .marketing-nav-panel {
   position: absolute;
   z-index: 40;
