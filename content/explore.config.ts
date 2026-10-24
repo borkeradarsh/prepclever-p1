@@ -33,8 +33,7 @@ export const exploreCards: ExploreCard[] = [
     id: "concept-map",
     title: "Concept map",
     description: "The concepts behind every role and how they build on each other.",
-    // TODO(session-b2): routes.conceptMap once the map is ported to React.
-    href: null,
+    href: "/roadmap/concept-map",
   },
   {
     id: "hiring",
