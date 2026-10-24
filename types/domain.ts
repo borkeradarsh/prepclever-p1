@@ -286,3 +286,84 @@ export interface GapReport {
 export type NextRecommended =
   | { kind: "item"; blockId: BlockId; itemSlug: string; title: string; href: string; locked: boolean }
   | { kind: "concept"; conceptId: string; title: string; href: string; locked: boolean };
+
+// Jobs (docs/jobs-spec.md section 6). TODO(match): JobMatch and getJobMatch
+// arrive with the skill audit; nothing here assumes one exists.
+
+/** Same four values as Track: the spec classifies jobs on the user's ladder. */
+export type JobSeniority = Track;
+export type JobPostedWithin = 7 | 30;
+/** TODO(match): "best_match" once the skill audit exists. */
+export type JobSort = "newest";
+
+/**
+ * Where a job came from. `example` is a research posting that may have closed;
+ * `dev_sample` is generated for layout testing in development only;
+ * `collected` comes from the careers-page pipeline (Session J1).
+ */
+export type JobKind = "example" | "dev_sample" | "collected";
+
+export interface Job {
+  id: string;
+  kind: JobKind;
+  title: string;
+  company: string;
+  /** Null when the posting does not say. */
+  city: string | null;
+  /** Null when the posting could not be classified with confidence. */
+  roleId: RoleId | null;
+  seniority: JobSeniority | null;
+  expMin: number | null;
+  expMax: number | null;
+  /** Concept ids from the concept map, in display order. */
+  conceptIds: string[];
+  /**
+   * `posting`: the skills the posting asks for. `role`: the role's core
+   * concepts, used when the posting itself was not classified.
+   */
+  skillsBasis: "posting" | "role";
+  /** At most 280 characters, never the posting's own text. */
+  summary: string | null;
+  /** The original posting. Every job links out; nothing is republished. */
+  applyUrl: string;
+  postedAt: string | null;
+  firstSeenAt: string;
+  lastCheckedAt: string;
+  status: "active" | "closed";
+}
+
+export interface JobFilters {
+  /** Null is "All roles". */
+  roleId: RoleId | null;
+  company: string | null;
+  city: string | null;
+  seniority: JobSeniority | null;
+  postedWithinDays: JobPostedWithin | null;
+  /** Free text over title and company. */
+  q: string;
+  sort: JobSort;
+  /** 1-based. */
+  page: number;
+  /** Development only: mixes in labelled DEV SAMPLE entries. Ignored in production. */
+  devSample?: boolean;
+}
+
+export interface JobPage {
+  jobs: Job[];
+  /** Jobs matching the filters, across all pages. */
+  total: number;
+  page: number;
+  pageCount: number;
+  pageSize: number;
+  /** Jobs in the source before any filter. Zero means nothing has been collected yet. */
+  totalUnfiltered: number;
+  /** `examples` until the pipeline has run; the UI words its freshness line from this. */
+  source: "examples" | "collected";
+  /** Examples: the research check date. Collected: the last successful run. */
+  updatedAt: string | null;
+}
+
+export interface JobFacets {
+  companies: string[];
+  cities: string[];
+}
