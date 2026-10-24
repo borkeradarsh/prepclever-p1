@@ -21,7 +21,9 @@ export type WidgetKey =
   | "syllabus"
   | "concept"
   | "gap"
-  | "jobs";
+  | "jobs"
+  | "home"
+  | "roles";
 
 export interface DevFlags {
   scenario: Scenario;
@@ -32,7 +34,20 @@ export interface DevFlags {
 
 const SCENARIOS: Scenario[] = ["first-run", "in-progress", "complete"];
 const PLANS: Plan[] = ["free", "pro"];
-const WIDGETS: WidgetKey[] = ["continue", "journey", "goal", "pulse", "readiness", "user", "syllabus", "concept", "gap", "jobs"];
+const WIDGETS: WidgetKey[] = [
+  "continue",
+  "journey",
+  "goal",
+  "pulse",
+  "readiness",
+  "user",
+  "syllabus",
+  "concept",
+  "gap",
+  "jobs",
+  "home",
+  "roles",
+];
 
 export const devToolsEnabled = process.env.NODE_ENV !== "production";
 

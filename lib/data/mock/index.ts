@@ -10,8 +10,10 @@ import { resources } from "@/content/resources.data";
 import { getRoleById, roles } from "@/content/roles.config";
 import { getStatsForRole } from "@/content/stats.config";
 import { canAccess } from "@/lib/access";
-import { buildBlockItemView, buildBlockViews, nextRecommended, resolveBlocks } from "@/lib/journey";
-import { conceptKey } from "@/lib/progress";
+import { buildBlockItemView, buildBlockViews, nextRecommended, resolveBlocks, resolveLastItem } from "@/lib/journey";
+import { hasAudit } from "@/lib/jobs/match";
+import { conceptKey, roadmapTotals } from "@/lib/progress";
+import { roleOverviews } from "@/lib/role-overview";
 import { buildGapReport, buildSyllabus, optionalPrerequisites } from "@/lib/syllabus";
 import { getFirstName } from "@/lib/user/profile";
 import type {
@@ -21,6 +23,7 @@ import type {
   Company,
   ConceptView,
   GapReport,
+  HomeSummary,
   Lesson,
   LessonBody,
   LessonRef,
@@ -32,6 +35,7 @@ import type {
   Resource,
   Role,
   RoleId,
+  RoleOverview,
   RoleSyllabus,
   User,
   UserProfile,
@@ -204,6 +208,27 @@ export async function getNextRecommended(): Promise<NextRecommended | null> {
     learningOrder: syllabusFor(profile.roleId, progress).order,
     ratings: progress.auditRatings,
   });
+}
+
+/** The home metrics row in one read: last studied, next step, totals, readiness. */
+export async function getHomeSummary(): Promise<HomeSummary> {
+  await begin("home");
+  const { flags, profile, progress } = await loadContext();
+  const syllabus = syllabusFor(profile.roleId, progress);
+  const views = buildBlockViews(blocks, flags.plan, progress, syllabus.order);
+  return {
+    lastStudied: resolveLastItem(progress.lastItem, blocks),
+    next: nextRecommended({ blocks, progress, plan: flags.plan, learningOrder: syllabus.order, ratings: progress.auditRatings }),
+    roadmap: roadmapTotals(views.map((view) => view.progress)),
+    readiness: hasAudit(progress.auditRatings) ? buildGapReport(syllabus, progress.auditRatings).readiness : null,
+  };
+}
+
+/** Every role for the home row, the user's target first. */
+export async function getRoleOverviews(): Promise<RoleOverview[]> {
+  await begin("roles");
+  const { profile, progress } = await loadContext();
+  return roleOverviews(roles, profile.roleId, profile.track, progress.auditRatings);
 }
 
 export async function getChecklists(): Promise<Checklist[]> {

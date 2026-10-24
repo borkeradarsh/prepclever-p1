@@ -21,6 +21,8 @@ export {
   getLessonBody,
   getGapReport,
   getNextRecommended,
+  getHomeSummary,
+  getRoleOverviews,
   getChecklists,
   getCompanies,
   getResources,

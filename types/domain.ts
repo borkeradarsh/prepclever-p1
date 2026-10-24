@@ -287,6 +287,34 @@ export type NextRecommended =
   | { kind: "item"; blockId: BlockId; itemSlug: string; title: string; href: string; locked: boolean }
   | { kind: "concept"; conceptId: string; title: string; href: string; locked: boolean };
 
+/** The step the user touched last: a block item or a concept. */
+export interface LastStudied extends ItemLink {
+  /** Where it sits, e.g. "Block 1 · Market and role" or the concept's domain. */
+  context: string;
+}
+
+/** The home metrics row (getHomeSummary). */
+export interface HomeSummary {
+  lastStudied: LastStudied | null;
+  next: NextRecommended | null;
+  /** Available block items done, across all six blocks (Block 3 includes its concepts). */
+  roadmap: { done: number; total: number };
+  /** Gap report readiness 0 to 1; null until the user has rated anything. */
+  readiness: number | null;
+}
+
+/** One card in the home roles row (getRoleOverviews). */
+export interface RoleOverview {
+  roleId: RoleId;
+  title: string;
+  shortDescription: string;
+  isTarget: boolean;
+  fit: RoleFit;
+  /** Readiness for this role from the user's one audit; null with no answers. */
+  readiness: number | null;
+  coreCount: number;
+}
+
 // Jobs (docs/jobs-spec.md section 6).
 
 /** Same four values as Track: the spec classifies jobs on the user's ladder. */

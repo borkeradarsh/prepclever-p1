@@ -116,6 +116,10 @@
   --drawer-width: min(280px, 85vw);
   /* One /roadmap block card; the loading skeleton reserves the same height. */
   --roadmap-card-min-height: 11rem;
+  /* Home: metric tiles and block cards share these with their skeletons. */
+  --home-tile-min-height: 11.5rem;
+  --home-block-min-height: 13rem;
+  --role-card-width: 17.5rem;
   /* Job cards and their skeletons share this, so loading never shifts the grid.
      Just above the tallest real card (five wrapped tags at 1024px, 468px),
      plus the 44px match row and its gap. */

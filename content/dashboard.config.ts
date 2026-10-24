@@ -1,5 +1,6 @@
-// Every string the dashboard renders. The widget blocks are filled in now so the
-// next session adds markup, not copy decisions.
+// Every string the home page renders.
+
+import type { RoleFit } from "@/types/domain";
 
 export const dashboardCopy = {
   greeting: {
@@ -14,73 +15,87 @@ export const dashboardCopy = {
     planPro: "Pro",
   },
 
-  /** TODO(session-c): the temporary home until the widgets are rebuilt on the six blocks. */
-  temporary: {
-    title: "Your roadmap is ready",
-    body: "Six blocks, from knowing the market to sitting the interview. Blocks 1 and 2 are free.",
-    cta: "Start your roadmap",
-  },
-
   states: {
     errorMessage: "Couldn't load this. Try again.",
     retryLabel: "Try again",
     loadingLabel: "Loading",
   },
 
-  continueCard: {
-    heading: "Continue",
-    eyebrowFirstRun: "Start here",
-    ctaFirstRun: "Start lesson 1",
-    ctaContinue: "Continue",
-    ctaLocked: "Unlock with Pro",
-    secondaryLocked: "Review free lessons",
-    lockedBody: "Lesson 1 of every course is free. Pro opens the rest.",
-    completeTitle: "You've finished your path",
-    completeBody: "Revisit any course to keep the material fresh.",
-    completeCta: "Browse courses",
-    emptyTitle: "No lessons yet",
-    emptyBody: "Your path has no courses in it yet.",
+  metrics: {
+    label: "Your progress",
+    lastStudied: {
+      label: "Last studied",
+      firstRunTitle: "Nothing yet",
+      firstRunBody: "Your roadmap starts with the GCC market and your target role.",
+      firstRunAction: "Start with Block 1",
+      action: "Pick up where you left off",
+    },
+    next: {
+      label: "Next up",
+      action: "Continue",
+      lockedAction: "Unlock with Pro",
+      lockedNote: "Part of Pro",
+      doneTitle: "You're through the roadmap",
+      doneBody: "Revisit any block to keep it fresh.",
+      doneAction: "See the roadmap",
+    },
+    roadmap: {
+      label: "Roadmap progress",
+      value: (done: number, total: number) => `${done} of ${total}`,
+      body: "steps done across the six blocks",
+      bar: "Roadmap progress",
+      emptyBody: "No steps are set up yet.",
+      action: "See the roadmap",
+    },
+    readiness: {
+      label: "Skill readiness",
+      value: (percent: number) => `${percent}%`,
+      body: "for your role, from your skill audit",
+      bar: "Skill readiness",
+      action: "See your gap report",
+      firstRunTitle: "Not measured yet",
+      firstRunBody: "Rate your skills once to see how ready you are.",
+      firstRunAction: "Take the skill audit",
+      mapAction: "Open the concept map",
+    },
   },
 
-  pathOverview: {
-    heading: "Your path",
-    footerLink: "See full roadmap",
+  blocks: {
+    heading: "Your six blocks",
+    subtext: "Where you are on the roadmap, and where you need help next.",
+    label: (order: number) => `Block ${order}`,
+    progress: (done: number, total: number) => `${done} of ${total} done`,
+    progressLabel: (title: string) => `${title} progress`,
+    current: "You are here",
+    nextHeading: "Next in this block",
     lockedNote: "Included in Pro",
-    stateLabels: {
-      done: "Done",
-      in_progress: "In progress",
-      up_next: "Up next",
-      locked: "Locked",
-    },
-    /** e.g. "2 courses · 9 lessons" — what a free user sees instead of the list. */
-    counts: (courses: number, lessons: number) =>
-      `${courses} ${courses === 1 ? "course" : "courses"} · ${lessons} ${lessons === 1 ? "lesson" : "lessons"}`,
-    emptyTitle: "No stages yet",
+    mapNote: "The concept map in this block is free",
+    open: (title: string) => `Open ${title}`,
+    emptyTitle: "No blocks yet",
     emptyBody: "Your roadmap is being prepared.",
   },
 
-  weeklyGoal: {
-    heading: "This week",
-    prompt: "How many sessions a week?",
-    chips: [2, 3, 5],
-    chipSuffix: "a week",
-    progress: (done: number, goal: number) => `${done} of ${goal} sessions this week`,
-    streak: (days: number) => `${days}-day streak`,
-    metMessage: "Goal met this week. Nice.",
-    saveError: "Couldn't save your goal. Try again.",
-  },
-
-  gccPulse: {
-    heading: "GCC pulse",
-    nextLabel: "Next stat",
-    unverifiedLabel: "Unverified",
-  },
-
-  profileReadiness: {
-    heading: "Profile readiness",
-    count: (done: number, total: number) => `${done} of ${total} done`,
-    seeAll: "See all",
-    seeFewer: "See fewer",
-    action: "Do this",
+  roles: {
+    heading: "Roles you could aim for",
+    subtext: "All seven GCC AI roles, scored against your one skill audit. Yours comes first.",
+    regionLabel: "Roles, scroll sideways",
+    previous: "Previous roles",
+    next: "More roles",
+    yourRole: "Your role",
+    fit: {
+      on_track: "Your experience fits",
+      stretch: "A stretch for now",
+      adjacent_first: "Enter through a related role first",
+    } as Record<RoleFit, string>,
+    readiness: (percent: number) => `${percent}% ready`,
+    readinessLabel: (title: string) => `Readiness for ${title}`,
+    noAudit: "Take the skill audit to see how ready you are",
+    core: (count: number) => `${count} core concepts`,
+    jobs: "See jobs",
+    jobsLabel: (title: string) => `See ${title} jobs`,
+    rolePage: "Your role page",
+    allRoles: "About this role",
+    emptyTitle: "No roles to show",
+    emptyBody: "Role data is being prepared.",
   },
 };

@@ -11,8 +11,7 @@ import {
   isFirstRun,
   itemKey,
   profileReadiness,
-  weeklyGoalState,
-} from "@/lib/progress";
+  weeklyGoalState, roadmapTotals } from "@/lib/progress";
 
 const market = resolveBlocks()[0];
 const positioning = resolveBlocks().find((block) => block.slug === "positioning")!;
@@ -67,5 +66,17 @@ describe("weeklyGoalState", () => {
     expect(weeklyGoalState(emptyProgress()).kind).toBe("first_run");
     expect(weeklyGoalState({ ...emptyProgress(), weeklyGoalSessions: 3, sessionsThisWeek: 1 }).kind).toBe("in_progress");
     expect(weeklyGoalState({ ...emptyProgress(), weeklyGoalSessions: 3, sessionsThisWeek: 3 }).kind).toBe("met");
+  });
+});
+
+describe("roadmapTotals", () => {
+  it("sums done and total across blocks", () => {
+    expect(roadmapTotals([{ done: 2, total: 3 }, { done: 0, total: 2 }, { done: 5, total: 10 }])).toEqual({ done: 7, total: 15 });
+    expect(roadmapTotals([])).toEqual({ done: 0, total: 0 });
+  });
+
+  it("leaves coming-soon items out, because blockProgress does", () => {
+    const positioning = resolveBlocks().find((block) => block.slug === "positioning")!;
+    expect(roadmapTotals([blockProgress(positioning, emptyProgress())]).total).toBe(3);
   });
 });

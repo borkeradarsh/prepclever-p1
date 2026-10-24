@@ -3,6 +3,11 @@
 
 import type { Block, BlockId, BlockProgress, Checklist, ChecklistItem, Progress } from "@/types/domain";
 
+/** The whole roadmap's done over total, summed from per-block progress. */
+export function roadmapTotals(progress: Pick<BlockProgress, "done" | "total">[]): { done: number; total: number } {
+  return progress.reduce((sum, block) => ({ done: sum.done + block.done, total: sum.total + block.total }), { done: 0, total: 0 });
+}
+
 /** The key a block item is stored under in `doneItems` and `lastItem`. */
 export const itemKey = (blockId: BlockId, itemSlug: string) => `${blockId}/${itemSlug}`;
 /** The key a concept is stored under in `doneItems` and `lastItem`. */
