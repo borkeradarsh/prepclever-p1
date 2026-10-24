@@ -1,8 +1,15 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { situations } from "@/components/auth/onboarding/config";
 import { BlockGlyph } from "@/components/graphics/BlockGlyph";
 import { Container } from "@/components/ui/Container";
+import { statusLabels, tierLabels } from "@/content/blocks.config";
 import { blueprint } from "@/content/landing.config";
+import { resolveBlocks } from "@/lib/journey";
+import { IntentOption } from "./IntentOption";
+
+// Title, summary, bullets, tier and status all come from content/blocks.config.ts
+// (tier via the access rules), so the landing page cannot drift from the product.
+const blocks = resolveBlocks();
 
 export function Blueprint() {
   return (
@@ -18,20 +25,28 @@ export function Blueprint() {
         </div>
 
         <ol className="blueprint-grid">
-          {blueprint.blocks.map((block) => (
-            <li className="blueprint-card" key={block.id}>
+          {blocks.map((block) => (
+            <li className="blueprint-card" key={block.slug}>
               <div className="blueprint-card-head">
                 <span className="blueprint-index" aria-hidden="true">
-                  {block.index}
+                  {String(block.order).padStart(2, "0")}
+                </span>
+                <span className="blueprint-chips">
+                  <span className={`blueprint-tier${block.tier === "free" ? " is-free" : ""}`}>
+                    {tierLabels[block.tier]}
+                  </span>
+                  {block.status === "coming_soon" ? (
+                    <span className="blueprint-tier">{statusLabels.coming_soon}</span>
+                  ) : null}
                 </span>
                 <span className="blueprint-glyph">
-                  <BlockGlyph block={block.id} />
+                  <BlockGlyph block={block.slug} />
                 </span>
               </div>
               <h3 className="blueprint-card-title">{block.title}</h3>
               <p className="blueprint-card-summary">{block.summary}</p>
               <dl className="blueprint-points">
-                {block.points.map((point) => (
+                {block.bullets.map((point) => (
                   <div key={point.term}>
                     <dt>{point.term}</dt>
                     <dd>{point.detail}</dd>
@@ -53,13 +68,14 @@ export function Blueprint() {
             </p>
           </div>
           <ul className="blueprint-cta-options">
-            {blueprint.cta.options.map((option) => (
-              <li key={option.label}>
-                <Link href={blueprint.cta.href}>
-                  <span className="blueprint-option-label">{option.label}</span>
-                  <span className="blueprint-option-detail">{option.detail}</span>
-                  <ArrowRight className="blueprint-option-arrow" size={15} strokeWidth={1.8} aria-hidden="true" />
-                </Link>
+            {situations.map((option) => (
+              <li key={option.id}>
+                <IntentOption
+                  situation={option.id}
+                  href={blueprint.cta.href}
+                  label={option.title}
+                  detail={option.description}
+                />
               </li>
             ))}
           </ul>

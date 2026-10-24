@@ -2,6 +2,8 @@
 // which drives the signed-in app shell. One list feeds the desktop bar and the
 // mobile sheet, so they cannot drift apart.
 
+import { roles } from "@/content/roles.config";
+
 export type MarketingNavLink = {
   label: string;
   href: string;
@@ -18,32 +20,13 @@ export const marketingNav: MarketingNavItem[] = [
     kind: "menu",
     label: "Roles",
     id: "roles",
+    // The seven roles, read from content/roles.config.ts so the nav cannot drift.
     items: [
-      {
-        label: "GenAI / LLM Engineer",
-        href: "/roles#genai_llm",
-        description: "RAG, agents and evals on top of language models",
-      },
-      {
-        label: "ML / MLOps Engineer",
-        href: "/roles#ml_mlops",
-        description: "Train, deploy and monitor models in production",
-      },
-      {
-        label: "AI Platform Engineer",
-        href: "/roles#ai_platform",
-        description: "The infrastructure AI teams build on",
-      },
-      {
-        label: "AI Data Engineer",
-        href: "/roles#ai_data",
-        description: "Pipelines, embeddings and data quality for AI",
-      },
-      {
-        label: "Backend → AI",
-        href: "/roles#backend_to_ai",
-        description: "A backend engineer's route into AI work",
-      },
+      ...roles.map((role) => ({
+        label: role.title,
+        href: `/roles#${role.id}`,
+        description: role.cardDescription,
+      })),
       { label: "Compare all roles", href: "/roles" },
     ],
   },

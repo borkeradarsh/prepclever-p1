@@ -119,12 +119,12 @@ function InterviewGlyph() {
 }
 
 const glyphs: Record<string, () => ReactNode> = {
-  "market-intelligence": MarketGlyph,
+  market: MarketGlyph,
   "gap-analysis": GapGlyph,
   upskilling: BuildGlyph,
   positioning: PositioningGlyph,
   referrals: ReferralGlyph,
-  interview: InterviewGlyph,
+  interviews: InterviewGlyph,
 };
 
 export function BlockGlyph({ block }: GlyphProps) {

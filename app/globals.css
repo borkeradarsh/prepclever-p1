@@ -1580,6 +1580,28 @@ body {
   letter-spacing: -0.08em;
 }
 
+.blueprint-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-right: auto;
+}
+
+.blueprint-tier {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 0.125rem 0.5rem;
+  color: var(--text-muted);
+  font-size: var(--font-size-small);
+  line-height: 1.5;
+}
+
+.blueprint-tier.is-free {
+  border-color: transparent;
+  color: var(--text-primary);
+  background: var(--brand-soft);
+}
+
 .blueprint-glyph {
   display: grid;
   width: 3.25rem;

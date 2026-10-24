@@ -9,6 +9,10 @@
 //   - Items marked PLACEHOLDER are stand-ins and must be replaced with real,
 //     consented content before launch.
 
+import { getStat } from "@/content/stats.config";
+
+const payPremium = getStat("pay_premium")!;
+
 export type MetricTicker = {
   value: string;
   label: string;
@@ -47,14 +51,6 @@ export type MapHotspot = {
   share: number;
   /** Year-on-year growth, where the source reports it for that city. */
   growth: string;
-};
-
-export type BlueprintBlock = {
-  id: string;
-  index: string;
-  title: string;
-  summary: string;
-  points: { term: string; detail: string }[];
 };
 
 export type Testimonial = {
@@ -174,9 +170,10 @@ export const pillars: Pillar[] = [
     graphic: "rewards",
     points: [
       {
-        term: "Competitive global-benchmark pay",
-        detail:
-          "Receive top-quartile base salaries that rival top product companies and global tech giants.",
+        // Sourced, replacing an unsourced claim of pay that competes with
+        // product companies. Approximate and attributed to Zyoin until verified.
+        term: "Pay above IT services",
+        detail: `${payPremium.text} ${payPremium.sourceLabel}, not yet verified.`,
       },
       {
         term: "Rewards beyond base",
@@ -245,128 +242,16 @@ export const blueprint = {
   title: "The complete blueprint to fast-track your next role",
   description:
     "Six blocks, in order. Each one has a clear output, so you always know what you are producing — not just what you are studying.",
-  blocks: [
-    {
-      id: "market-intelligence",
-      index: "01",
-      title: "Market intelligence and role alignment",
-      summary: "Know exactly what you are aiming at before you spend a week studying.",
-      points: [
-        {
-          term: "Understand the landscape",
-          detail:
-            "Research specific roles, compensation benchmarks, core technology stacks and domain expectations for your target industry.",
-        },
-        {
-          term: "Target mapping",
-          detail:
-            "Identify target tiers, companies and exact job descriptions, so you know what hiring managers actually prioritise.",
-        },
-      ],
-    },
-    {
-      id: "gap-analysis",
-      index: "02",
-      title: "Gap analysis and baseline assessment",
-      summary: "An honest starting line, measured against real job requirements.",
-      points: [
-        {
-          term: "Skill audit",
-          detail:
-            "Benchmark your current technical skills, project portfolio and domain experience against real job requirements.",
-        },
-        {
-          term: "Identify gaps",
-          detail:
-            "Pinpoint missing competencies across fundamental, intermediate and advanced requirements — system design, MLOps, domain knowledge.",
-        },
-      ],
-    },
-    {
-      id: "upskilling",
-      index: "03",
-      title: "Targeted upskilling and project building",
-      summary: "High-yield study, and proof that you can ship.",
-      points: [
-        {
-          term: "Curated learning",
-          detail:
-            "Study expert-curated resources focused strictly on high-value skills, rather than generic tutorials.",
-        },
-        {
-          term: "Proof-of-work creation",
-          detail:
-            "Build one or two production-grade, end-to-end projects that mirror real enterprise problems.",
-        },
-      ],
-    },
-    {
-      id: "positioning",
-      index: "04",
-      title: "Positioning and personal branding",
-      summary: "Make the work you have done legible in six seconds.",
-      points: [
-        {
-          term: "Resume tailoring",
-          detail:
-            "Optimise your resume with quantified achievements and ATS-friendly keyword alignment.",
-        },
-        {
-          term: "Profile optimisation",
-          detail:
-            "Update LinkedIn, GitHub and your portfolio so they reflect the role you are targeting and the narrative behind it.",
-        },
-      ],
-    },
-    {
-      id: "referrals",
-      index: "05",
-      title: "Tactical referral and application strategy",
-      summary: "Reach a human before the portal reaches a filter.",
-      points: [
-        {
-          term: "Direct outreach",
-          detail:
-            "Target internal recruiters, engineering managers and alumni for warm referrals instead of relying on cold portal applications.",
-        },
-        {
-          term: "Strategic job hunt",
-          detail:
-            "Apply deliberately across premium job boards, executive search firms and company career portals.",
-        },
-      ],
-    },
-    {
-      id: "interview",
-      index: "06",
-      title: "Interview preparation",
-      summary: "Rehearse the rounds you will actually sit.",
-      points: [
-        {
-          term: "Technical mastery",
-          detail:
-            "Work through real interview experiences and questions on data structures, domain coding, system design and architecture.",
-        },
-        {
-          term: "Behavioural and leadership alignment",
-          detail:
-            "Prepare structured STAR stories on leadership, cross-functional collaboration and problem-solving.",
-        },
-      ],
-    },
-  ] satisfies BlueprintBlock[],
+  // The six blocks themselves live in content/blocks.config.ts, the one
+  // definition the product shares; components/sections/Blueprint.tsx reads them.
   cta: {
     eyebrow: "Step 1 of 3",
     title: "It starts with one question",
     description:
       "Tell us where you are today and the six blocks reorder themselves around your gaps. Pick your starting point to create your account.",
-    /** Mirrors the first onboarding question, so the first click is never wasted. */
-    options: [
-      { label: "Student or final year", detail: "In college or about to graduate" },
-      { label: "IT services company", detail: "At a services or consulting firm" },
-      { label: "Product or tech role", detail: "At a product company or another tech job" },
-      { label: "Switching careers", detail: "Coming from a non-technical background" },
-    ],
+    // The four options are onboarding's own situations (components/auth/onboarding/
+    // config.ts). Choosing one records it in the prepclever-intent cookie, so
+    // onboarding opens with it selected and the first click is never wasted.
     href: "/signup",
     footnote: "Already have an account?",
     footnoteAction: { label: "Log in", href: "/login" },
@@ -452,7 +337,7 @@ export const faq: FaqItem[] = [
   {
     question: "Is it free?",
     answer:
-      "Getting started, your roadmap and the first lessons in every stage are free. A paid plan opens every lesson and the full detail inside each stage. Pricing has not been set yet.",
+      "Blocks 1 and 2 of the roadmap are free. Pro unlocks Blocks 3 to 6 and the hands-on features as they launch.",
   },
   {
     question: "Where do your GCC numbers come from?",
