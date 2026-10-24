@@ -1,28 +1,23 @@
 import { describe, expect, it } from "vitest";
-import { getDefaultRole, resolveRole } from "@/components/auth/onboarding/config";
+import { situations, yearsBands } from "@/components/auth/onboarding/config";
+import { SITUATIONS, YEARS_BANDS } from "@/components/auth/onboarding/types";
 
-// Smoke coverage for the onboarding business rules, to prove the test runner
-// and the "@/" alias are wired. The full suite the build spec asks for
-// (every situation mapping, plus the copy-length limits) is still to come.
-describe("getDefaultRole", () => {
-  it("maps a situation to its default role", () => {
-    expect(getDefaultRole("student")).toBe("genai_llm");
-    expect(getDefaultRole("it_services")).toBe("backend_to_ai");
-  });
-});
-
-describe("resolveRole", () => {
-  it("keeps an explicit choice and flags it as not a default", () => {
-    expect(resolveRole("ai_data", "student")).toEqual({
-      roleId: "ai_data",
-      roleIsDefault: false,
-    });
+// The role cards are covered in content/roles.config.test.ts, where they are
+// compared with the role definitions they derive from.
+describe("onboarding config", () => {
+  it("asks about the four situations", () => {
+    expect(situations.map((item) => item.id)).toEqual(SITUATIONS);
   });
 
-  it('resolves "not_sure" to the situation default and flags it', () => {
-    expect(resolveRole("not_sure", "product_tech")).toEqual({
-      roleId: "ml_mlops",
-      roleIsDefault: true,
-    });
+  it("asks for years only for working situations", () => {
+    expect(situations.filter((item) => item.needsYears).map((item) => item.id)).toEqual([
+      "it_services",
+      "product_tech",
+    ]);
+  });
+
+  it("offers the v2 year chips", () => {
+    expect(yearsBands.map((item) => item.id)).toEqual(YEARS_BANDS);
+    expect(yearsBands.map((item) => item.id)).toEqual(["0-1", "2-5", "6-10", "10+"]);
   });
 });

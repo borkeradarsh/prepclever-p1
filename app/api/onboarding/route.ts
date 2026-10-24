@@ -1,16 +1,17 @@
 import { NextResponse } from "next/server";
-import { emptyOnboardingState } from "@/components/auth/onboarding/types";
+import { parseOnboardingCookie } from "@/components/auth/onboarding/migrate";
+import { ONBOARDING_STEPS, ROLE_IDS, SITUATIONS, YEARS_BANDS } from "@/components/auth/onboarding/types";
 import type { OnboardingState } from "@/components/auth/onboarding/types";
 
 const cookieName = "prepclever-onboarding";
-const validSituations = new Set(["student", "it_services", "product_tech", "non_tech"]);
-const validYears = new Set(["0-2", "3-5", "6-10", "10+"]);
-const validRoles = new Set(["genai_llm", "ml_mlops", "ai_platform", "ai_data", "backend_to_ai"]);
-const validSteps = new Set(["situation", "role", "payoff", "done"]);
+const validSituations = new Set<string>(SITUATIONS);
+const validYears = new Set<string>(YEARS_BANDS);
+const validRoles = new Set<string>(ROLE_IDS);
+const validSteps = new Set<string>(ONBOARDING_STEPS);
+// Reading migrates old year bands and role ids; the response then re-saves them.
 function read(request: Request): OnboardingState {
   const value = request.headers.get("cookie")?.match(new RegExp(`${cookieName}=([^;]+)`))?.[1];
-  if (!value) return emptyOnboardingState();
-  try { return JSON.parse(decodeURIComponent(value)) as OnboardingState; } catch { return emptyOnboardingState(); }
+  return parseOnboardingCookie(value);
 }
 function valid(state: OnboardingState) {
   if (state.situation && !validSituations.has(state.situation)) return false;

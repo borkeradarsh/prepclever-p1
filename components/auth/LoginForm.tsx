@@ -5,13 +5,16 @@ import { ArrowRight } from "lucide-react";
 import { GoogleIcon } from "@/components/auth/GoogleIcon";
 import { Button } from "@/components/ui/Button";
 import { signInWithEmail, signInWithGoogle } from "@/lib/auth/actions";
+import { safeReturnTo } from "@/lib/return-to";
+import { routes } from "@/lib/routes";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
-  const finish = () => window.location.assign("/");
+  // Back to where the user was sent from, if that is a safe same-site path; else /start decides.
+  const finish = () => window.location.assign(safeReturnTo(new URLSearchParams(window.location.search).get("returnTo"), routes.start));
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault(); setError(""); setPending(true);

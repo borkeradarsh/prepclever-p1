@@ -6,7 +6,7 @@ import { OnboardingFlow } from "@/components/auth/OnboardingFlow";
 export function AuthDisabledFlow() {
   return (
     <AuthShell showLegal={false} contentClassName="onboarding-auth-content">
-      <OnboardingFlow nameRequired onComplete={() => window.location.assign("/")} />
+      <OnboardingFlow nameRequired onComplete={(destination) => window.location.assign(destination)} />
       <style jsx>{`
         :global(.onboarding-auth-content) {
           width: min(100% - 2rem, 30rem);

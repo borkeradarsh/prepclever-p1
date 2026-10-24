@@ -42,7 +42,7 @@ export function SignupForm() {
     finally { setPending(false); }
   };
 
-  if (view === "onboarding") return <OnboardingFlow nameRequired={nameRequired} onComplete={() => window.location.assign("/")} />;
+  if (view === "onboarding") return <OnboardingFlow nameRequired={nameRequired} onComplete={(destination) => window.location.assign(destination)} />;
 
   return <form className="auth-form-card" onSubmit={submit}>
     <Button type="button" variant="secondary" className="auth-provider-button" onClick={google} disabled={pending}><GoogleIcon /> Continue with Google</Button>

@@ -1,3 +1,4 @@
+import { migrateOnboardingState } from "@/components/auth/onboarding/migrate";
 import type { OnboardingState } from "@/components/auth/onboarding/types";
 
 const storageKey = "prepclever-onboarding";
@@ -8,7 +9,8 @@ export async function loadOnboarding(): Promise<OnboardingState | null> {
   } catch { /* local mock keeps the disabled-auth prototype usable offline */ }
   if (typeof window === "undefined") return null;
   const raw = localStorage.getItem(storageKey);
-  return raw ? JSON.parse(raw) as OnboardingState : null;
+  if (!raw) return null;
+  try { return migrateOnboardingState(JSON.parse(raw)); } catch { return null; }
 }
 
 export async function saveOnboarding(patch: Partial<OnboardingState>) {
