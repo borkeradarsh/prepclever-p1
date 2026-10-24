@@ -17,7 +17,7 @@ export function NavLink({ href, label }: NavLinkProps) {
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className={`relative inline-flex min-h-11 items-center text-[length:var(--font-size-small)] transition-colors duration-200 ease-out ${active ? "text-text-primary" : "text-text-subtle hover:text-text-primary"}`}
+      className={`relative inline-flex min-h-11 items-center whitespace-nowrap text-[length:var(--font-size-small)] transition-colors duration-200 ease-out ${active ? "text-text-primary" : "text-text-subtle hover:text-text-primary"}`}
     >
       {label}
       {active ? (

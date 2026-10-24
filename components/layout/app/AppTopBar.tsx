@@ -26,7 +26,7 @@ export function AppTopBar({ user }: AppTopBarProps) {
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-border-soft bg-surface-card backdrop-blur">
-        <div className="mx-auto flex min-h-[var(--app-nav-height)] w-full max-w-[var(--app-max-width)] items-center gap-[var(--space-lg)] px-4 md:px-8">
+        <div className="mx-auto flex min-h-[var(--app-nav-height)] w-full max-w-[var(--app-max-width)] items-center gap-[var(--space-md)] px-4 md:px-8 lg:gap-[var(--space-lg)]">
           <Link
             href={routes.dashboard}
             aria-label={navCopy.brandAriaLabel}
@@ -37,7 +37,7 @@ export function AppTopBar({ user }: AppTopBarProps) {
 
           <nav
             aria-label={navCopy.primaryNavLabel}
-            className="hidden flex-1 items-center gap-[var(--space-lg)] md:flex"
+            className="hidden flex-1 items-center gap-[var(--space-md)] md:flex lg:gap-[var(--space-lg)]"
           >
             {appNav.map((item) => (
               <NavLink key={item.href} href={item.href} label={item.label} />

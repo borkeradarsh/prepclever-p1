@@ -1,7 +1,7 @@
 // The app shell's navigation. One list drives both the desktop top bar and the
 // mobile bottom tab bar, so they can never drift apart.
 
-import { House, Library, Route, User } from "lucide-react";
+import { BriefcaseBusiness, House, Library, Route, User } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { routes } from "@/lib/routes";
 
@@ -17,6 +17,7 @@ export const appNav: NavItem[] = [
   { href: routes.dashboard, label: "Home", tabLabel: "Home", icon: House },
   { href: routes.path, label: "My path", tabLabel: "Path", icon: Route },
   { href: routes.courses, label: "Courses", tabLabel: "Courses", icon: Library },
+  { href: routes.jobs, label: "Jobs", tabLabel: "Jobs", icon: BriefcaseBusiness },
   { href: routes.profile, label: "Profile", tabLabel: "Profile", icon: User },
 ];
 
