@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { ProgressBar } from "@/components/ui/Progress";
-import { navCopy, sidebarNav } from "@/content/nav.config";
+import { navCopy, roadmapLinks, sidebarNav } from "@/content/nav.config";
 import {
   isActivePath,
   sidebarContext,
@@ -169,6 +169,19 @@ function HomeContext({ data, collapsed, pathname, onNavigate }: SidebarContentPr
                   </li>
                 );
               })}
+              {roadmapLinks.map((link) => (
+                <li key={link.key}>
+                  <NavRow
+                    href={link.href}
+                    label={link.label}
+                    icon={<Icon icon={link.icon} />}
+                    active={isActivePath(pathname, link.href)}
+                    collapsed={collapsed}
+                    indent
+                    onNavigate={onNavigate}
+                  />
+                </li>
+              ))}
             </ul>
           ) : null}
         </li>

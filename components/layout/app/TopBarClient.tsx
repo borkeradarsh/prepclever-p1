@@ -5,12 +5,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRight } from "lucide-react";
-import { navCopy, sectionLabels } from "@/content/nav.config";
+import { navCopy, roadmapPageLabels, sectionLabels } from "@/content/nav.config";
 import { breadcrumbFor, type NavBlock } from "@/lib/nav";
 import { routes } from "@/lib/routes";
 
 export function Breadcrumb({ blocks, className = "" }: { blocks: NavBlock[] | null; className?: string }) {
-  const crumbs = breadcrumbFor(usePathname() ?? "", blocks, sectionLabels);
+  const crumbs = breadcrumbFor(usePathname() ?? "", blocks, sectionLabels, roadmapPageLabels);
 
   return (
     <nav aria-label={navCopy.breadcrumbLabel} className={`min-w-0 ${className}`}>

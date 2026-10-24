@@ -8,7 +8,7 @@ import Link from "next/link";
 import { AppContainer } from "@/components/layout/app/AppContainer";
 import { PageHeader } from "@/components/layout/app/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { primaryLink } from "@/components/ui/link-styles";
+import { primaryLink, secondaryLink } from "@/components/ui/link-styles";
 import { firstItem } from "@/content/blocks.config";
 import { roadmapCopy } from "@/content/roadmap.config";
 import { RoadmapFlow } from "@/features/roadmap/RoadmapFlow";
@@ -37,11 +37,16 @@ export default async function RoadmapPage() {
         title={roadmapCopy.title}
         subtext={roadmapCopy.subtext}
         action={
-          action ? (
-            <Link href={action.href} className={primaryLink}>
-              {action.label}
+          <>
+            <Link href={routes.conceptMap} className={secondaryLink}>
+              {roadmapCopy.openMap}
             </Link>
-          ) : null
+            {action ? (
+              <Link href={action.href} className={primaryLink}>
+                {action.label}
+              </Link>
+            ) : null}
+          </>
         }
       />
       {blocks.length === 0 ? (

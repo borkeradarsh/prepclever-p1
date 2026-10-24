@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { blocks as blockConfigs } from "@/content/blocks.config";
-import { sectionLabels, sidebarNav, tabNav } from "@/content/nav.config";
+import { roadmapLinks, roadmapPageLabels, sectionLabels, sidebarNav, tabNav } from "@/content/nav.config";
 import { buildBlockViews, resolveBlocks } from "@/lib/journey";
 import { breadcrumbFor, buildNavBlocks, isActivePath, sidebarContext } from "@/lib/nav";
 import { conceptKey, emptyProgress, itemKey } from "@/lib/progress";
@@ -156,5 +156,26 @@ describe("Block 3 concept groups", () => {
       label: concept.title,
       href: concept.href,
     });
+  });
+});
+
+describe("concept map access", () => {
+  const nav = navFor("free");
+
+  it("is listed under Roadmap in the sidebar and drawer", () => {
+    expect(roadmapLinks.map((link) => link.href)).toContain("/roadmap/concept-map");
+  });
+
+  it("keeps the home context on the map, where its row is the active one", () => {
+    expect(sidebarContext("/roadmap/concept-map", nav).kind).toBe("home");
+    expect(isActivePath("/roadmap/concept-map", roadmapLinks[0].href)).toBe(true);
+  });
+
+  it("names the map in the breadcrumb", () => {
+    expect(breadcrumbFor("/roadmap/concept-map", nav, sectionLabels, roadmapPageLabels).map((crumb) => crumb.label)).toEqual([
+      "Home",
+      "Roadmap",
+      "Concept map",
+    ]);
   });
 });

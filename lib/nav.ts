@@ -177,13 +177,20 @@ export type SectionLabels = Record<"dashboard" | "roadmap" | "jobs" | "explore" 
  * Home first, then the section, then the block and item when they resolve.
  * The last crumb is the current page.
  */
-export function breadcrumbFor(pathname: string, blocks: NavBlock[] | null, labels: SectionLabels): Crumb[] {
+export function breadcrumbFor(
+  pathname: string,
+  blocks: NavBlock[] | null,
+  labels: SectionLabels,
+  /** Roadmap pages that are not blocks, such as the concept map, by segment. */
+  roadmapPages: Record<string, string> = {},
+): Crumb[] {
   const [root, second, third, fourth] = segments(pathname);
   const home: Crumb = { label: labels.dashboard, href: routes.dashboard };
   if (!root || root === "dashboard" || !(root in labels)) return [home];
 
   const crumbs: Crumb[] = [home, { label: labels[root as keyof SectionLabels], href: `/${root}` }];
   if (root !== "roadmap" || !second) return crumbs;
+  if (roadmapPages[second]) return [...crumbs, { label: roadmapPages[second], href: `/roadmap/${second}` }];
 
   const block = blocks?.find((entry) => entry.slug === second);
   if (!block) return crumbs;

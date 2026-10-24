@@ -30,6 +30,7 @@ export const roadmapCopy = {
   lockedNote: "Included in Pro",
   comingSoon: "Coming soon",
   startFirst: "Start with Block 1",
+  openMap: "Open the concept map",
   continueBlock: (order: number) => `Continue with Block ${order}`,
   allDone: "You've been through every block. Revisit any of them to keep it fresh.",
   emptyTitle: "No blocks yet",
@@ -202,9 +203,14 @@ export const mapCopy = {
   levelFor: (level: string, role: string) => `${level} for ${role}`,
 };
 
-/** Block 3's overview lists the role's concepts by domain. */
-export const syllabusCopy = {
-  heading: "Your concepts",
-  note: "Your role's concepts, grouped by domain and in learning order within each.",
-  count: (count: number) => `${count} ${count === 1 ? "concept" : "concepts"}`,
+/** The role's concepts as one ordered list (Block 3 and beside the concept map). */
+export const pathCopy = {
+  eyebrow: "Learning path",
+  heading: (role: string) => `${role}: concepts in order`,
+  note: "Ordered so prerequisites come first.",
+  count: (shown: number) => `${shown} ${shown === 1 ? "concept" : "concepts"} in order`,
+  coreOnly: "Core only",
+  progress: (done: number, total: number) => `${done} of ${total} core concepts done`,
+  progressLabel: "Core concepts done",
+  notRated: "Not rated",
 };

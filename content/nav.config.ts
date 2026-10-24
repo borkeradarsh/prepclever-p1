@@ -2,13 +2,13 @@
 // and the bottom tab bar, so they can never drift apart. The roadmap's blocks
 // are not listed here: they come from content/blocks.config.ts via lib/nav.ts.
 
-import { BriefcaseBusiness, Compass, House, Route, User } from "lucide-react";
+import { BriefcaseBusiness, Compass, House, Network, Route, User } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { routes } from "@/lib/routes";
 import type { SectionLabels } from "@/lib/nav";
 
 export type NavItem = {
-  key: "home" | "roadmap" | "jobs" | "explore" | "profile";
+  key: "home" | "roadmap" | "jobs" | "explore" | "profile" | "concept-map";
   href: string;
   label: string;
   icon: LucideIcon;
@@ -22,6 +22,14 @@ const profile: NavItem = { key: "profile", href: routes.profile, label: "Profile
 
 /** Sidebar order. The roadmap entry renders the six blocks beneath it. */
 export const sidebarNav: NavItem[] = [home, roadmap, jobs, explore, profile];
+
+/** Listed under Roadmap, after the six blocks: roadmap pages that are not a block. */
+export const roadmapLinks: NavItem[] = [
+  { key: "concept-map", href: routes.conceptMap, label: "Concept map", icon: Network },
+];
+
+/** Breadcrumb labels for those pages, keyed by their /roadmap/<segment>. */
+export const roadmapPageLabels: Record<string, string> = { "concept-map": "Concept map" };
 
 /** Bottom tab bar under 1024px. Profile lives in the user menu there. */
 export const tabNav: NavItem[] = [home, roadmap, jobs, explore];
