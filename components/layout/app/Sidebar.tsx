@@ -45,11 +45,9 @@ export function Sidebar({ data, initialState }: SidebarProps) {
         </Link>
       </div>
 
-      <div id="app-sidebar-content" className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-[var(--space-sm)]">
-        <SidebarContent data={data} collapsed={collapsed} />
-      </div>
-
-      <div className={`shrink-0 border-t border-border-soft p-[var(--space-sm)] ${collapsed ? "grid justify-items-center" : ""}`}>
+      <div
+        className={`shrink-0 border-b border-border-soft p-[var(--space-sm)] ${collapsed ? "grid justify-items-center" : ""}`}
+      >
         <button
           type="button"
           onClick={toggle}
@@ -68,6 +66,10 @@ export function Sidebar({ data, initialState }: SidebarProps) {
             </>
           )}
         </button>
+      </div>
+
+      <div id="app-sidebar-content" className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-[var(--space-sm)]">
+        <SidebarContent data={data} collapsed={collapsed} />
       </div>
     </aside>
   );
