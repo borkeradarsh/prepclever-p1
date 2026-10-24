@@ -110,6 +110,9 @@
   --reading-max-width: 720px;
   --app-nav-height: 4rem;
   --app-tabbar-height: 3.75rem;
+  /* Job cards and their skeletons share this, so loading never shifts the grid.
+     Just above the tallest real card (five wrapped tags at 1024px, 468px). */
+  --job-card-min-height: 29.5rem;
   --font-size-page-title: clamp(1.75rem, 4.5vw, 2.25rem);
   --line-height-page-title: 1.12;
 }

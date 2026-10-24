@@ -15,6 +15,7 @@ export const routes = {
     `/roadmap/upskilling/${seg(domainId)}/${seg(conceptId)}/${seg(lessonSlug)}`,
   explore: "/explore",
   jobs: "/jobs",
+  job: (id: string) => `/jobs/${seg(id)}`,
   // TODO(session-b): /path and /courses redirect to /roadmap and /roadmap/upskilling.
   path: "/path",
   courses: "/courses",
