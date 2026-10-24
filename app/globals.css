@@ -188,7 +188,7 @@ body {
 .navbar-shell {
   position: absolute;
   z-index: 30;
-  top: 2rem;
+  top: 2.5rem;
   left: 0;
   width: calc(100% - 2.5rem);
   max-width: 1400px;
@@ -885,7 +885,7 @@ body {
   position: relative;
   display: flex;
   width: 100%;
-  min-height: 3.5rem;
+  min-height: 4rem;
   max-width: 76rem;
   align-items: center;
   gap: var(--space-md);
@@ -1032,8 +1032,8 @@ body {
 
 .marketing-nav-toggle {
   display: inline-flex;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 2rem;
+  height: 2rem;
   align-items: center;
   justify-content: center;
   margin-left: auto;
