@@ -16,18 +16,12 @@ export const routes = {
   explore: "/explore",
   jobs: "/jobs",
   job: (id: string) => `/jobs/${seg(id)}`,
-  // TODO(session-b): /path and /courses redirect to /roadmap and /roadmap/upskilling.
-  path: "/path",
-  courses: "/courses",
   profile: "/profile",
   upgrade: "/upgrade",
   /** Every upgrade entry point says where it came from and where to return. */
   upgradeFrom: (from: string, returnTo: string) =>
     `/upgrade?from=${seg(from)}&returnTo=${seg(returnTo)}`,
   onboarding: "/onboarding/situation",
-  /** Legacy lesson URL, now keyed by concept id. TODO(session-b): replaced by conceptLesson. */
-  lesson: (conceptId: string, lessonSlug: string) =>
-    `/courses/${seg(conceptId)}/lessons/${seg(lessonSlug)}`,
 } as const;
 
 /** Prefixes that live behind the app shell, for a future route guard. */
@@ -36,8 +30,6 @@ export const APP_ROUTE_PREFIXES = [
   routes.roadmap,
   routes.explore,
   routes.jobs,
-  routes.path,
-  routes.courses,
   routes.profile,
   routes.upgrade,
 ] as const;

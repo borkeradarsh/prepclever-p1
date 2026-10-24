@@ -76,6 +76,60 @@ describe("itemNeighbours", () => {
     expect(itemNeighbours(blocks, "positioning", "github").next.href).toBe("/roadmap/referrals");
     expect(itemNeighbours(blocks, "referrals", "where-to-apply").next.href).toBe("/roadmap/interviews");
   });
+
+  it("has no Previous on a block's first item", () => {
+    expect(itemNeighbours(blocks, "market", "landscape").previous).toBeNull();
+    expect(itemNeighbours(blocks, "gap-analysis", "skill-audit").previous).toBeNull();
+  });
+
+  it("still gives a coming-soon item its neighbours", () => {
+    const { previous, next } = itemNeighbours(blocks, "positioning", "resume-evaluate");
+    expect(previous?.href).toBe("/roadmap/positioning/github");
+    expect(next.href).toBe("/roadmap/referrals");
+    // ...but never sends Previous back onto another coming-soon item.
+    expect(itemNeighbours(blocks, "referrals", "application-tracker").previous?.href).toBe(
+      "/roadmap/referrals/where-to-apply",
+    );
+  });
+
+  it("titles Next after what it opens", () => {
+    expect(itemNeighbours(blocks, "market", "landscape").next.title).toBe("Your target role");
+    expect(itemNeighbours(blocks, "market", "target-companies").next.title).toBe(blocks[1].title);
+    expect(itemNeighbours(blocks, "interviews", "interview-pillars").next.title).toBe("Home");
+  });
+
+  it("walks every available item in order, then the next block, ending at the dashboard", () => {
+    const steps = blocks.flatMap((block) =>
+      block.items.filter((item) => item.status === "available").map((item) => ({ block: block.slug, item: item.slug })),
+    );
+    steps.forEach((step, index) => {
+      const next = itemNeighbours(blocks, step.block, step.item).next.href;
+      const following = steps[index + 1];
+      if (!following) expect(next).toBe("/dashboard");
+      else if (following.block === step.block) expect(next).toBe(`/roadmap/${following.block}/${following.item}`);
+      else expect(next).toBe(`/roadmap/${following.block}`);
+    });
+  });
+});
+
+describe("lock behaviour per block", () => {
+  const expected = { market: false, "gap-analysis": false, upskilling: true, positioning: true, referrals: true, interviews: true };
+
+  for (const plan of ["free", "pro"] as const) {
+    it(`locks the right items for a ${plan} user`, () => {
+      const views = buildBlockViews(blocks, plan, emptyProgress(), order);
+      for (const block of views) {
+        const paidBlock = expected[block.slug];
+        expect(block.locked).toBe(plan === "free" && paidBlock);
+        for (const item of block.items) {
+          const view = buildBlockItemView(views, block.slug, item.slug, plan, emptyProgress());
+          // The concept map is the one free item inside a Pro block.
+          const freeOverride = block.slug === "upskilling" && item.slug === "concept-map";
+          expect(view?.locked, `${block.slug}/${item.slug}`).toBe(plan === "free" && paidBlock && !freeOverride);
+        }
+      }
+    });
+  }
 });
 
 describe("block views", () => {
