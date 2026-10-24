@@ -17,8 +17,13 @@ const BASE_URL = process.env.BASE_URL ?? "http://localhost:3000";
 const OUT_DIR = path.resolve("screenshots");
 const WIDTHS = [375, 768, 1280];
 
-// A concept lesson on the legacy URL (lessons are Pro, so free sees the lock).
-const LESSON = "/courses/linalg/lessons/vectors-dot-products-and-norms";
+const PRO = { "prepclever-dev": "plan:pro" };
+const COLLAPSED = { "prepclever-sidebar": "collapsed" };
+// The sidebar only exists from 1024px, so its collapsed state is only worth a desktop capture.
+const DESKTOP = [1280];
+// The drawer replaces the sidebar below 1024px.
+const MOBILE = [375, 768];
+const DRAWER_BUTTON = "header button[aria-haspopup=dialog]";
 
 /** An onboarding cookie at a given step, as the route handlers write it. */
 const onboarding = (patch) =>
@@ -50,12 +55,43 @@ const PAGES = [
     cookies: { "prepclever-onboarding": onboarding({ currentStep: "payoff", roleId: "ai_backend" }) },
   },
   { name: "dashboard", url: "/dashboard" },
-  { name: "path", url: "/path" },
-  { name: "courses", url: "/courses" },
+  { name: "dashboard-pro", url: "/dashboard", cookies: PRO },
   { name: "profile", url: "/profile" },
-  { name: "upgrade", url: "/upgrade" },
-  { name: "lesson-locked", url: LESSON },
-  { name: "lesson-pro", url: LESSON, cookies: { "prepclever-dev": "plan:pro" } },
+  // The roadmap: free and Pro, first run, and mid-load.
+  { name: "roadmap", url: "/roadmap" },
+  { name: "roadmap-pro", url: "/roadmap", cookies: PRO },
+  { name: "roadmap-first-run", url: "/roadmap", cookies: { "prepclever-dev": "scenario:first-run" } },
+  // Reached by a client navigation, as a user would: the shell stays and only the page loads.
+  {
+    name: "roadmap-loading",
+    url: "/dashboard",
+    cookies: { "prepclever-dev": "slow:1" },
+    loading: true,
+    navigateBy: 'a[href="/roadmap"]:visible',
+  },
+  // Block overviews: open, locked for free, open for Pro.
+  { name: "block-market", url: "/roadmap/market" },
+  { name: "block-upskilling-locked", url: "/roadmap/upskilling" },
+  { name: "block-upskilling-pro", url: "/roadmap/upskilling", cookies: PRO },
+  // Item pages: open, locked, Pro, coming soon, and the very last item.
+  { name: "item-your-role", url: "/roadmap/market/your-role" },
+  { name: "item-track-plan-locked", url: "/roadmap/upskilling/track-plan" },
+  { name: "item-track-plan-pro", url: "/roadmap/upskilling/track-plan", cookies: PRO },
+  { name: "item-star-stories-pro", url: "/roadmap/interviews/star-stories", cookies: PRO },
+  { name: "item-coming-soon-pro", url: "/roadmap/positioning/resume-evaluate", cookies: PRO },
+  { name: "item-last-pro", url: "/roadmap/interviews/interview-pillars", cookies: PRO },
+  { name: "upgrade", url: "/upgrade?from=locked-page&returnTo=%2Froadmap%2Fupskilling%2Ftrack-plan" },
+  { name: "upgrade-pro", url: "/upgrade", cookies: PRO },
+  { name: "explore", url: "/explore" },
+  // The sidebar collapsed, in both contexts and both plans.
+  { name: "roadmap-collapsed", url: "/roadmap", cookies: COLLAPSED, widths: DESKTOP },
+  { name: "roadmap-pro-collapsed", url: "/roadmap", cookies: { ...PRO, ...COLLAPSED }, widths: DESKTOP },
+  { name: "item-locked-collapsed", url: "/roadmap/upskilling/track-plan", cookies: COLLAPSED, widths: DESKTOP },
+  { name: "item-pro-collapsed", url: "/roadmap/market/your-role", cookies: { ...PRO, ...COLLAPSED }, widths: DESKTOP },
+  // The mobile drawer, open, in the home and block contexts.
+  { name: "drawer-home", url: "/dashboard", click: DRAWER_BUTTON, widths: MOBILE },
+  { name: "drawer-block", url: "/roadmap/market/your-role", click: DRAWER_BUTTON, widths: MOBILE },
+  { name: "drawer-block-pro", url: "/roadmap/upskilling/track-plan", cookies: PRO, click: DRAWER_BUTTON, widths: MOBILE },
   // Jobs, in each of the list's five states. Example ids hash the posting URL.
   { name: "jobs", url: "/jobs?role=all" },
   { name: "jobs-own-role", url: "/jobs", cookies: { "prepclever-onboarding": onboarding({ currentStep: "done", roleId: "genai_llm" }) } },
@@ -126,6 +162,7 @@ for (const width of WIDTHS) {
   });
 
   for (const page of PAGES) {
+    if (page.widths && !page.widths.includes(width)) continue;
     await context.clearCookies();
     if (page.cookies) {
       await context.addCookies(
@@ -133,21 +170,38 @@ for (const width of WIDTHS) {
       );
     }
     const tab = await context.newPage();
-    const response = await tab.goto(`${BASE_URL}${page.url}`, { waitUntil: page.loading ? "commit" : "networkidle" });
+    const response = await tab.goto(`${BASE_URL}${page.url}`, {
+      waitUntil: page.loading && !page.navigateBy ? "commit" : "networkidle",
+    });
     const status = response?.status() ?? 0;
+    if (page.navigateBy) await tab.locator(page.navigateBy).first().click();
     // Loading captures: give the shell and the skeleton a moment to paint, no more.
     if (page.loading) await tab.waitForSelector("main [role=status]", { timeout: 5000 });
 
-    // Scroll to the bottom first: that is where a fixed tab bar overlaps.
-    await tab.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await tab.waitForTimeout(150);
+    let problems;
+    if (page.click) {
+      // An overlay (the drawer): open it, check it took focus, capture the viewport.
+      await tab.click(page.click);
+      await tab.waitForSelector("dialog[open]", { timeout: 5000 });
+      problems = status === 200 ? await tab.evaluate(auditPage) : [`HTTP ${status}`];
+      const focusInside = await tab.evaluate(() => Boolean(document.activeElement?.closest("dialog[open]")));
+      if (!focusInside) problems.push("drawer opened without moving focus into it");
+      await tab.screenshot({ path: path.join(OUT_DIR, `${page.name}-${width}.png`) });
+      await tab.keyboard.press("Escape");
+      const closed = await tab.waitForSelector("dialog[open]", { state: "detached", timeout: 2000 }).then(() => true, () => false);
+      if (!closed) problems.push("Escape did not close the drawer");
+    } else {
+      // Scroll to the bottom first: that is where a fixed tab bar overlaps.
+      await tab.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      await tab.waitForTimeout(150);
 
-    const problems = status === 200 ? await tab.evaluate(auditPage) : [`HTTP ${status}`];
-    await tab.evaluate(() => window.scrollTo(0, 0));
-    await tab.screenshot({
-      path: path.join(OUT_DIR, `${page.name}-${width}.png`),
-      fullPage: true,
-    });
+      problems = status === 200 ? await tab.evaluate(auditPage) : [`HTTP ${status}`];
+      await tab.evaluate(() => window.scrollTo(0, 0));
+      await tab.screenshot({
+        path: path.join(OUT_DIR, `${page.name}-${width}.png`),
+        fullPage: true,
+      });
+    }
 
     if (problems.length > 0) {
       failures += problems.length;
