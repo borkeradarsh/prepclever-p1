@@ -1,6 +1,7 @@
-// /roadmap/[block]/[item]: the generic item page. Guide content is written in a
-// later session, so an open item shows a "Content is being added" state, never
-// invented text.
+// /roadmap/[block]/[item]: the generic item page. Items with a real body (the
+// skill audit, the gap report, the concept map) render it from item-bodies;
+// guide content is written in a later session, so any other open item shows a
+// "Content is being added" state, never invented text.
 //
 // Locked: the page returns before anything could touch an item body, so a
 // locked body is never rendered and never requested. TODO(session-c): when item
@@ -15,6 +16,7 @@ import { Chip } from "@/components/ui/Chip";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getBlockConfig, statusLabels } from "@/content/blocks.config";
 import { itemCopy, kindLabels, roadmapCopy } from "@/content/roadmap.config";
+import { itemBody } from "@/features/roadmap/item-bodies";
 import { ItemPager } from "@/features/roadmap/ItemPager";
 import { LockedItem } from "@/features/roadmap/LockedItem";
 import { MarkDoneButton } from "@/features/roadmap/MarkDoneButton";
@@ -35,6 +37,8 @@ export default async function ItemPage({ params }: ItemParams) {
 
   const { block, item, locked, done, previous, next } = view;
   const comingSoon = item.status === "coming_soon";
+  const body = itemBody(block.slug, item.slug);
+  const width = body?.width ?? "reading";
 
   const header = (
     <>
@@ -59,13 +63,17 @@ export default async function ItemPage({ params }: ItemParams) {
   }
 
   return (
-    <AppContainer width="reading">
+    <AppContainer width={width}>
       {header}
       <div className="grid gap-[var(--space-lg)]">
-        <EmptyState
-          title={comingSoon ? itemCopy.comingSoon.title : itemCopy.pending.title}
-          body={comingSoon ? itemCopy.comingSoon.body : itemCopy.pending.body}
-        />
+        {body && !comingSoon ? (
+          <body.Body />
+        ) : (
+          <EmptyState
+            title={comingSoon ? itemCopy.comingSoon.title : itemCopy.pending.title}
+            body={comingSoon ? itemCopy.comingSoon.body : itemCopy.pending.body}
+          />
+        )}
 
         {item.extras?.length ? (
           <section aria-labelledby="item-extras" className="grid gap-[var(--space-sm)]">
