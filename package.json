@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "screenshots": "node scripts/screenshots.mjs",
-    "build:map": "node --experimental-strip-types scripts/build-india-map.ts"
+    "build:map": "node --experimental-strip-types scripts/build-india-map.ts",
+    "build:research-data": "node scripts/build-research-data.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
