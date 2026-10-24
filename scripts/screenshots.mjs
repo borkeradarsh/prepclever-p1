@@ -57,8 +57,19 @@ const PAGES = [
     url: "/onboarding/payoff",
     cookies: { "prepclever-onboarding": onboarding({ currentStep: "payoff", roleId: "ai_backend" }) },
   },
+  // Home: each scenario, both plans, each widget's error state, and mid-load.
   { name: "dashboard", url: "/dashboard" },
   { name: "dashboard-pro", url: "/dashboard", cookies: PRO },
+  { name: "dashboard-first-run", url: "/dashboard", cookies: { "prepclever-dev": "scenario:first-run" } },
+  { name: "dashboard-complete", url: "/dashboard", cookies: { "prepclever-dev": "scenario:complete|plan:pro" } },
+  { name: "dashboard-errors", url: "/dashboard", cookies: { "prepclever-dev": "fail:home,roles" } },
+  {
+    name: "dashboard-loading",
+    url: "/roadmap",
+    cookies: { "prepclever-dev": "slow:1" },
+    loading: true,
+    navigateBy: 'a[href="/dashboard"]:visible',
+  },
   { name: "profile", url: "/profile" },
   // The roadmap: free and Pro, first run, and mid-load.
   { name: "roadmap", url: "/roadmap" },
@@ -80,9 +91,12 @@ const PAGES = [
   { name: "item-your-role", url: "/roadmap/market/your-role" },
   { name: "item-track-plan-locked", url: "/roadmap/upskilling/track-plan" },
   { name: "item-track-plan-pro", url: "/roadmap/upskilling/track-plan", cookies: PRO },
-  { name: "item-star-stories-pro", url: "/roadmap/interviews/star-stories", cookies: PRO },
   { name: "item-coming-soon-pro", url: "/roadmap/positioning/resume-evaluate", cookies: PRO },
-  { name: "item-last-pro", url: "/roadmap/interviews/interview-pillars", cookies: PRO },
+  // Block 6: the owner's three interview pages, and one as free users see it.
+  { name: "interview-process-pro", url: "/roadmap/interviews/interview-process", cookies: PRO },
+  { name: "interview-companies-pro", url: "/roadmap/interviews/interview-companies", cookies: PRO },
+  { name: "dos-and-donts-pro", url: "/roadmap/interviews/dos-and-donts", cookies: PRO },
+  { name: "interview-process-locked", url: "/roadmap/interviews/interview-process" },
   // Block 3 concepts and lessons: the free preview with locked lessons, and Pro.
   { name: "concept-free", url: CONCEPT },
   { name: "concept-pro", url: CONCEPT, cookies: PRO },
