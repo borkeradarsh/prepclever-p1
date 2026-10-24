@@ -70,9 +70,7 @@ export type FaqItem = {
 };
 
 export const hero = {
-  titleLead: "The end-to-end AI engineering",
-  titleAccent: "career roadmap",
-  titleTail: "for GCCs",
+  title: "The complete career roadmap for AI engineering at GCCs",
   description:
     "PrepClever turns the scattered advice about Global Capability Centres into one sequenced plan: what the roles actually need, where you stand against them, and the exact next step.",
   primaryAction: { label: "Get started free", href: "/signup" },

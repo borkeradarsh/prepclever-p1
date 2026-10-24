@@ -90,7 +90,6 @@
   --radius-card: 0.25rem;
   --radius-button: 0.125rem;
   --radius-pill: 999px;
-  --announcement-offset: 1.75rem;
 
   /* App shell and dashboard: the "soft" scale, continuing the onboarding card
      language. The marketing pages keep the sharp --radius-card above. */
@@ -189,7 +188,7 @@ body {
 .navbar-shell {
   position: absolute;
   z-index: 30;
-  top: calc(2rem + var(--announcement-offset));
+  top: 2rem;
   left: 0;
   width: calc(100% - 2.5rem);
   max-width: 1400px;
@@ -224,13 +223,9 @@ body {
   animation-play-state: paused;
 }
 
-.announcement-bar {
-  margin-top: var(--announcement-offset);
-}
-
 @media (max-width: 640px) {
   .navbar-shell {
-    top: calc(2rem + var(--announcement-offset));
+    top: 2rem;
     width: calc(100% - 1.5rem);
     transform: translateX(0.75rem);
   }
@@ -890,7 +885,7 @@ body {
   position: relative;
   display: flex;
   width: 100%;
-  min-height: 4.5rem;
+  min-height: 3.5rem;
   max-width: 76rem;
   align-items: center;
   gap: var(--space-md);
@@ -1163,22 +1158,30 @@ body {
 
 .logo-chip {
   display: inline-flex;
-  min-width: 10rem;
-  min-height: 9.5rem;
+  min-height: 6rem;
   flex-shrink: 0;
   align-items: center;
-  justify-content: center;
-  margin-right: var(--space-xs);
+  gap: var(--space-sm);
+  margin-right: var(--space-lg);
   padding: 0 var(--space-xs);
 }
 
 .logo-mark {
   display: block;
-  width: 7.5rem;
+  width: 2.5rem;
   height: 2.5rem;
+  flex-shrink: 0;
   background-position: center;
   background-repeat: no-repeat;
-  background-size: 2.25rem;
+  background-size: contain;
+}
+
+.logo-name {
+  color: var(--text-primary);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
 }
 
 @keyframes logo-scroll {

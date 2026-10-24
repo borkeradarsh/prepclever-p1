@@ -33,13 +33,12 @@ function Row({ companies, reverse }: { companies: string[]; reverse?: boolean })
         <span className="logo-chip" key={`${group}-${company}`}>
           <span
             className="logo-mark"
-            role="img"
-            aria-label={company}
+            aria-hidden="true"
             style={{
               backgroundImage: `url(https://www.google.com/s2/favicons?domain=${logoDomains[company]}&sz=128)`,
             }}
           />
-          <span className="sr-only">{company}</span>
+          <span className="logo-name">{company}</span>
         </span>
       ))}
     </div>

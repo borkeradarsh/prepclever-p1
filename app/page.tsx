@@ -24,8 +24,8 @@ export default function Home() {
       <Navbar />
       <Hero />
       <LogoMarquee />
-      <WhyGcc />
       <GrowthStory />
+      <WhyGcc />
       <Blueprint />
       <Testimonials />
       <Faq />
