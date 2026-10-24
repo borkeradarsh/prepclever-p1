@@ -24,6 +24,9 @@ const DESKTOP = [1280];
 // The drawer replaces the sidebar below 1024px.
 const MOBILE = [375, 768];
 const DRAWER_BUTTON = "header button[aria-haspopup=dialog]";
+// A Block 3 concept and one of its lessons (lessons are Pro, so free sees the lock).
+const CONCEPT = "/roadmap/upskilling/math/linalg";
+const LESSON = `${CONCEPT}/vectors-dot-products-and-norms`;
 
 /** An onboarding cookie at a given step, as the route handlers write it. */
 const onboarding = (patch) =>
@@ -80,6 +83,22 @@ const PAGES = [
   { name: "item-star-stories-pro", url: "/roadmap/interviews/star-stories", cookies: PRO },
   { name: "item-coming-soon-pro", url: "/roadmap/positioning/resume-evaluate", cookies: PRO },
   { name: "item-last-pro", url: "/roadmap/interviews/interview-pillars", cookies: PRO },
+  // Block 3 concepts and lessons: the free preview with locked lessons, and Pro.
+  { name: "concept-free", url: CONCEPT },
+  { name: "concept-pro", url: CONCEPT, cookies: PRO },
+  { name: "lesson-locked", url: LESSON },
+  { name: "lesson-pro", url: LESSON, cookies: PRO },
+  // The concept map: standalone, as Block 3's first item, and as the matrix.
+  { name: "concept-map", url: "/roadmap/concept-map" },
+  { name: "concept-map-matrix", url: "/roadmap/concept-map", press: 'button[aria-pressed]:has-text("Role matrix")' },
+  { name: "concept-map-item-pro", url: "/roadmap/upskilling/concept-map", cookies: PRO },
+  // Block 2: the audit and the gap report, before and after any answers.
+  { name: "skill-audit", url: "/roadmap/gap-analysis/skill-audit" },
+  { name: "skill-audit-first-run", url: "/roadmap/gap-analysis/skill-audit", cookies: { "prepclever-dev": "scenario:first-run" } },
+  { name: "gap-report", url: "/roadmap/gap-analysis/gap-report" },
+  { name: "gap-report-pro", url: "/roadmap/gap-analysis/gap-report", cookies: PRO },
+  { name: "gap-report-first-run", url: "/roadmap/gap-analysis/gap-report", cookies: { "prepclever-dev": "scenario:first-run" } },
+  { name: "jobs-best-match", url: "/jobs?role=all&sort=best_match" },
   { name: "upgrade", url: "/upgrade?from=locked-page&returnTo=%2Froadmap%2Fupskilling%2Ftrack-plan" },
   { name: "upgrade-pro", url: "/upgrade", cookies: PRO },
   { name: "explore", url: "/explore" },
@@ -88,10 +107,12 @@ const PAGES = [
   { name: "roadmap-pro-collapsed", url: "/roadmap", cookies: { ...PRO, ...COLLAPSED }, widths: DESKTOP },
   { name: "item-locked-collapsed", url: "/roadmap/upskilling/track-plan", cookies: COLLAPSED, widths: DESKTOP },
   { name: "item-pro-collapsed", url: "/roadmap/market/your-role", cookies: { ...PRO, ...COLLAPSED }, widths: DESKTOP },
+  { name: "concept-collapsed", url: CONCEPT, cookies: COLLAPSED, widths: DESKTOP },
   // The mobile drawer, open, in the home and block contexts.
   { name: "drawer-home", url: "/dashboard", click: DRAWER_BUTTON, widths: MOBILE },
   { name: "drawer-block", url: "/roadmap/market/your-role", click: DRAWER_BUTTON, widths: MOBILE },
   { name: "drawer-block-pro", url: "/roadmap/upskilling/track-plan", cookies: PRO, click: DRAWER_BUTTON, widths: MOBILE },
+  { name: "drawer-concept", url: CONCEPT, click: DRAWER_BUTTON, widths: MOBILE },
   // Jobs, in each of the list's five states. Example ids hash the posting URL.
   { name: "jobs", url: "/jobs?role=all" },
   { name: "jobs-own-role", url: "/jobs", cookies: { "prepclever-onboarding": onboarding({ currentStep: "done", roleId: "genai_llm" }) } },
@@ -180,10 +201,14 @@ for (const width of WIDTHS) {
 
     let problems;
     if (page.click) {
-      // An overlay (the drawer): open it, check it took focus, capture the viewport.
+      // An overlay (the drawer): audit the page underneath as usual, scrolled to
+      // the bottom, then open it, check it took focus, and capture the viewport.
+      await tab.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      await tab.waitForTimeout(150);
+      problems = status === 200 ? await tab.evaluate(auditPage) : [`HTTP ${status}`];
+      await tab.evaluate(() => window.scrollTo(0, 0));
       await tab.click(page.click);
       await tab.waitForSelector("dialog[open]", { timeout: 5000 });
-      problems = status === 200 ? await tab.evaluate(auditPage) : [`HTTP ${status}`];
       const focusInside = await tab.evaluate(() => Boolean(document.activeElement?.closest("dialog[open]")));
       if (!focusInside) problems.push("drawer opened without moving focus into it");
       await tab.screenshot({ path: path.join(OUT_DIR, `${page.name}-${width}.png`) });
@@ -191,6 +216,11 @@ for (const width of WIDTHS) {
       const closed = await tab.waitForSelector("dialog[open]", { state: "detached", timeout: 2000 }).then(() => true, () => false);
       if (!closed) problems.push("Escape did not close the drawer");
     } else {
+      // A control to press before capturing, such as a view toggle.
+      if (page.press) {
+        await tab.click(page.press);
+        await tab.waitForTimeout(150);
+      }
       // Scroll to the bottom first: that is where a fixed tab bar overlaps.
       await tab.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
       await tab.waitForTimeout(150);
