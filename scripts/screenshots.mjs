@@ -18,6 +18,17 @@ const OUT_DIR = path.resolve("screenshots");
 const WIDTHS = [375, 768, 1280];
 
 const PRO = { "prepclever-dev": "plan:pro" };
+
+/**
+ * Real users start from empty progress (the `live` scenario). Most captures
+ * need something to show, so they use the in-progress demo seed unless they
+ * name a scenario themselves; `scenario:live` captures what a new user sees.
+ */
+function withDemoScenario(cookies = {}) {
+  const dev = cookies["prepclever-dev"] ?? "";
+  if (/(^|\|)scenario:/.test(dev)) return cookies;
+  return { ...cookies, "prepclever-dev": dev ? `scenario:in-progress|${dev}` : "scenario:in-progress" };
+}
 const COLLAPSED = { "prepclever-sidebar": "collapsed" };
 // The sidebar only exists from 1024px, so its collapsed state is only worth a desktop capture.
 const DESKTOP = [1280];
@@ -61,6 +72,9 @@ const PAGES = [
   { name: "dashboard", url: "/dashboard" },
   { name: "dashboard-pro", url: "/dashboard", cookies: PRO },
   { name: "dashboard-first-run", url: "/dashboard", cookies: { "prepclever-dev": "scenario:first-run" } },
+  // What a real new user sees: no seed, every bar at zero.
+  { name: "dashboard-live", url: "/dashboard", cookies: { "prepclever-dev": "scenario:live" } },
+  { name: "roadmap-live", url: "/roadmap", cookies: { "prepclever-dev": "scenario:live" } },
   { name: "dashboard-complete", url: "/dashboard", cookies: { "prepclever-dev": "scenario:complete|plan:pro" } },
   { name: "dashboard-errors", url: "/dashboard", cookies: { "prepclever-dev": "fail:home,roles" } },
   {
@@ -199,11 +213,9 @@ for (const width of WIDTHS) {
   for (const page of PAGES) {
     if (page.widths && !page.widths.includes(width)) continue;
     await context.clearCookies();
-    if (page.cookies) {
-      await context.addCookies(
-        Object.entries(page.cookies).map(([name, value]) => ({ name, value, url: BASE_URL })),
-      );
-    }
+    await context.addCookies(
+      Object.entries(withDemoScenario(page.cookies)).map(([name, value]) => ({ name, value, url: BASE_URL })),
+    );
     const tab = await context.newPage();
     const response = await tab.goto(`${BASE_URL}${page.url}`, {
       waitUntil: page.loading && !page.navigateBy ? "commit" : "networkidle",

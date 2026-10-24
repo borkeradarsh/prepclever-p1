@@ -1,5 +1,10 @@
-// Dev-only switches that let the four acceptance scenarios and the widget
+// Dev-only switches that let the acceptance scenarios and the widget
 // loading/error states be seen without a database.
+//
+// The default scenario is `live`: progress starts empty and only what the user
+// actually does is shown. The other scenarios seed made-up progress for
+// screenshots and reviews, and only apply when asked for by name, never in
+// production.
 //
 // Session 1 has no writer for this cookie (the middleware that would capture
 // ?scenario=&plan=&fail=&slow= is deferred), so set `prepclever-dev` by hand in
@@ -10,7 +15,7 @@ import type { Plan } from "@/types/domain";
 
 export const DEV_COOKIE = "prepclever-dev";
 
-export type Scenario = "first-run" | "in-progress" | "complete";
+export type Scenario = "live" | "first-run" | "in-progress" | "complete";
 export type WidgetKey =
   | "continue"
   | "journey"
@@ -32,7 +37,7 @@ export interface DevFlags {
   slow: boolean;
 }
 
-const SCENARIOS: Scenario[] = ["first-run", "in-progress", "complete"];
+const SCENARIOS: Scenario[] = ["live", "first-run", "in-progress", "complete"];
 const PLANS: Plan[] = ["free", "pro"];
 const WIDGETS: WidgetKey[] = [
   "continue",
@@ -52,7 +57,7 @@ const WIDGETS: WidgetKey[] = [
 export const devToolsEnabled = process.env.NODE_ENV !== "production";
 
 export function defaultDevFlags(): DevFlags {
-  return { scenario: "in-progress", plan: "free", fail: [], slow: false };
+  return { scenario: "live", plan: "free", fail: [], slow: false };
 }
 
 /**

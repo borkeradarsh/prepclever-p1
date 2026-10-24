@@ -86,9 +86,11 @@ export async function readProfile(): Promise<UserProfile> {
 }
 
 /**
- * The scenario seed until the user changes something; after that, the cookie.
- * Progress saved under a different dev scenario is ignored, so switching
- * scenarios in development always shows that scenario.
+ * The cookie, or the scenario seed when there is none. In the default `live`
+ * scenario the seed is empty, so every number on screen is the user's own.
+ * Progress saved under a different scenario is ignored: switching scenarios
+ * in development always shows that scenario, and progress recorded while a
+ * demo seed was active never leaks into live.
  */
 export async function readProgress(flags: DevFlags): Promise<Progress> {
   const [{ roleId }, store] = await Promise.all([readProfile(), cookies()]);

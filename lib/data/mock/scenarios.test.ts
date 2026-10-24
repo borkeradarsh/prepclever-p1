@@ -18,7 +18,7 @@ describe.each(ROLE_IDS)("scenario seeds for %s", (roleId) => {
   };
 
   it("only references ids the progress cookie can store", () => {
-    for (const scenario of ["first-run", "in-progress", "complete"] as const) {
+    for (const scenario of ["live", "first-run", "in-progress", "complete"] as const) {
       const progress = seedProgress(scenario, roleId);
       for (const id of progress.completedLessonIds) expect(codecSpace.lessonIds).toContain(id);
       for (const id of progress.checklistDone) expect(codecSpace.checklistIds).toContain(id);

@@ -11,6 +11,9 @@ import type { Scenario } from "@/lib/dev-flags";
 import { buildLessons } from "./lessons.mock";
 
 export const scenarioSeeds: Record<Scenario, (roleId: RoleId) => Progress> = {
+  /** The real thing: nothing is made up, so progress is only what the user did. */
+  live: () => emptyProgress(),
+
   "first-run": () => emptyProgress(),
 
   /**
