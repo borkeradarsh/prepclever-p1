@@ -1,4 +1,4 @@
-// The data contract (CLAUDE.md section 4, build spec section 5).
+// The data contract (CLAUDE.md section 4, docs/dashboard-v2-spec.md section 9).
 //
 // Components call these and nothing else: never a mock module, never fetch to a
 // content source. The signatures and return types are the contract, so swapping
@@ -6,15 +6,30 @@
 
 export {
   getUser,
-  getPath,
-  getCourses,
-  getCourse,
+  getProfile,
+  getOnboardingComplete,
+  getProgress,
+  getRoles,
+  getRole,
+  getBlocks,
+  getBlock,
+  getBlockItem,
+  getRoleSyllabus,
+  getConcept,
   getLesson,
   getLessonNeighbours,
-  getProgress,
-  getNextLesson,
+  getLessonBody,
+  getGapReport,
+  getNextRecommended,
+  getChecklists,
+  getCompanies,
+  getResources,
   getPulse,
-  getReadiness,
-  setWeeklyGoal,
+  setRating,
+  toggleChecklistItem,
+  markItemDone,
   markLessonComplete,
+  setWeeklyGoal,
+  setPlan,
+  roleTitle,
 } from "./mock";

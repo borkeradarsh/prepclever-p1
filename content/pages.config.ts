@@ -48,7 +48,7 @@ export const lessonCopy = {
     "Lesson bodies arrive with the CMS. This page exists so the structure, the reading width and the locked state can be checked now.",
   locked: {
     title: "This lesson is part of Pro",
-    body: "Pro opens every lesson in every course, plus the full roadmap detail inside each stage.",
+    body: "Pro opens Blocks 3 to 6 of the roadmap, including every lesson.",
     primary: "Unlock with Pro",
   },
 };

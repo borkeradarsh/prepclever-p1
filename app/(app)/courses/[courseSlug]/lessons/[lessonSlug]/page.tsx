@@ -1,5 +1,9 @@
 // Lesson page, structure only: the body is a placeholder until the CMS lands.
 // What is real here is the access gate and the locked state.
+//
+// TODO(session-b): this legacy URL now takes a concept id in [courseSlug]; it
+// moves to /roadmap/upskilling/[domain]/[concept]/[lesson] and /courses/*
+// redirects to /roadmap/upskilling.
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -12,7 +16,7 @@ import { LessonRow } from "@/features/shared/LessonRow";
 import { MarkCompleteButton } from "@/features/lesson/MarkCompleteButton";
 import { canAccess, getUserForAccess } from "@/features/lesson/access";
 import { lessonCopy, typeLabels } from "@/content/pages.config";
-import { getLesson, getLessonNeighbours, getProgress } from "@/lib/data";
+import { getLesson, getLessonBody, getLessonNeighbours, getProgress } from "@/lib/data";
 import { isLessonComplete } from "@/lib/progress";
 import { routes } from "@/lib/routes";
 
@@ -29,13 +33,13 @@ export default async function LessonPage({ params }: LessonParams) {
   const found = await getLesson(courseSlug, lessonSlug);
   if (!found) notFound();
 
-  const { course, lesson } = found;
+  const { concept, lesson } = found;
   const user = await getUserForAccess();
   const unlocked = canAccess(user, lesson);
 
   const header = (
     <>
-      {/* The course crumb is plain text: the course detail page does not exist yet. */}
+      {/* The concept crumb is plain text: the concept page arrives in Session B. */}
       <nav aria-label="Breadcrumb" className="pt-[var(--space-lg)] text-text-subtle">
         <Link
           href={routes.courses}
@@ -44,7 +48,7 @@ export default async function LessonPage({ params }: LessonParams) {
           {lessonCopy.breadcrumbRoot}
         </Link>
         <span aria-hidden="true"> / </span>
-        <span>{course.title}</span>
+        <span>{concept.title}</span>
       </nav>
       <PageHeader
         title={lesson.title}
@@ -63,16 +67,20 @@ export default async function LessonPage({ params }: LessonParams) {
           variant="panel"
           title={lessonCopy.locked.title}
           body={lessonCopy.locked.body}
-          primary={{ label: lessonCopy.locked.primary, href: routes.upgrade }}
+          primary={{
+            label: lessonCopy.locked.primary,
+            href: routes.upgradeFrom("locked-page", routes.lesson(courseSlug, lessonSlug)),
+          }}
           secondary={{ label: lessonCopy.backToCourses, href: routes.courses }}
         />
       </AppContainer>
     );
   }
 
-  const [progress, neighbours] = await Promise.all([
+  const [progress, neighbours, body] = await Promise.all([
     getProgress(),
     getLessonNeighbours(courseSlug, lessonSlug),
+    getLessonBody(courseSlug, lessonSlug),
   ]);
   const completed = isLessonComplete(lesson.id, progress);
 
@@ -84,7 +92,7 @@ export default async function LessonPage({ params }: LessonParams) {
         <p className="font-heading text-base leading-tight text-text-primary">
           {lessonCopy.placeholderTitle}
         </p>
-        <p className="mt-[var(--space-sm)] text-text-subtle">{lessonCopy.placeholderBody}</p>
+        <p className="mt-[var(--space-sm)] text-text-subtle">{body?.body ?? lessonCopy.placeholderBody}</p>
       </SoftCard>
 
       <div className="mt-[var(--space-lg)]">

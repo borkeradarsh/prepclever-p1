@@ -10,10 +10,8 @@ import { PageHeader } from "@/components/layout/app/PageHeader";
 import { Chip } from "@/components/ui/Chip";
 import { Skeleton, SkeletonText } from "@/components/ui/Skeleton";
 import { SoftCard } from "@/components/ui/SoftCard";
-import { roles } from "@/components/auth/onboarding/config";
 import { dashboardCopy } from "@/content/dashboard.config";
-import { getUser } from "@/lib/data";
-import { readTarget } from "@/lib/data/mock/store";
+import { getProfile, getUser, roleTitle } from "@/lib/data";
 import { routes } from "@/lib/routes";
 
 export const metadata: Metadata = { title: "Home · PrepClever" };
@@ -54,8 +52,7 @@ function WidgetPlaceholder({
 }
 
 export default async function DashboardPage() {
-  const [user, target] = await Promise.all([getUser(), readTarget()]);
-  const role = roles.find((item) => item.id === target.roleId);
+  const [user, profile] = await Promise.all([getUser(), getProfile()]);
   const firstName = user.firstName;
 
   return (
@@ -66,7 +63,7 @@ export default async function DashboardPage() {
         action={
           <Link href={routes.profile} aria-label={copy.greeting.roleChipHint}>
             <Chip>
-              {copy.greeting.roleChipPrefix} {role?.title ?? "AI Engineer"}
+              {copy.greeting.roleChipPrefix} {roleTitle(profile.roleId)}
             </Chip>
           </Link>
         }

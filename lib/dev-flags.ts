@@ -11,7 +11,16 @@ import type { Plan } from "@/types/domain";
 export const DEV_COOKIE = "prepclever-dev";
 
 export type Scenario = "first-run" | "in-progress" | "complete";
-export type WidgetKey = "continue" | "path" | "goal" | "pulse" | "readiness" | "user";
+export type WidgetKey =
+  | "continue"
+  | "journey"
+  | "goal"
+  | "pulse"
+  | "readiness"
+  | "user"
+  | "syllabus"
+  | "concept"
+  | "gap";
 
 export interface DevFlags {
   scenario: Scenario;
@@ -22,7 +31,7 @@ export interface DevFlags {
 
 const SCENARIOS: Scenario[] = ["first-run", "in-progress", "complete"];
 const PLANS: Plan[] = ["free", "pro"];
-const WIDGETS: WidgetKey[] = ["continue", "path", "goal", "pulse", "readiness", "user"];
+const WIDGETS: WidgetKey[] = ["continue", "journey", "goal", "pulse", "readiness", "user", "syllabus", "concept", "gap"];
 
 export const devToolsEnabled = process.env.NODE_ENV !== "production";
 

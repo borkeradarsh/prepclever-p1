@@ -1,181 +1,71 @@
-// Pure derivation tests against a small hand-built path, so a change in the mock
-// catalogue cannot quietly change what these assert.
+// Pure derivation tests. Built on the real configs where the rule is about them
+// (Block 4's checklists), on small hand-built data elsewhere.
 
 import { describe, expect, it } from "vitest";
+import { checklists } from "@/content/checklists.config";
+import { resolveBlocks } from "@/lib/journey";
 import {
-  courseProgress,
-  deriveStageProgress,
-  findLastFreeLesson,
-  findNextLesson,
+  blockProgress,
+  checklistProgress,
+  emptyProgress,
   isFirstRun,
-  orderedLessons,
-  readinessSummary,
+  itemKey,
+  profileReadiness,
   weeklyGoalState,
 } from "@/lib/progress";
-import type { Course, Path, Progress } from "@/types/domain";
 
-function lesson(id: string, order: number, access: "free" | "paid" = "paid") {
-  return { id, slug: id, title: id, type: "reading" as const, durationMin: 20, order, access };
-}
+const market = resolveBlocks()[0];
+const positioning = resolveBlocks().find((block) => block.slug === "positioning")!;
 
-const courses: Course[] = [
-  {
-    id: "c1",
-    slug: "c1",
-    title: "Course one",
-    summary: "",
-    stageId: "s1",
-    // Deliberately out of order, to prove ordering is derived and not assumed.
-    lessons: [lesson("l2", 2), lesson("l1", 1, "free")],
-  },
-  {
-    id: "c2",
-    slug: "c2",
-    title: "Course two",
-    summary: "",
-    stageId: "s2",
-    lessons: [lesson("l3", 1, "free"), lesson("l4", 2)],
-  },
-];
+describe("blockProgress", () => {
+  it("starts not started", () => {
+    expect(blockProgress(market, emptyProgress())).toMatchObject({ done: 0, total: 3, ratio: 0, state: "not_started" });
+  });
 
-const path: Path = {
-  roleId: "genai_llm",
-  situation: "student",
-  title: "Test path",
-  stages: [
-    { id: "s2", order: 2, name: "Stage two", outcome: "", courseIds: ["c2"] },
-    { id: "s1", order: 1, name: "Stage one", outcome: "", courseIds: ["c1"] },
-  ],
-};
+  it("counts done items and finishes at 100%", () => {
+    const some = { ...emptyProgress(), doneItems: [itemKey("market", "landscape")] };
+    expect(blockProgress(market, some)).toMatchObject({ done: 1, state: "in_progress" });
+    const all = { ...emptyProgress(), doneItems: market.items.map((item) => itemKey("market", item.slug)) };
+    expect(blockProgress(market, all)).toMatchObject({ done: 3, ratio: 1, state: "done" });
+  });
 
-function progressWith(completed: string[], overrides: Partial<Progress> = {}): Progress {
-  return {
-    completedLessonIds: completed,
-    lastLessonId: completed.at(-1) ?? null,
-    weeklyGoalSessions: null,
-    sessionsThisWeek: 0,
-    streakDays: 0,
-    ...overrides,
-  };
-}
-
-describe("orderedLessons", () => {
-  it("sorts by order without mutating the course", () => {
-    expect(orderedLessons(courses[0]).map((item) => item.id)).toEqual(["l1", "l2"]);
-    expect(courses[0].lessons.map((item) => item.id)).toEqual(["l2", "l1"]);
+  it("does not let a coming-soon item hold a block below 100%", () => {
+    const live = positioning.items.filter((item) => item.status === "available");
+    const progress = { ...emptyProgress(), doneItems: live.map((item) => itemKey("positioning", item.slug)) };
+    expect(blockProgress(positioning, progress).state).toBe("done");
   });
 });
 
-describe("findNextLesson", () => {
-  it("returns the first lesson of the first stage for a new user", () => {
-    expect(findNextLesson(path, courses, progressWith([]))?.lesson.id).toBe("l1");
+describe("checklists and profile readiness", () => {
+  it("tracks one checklist and its next item", () => {
+    const resume = checklists[0];
+    const progress = { ...emptyProgress(), checklistDone: [resume.items[0].id] };
+    expect(checklistProgress(resume, progress)).toMatchObject({ done: 1, total: resume.items.length, next: resume.items[1] });
   });
 
-  it("walks stage then course then lesson order", () => {
-    expect(findNextLesson(path, courses, progressWith(["l1"]))?.lesson.id).toBe("l2");
-    expect(findNextLesson(path, courses, progressWith(["l1", "l2"]))?.lesson.id).toBe("l3");
-  });
-
-  it("returns null once everything is complete", () => {
-    expect(findNextLesson(path, courses, progressWith(["l1", "l2", "l3", "l4"]))).toBeNull();
-  });
-});
-
-describe("findLastFreeLesson", () => {
-  it("returns the last free lesson in path order", () => {
-    expect(findLastFreeLesson(path, courses)?.lesson.id).toBe("l3");
-  });
-});
-
-describe("deriveStageProgress", () => {
-  it("marks the first stage up next for a new user and locks the rest", () => {
-    const result = deriveStageProgress(path, courses, progressWith([]));
-    expect(result.stages.map((stage) => stage.state)).toEqual(["up_next", "locked"]);
-    expect(result.allComplete).toBe(false);
-  });
-
-  it("marks a partly done stage in progress", () => {
-    const result = deriveStageProgress(path, courses, progressWith(["l1"]));
-    expect(result.stages[0]).toMatchObject({ state: "in_progress", completed: 1, total: 2 });
-    expect(result.stages[0].ratio).toBe(0.5);
-  });
-
-  it("never reports more than one open stage", () => {
-    const result = deriveStageProgress(path, courses, progressWith(["l1", "l3"]));
-    const open = result.stages.filter((stage) => stage.state !== "done" && stage.state !== "locked");
-    expect(open).toHaveLength(1);
-    expect(open[0].stageId).toBe("s1");
-  });
-
-  it("reports done stages and overall completion", () => {
-    const result = deriveStageProgress(path, courses, progressWith(["l1", "l2", "l3", "l4"]));
-    expect(result.stages.map((stage) => stage.state)).toEqual(["done", "done"]);
-    expect(result).toMatchObject({ completed: 4, total: 4, allComplete: true });
-  });
-
-  it("returns stages in order regardless of how the path lists them", () => {
-    const result = deriveStageProgress(path, courses, progressWith([]));
-    expect(result.stages.map((stage) => stage.stageId)).toEqual(["s1", "s2"]);
-  });
-});
-
-describe("courseProgress", () => {
-  it("counts only lessons of that course", () => {
-    expect(courseProgress(courses[0], progressWith(["l1", "l3"]))).toEqual({
-      completed: 1,
-      total: 2,
-      ratio: 0.5,
+  it("derives profile readiness from all of Block 4's checklists", () => {
+    const total = checklists.reduce((sum, list) => sum + list.items.length, 0);
+    expect(profileReadiness(checklists, emptyProgress())).toMatchObject({ done: 0, total, allDone: false });
+    const every = checklists.flatMap((list) => list.items.map((item) => item.id));
+    expect(profileReadiness(checklists, { ...emptyProgress(), checklistDone: every })).toMatchObject({
+      allDone: true,
+      next: null,
     });
   });
 });
 
 describe("isFirstRun", () => {
-  it("is true only with no completions and no last lesson", () => {
-    expect(isFirstRun(progressWith([]))).toBe(true);
-    expect(isFirstRun(progressWith(["l1"]))).toBe(false);
+  it("is true only before anything is touched", () => {
+    expect(isFirstRun(emptyProgress())).toBe(true);
+    expect(isFirstRun({ ...emptyProgress(), auditRatings: { rag: "learning" } })).toBe(false);
+    expect(isFirstRun({ ...emptyProgress(), lastItem: "market/landscape" })).toBe(false);
   });
 });
 
 describe("weeklyGoalState", () => {
-  it("is first run until a goal is set", () => {
-    expect(weeklyGoalState(progressWith([])).kind).toBe("first_run");
-  });
-
-  it("tracks progress towards the goal", () => {
-    const state = weeklyGoalState(
-      progressWith([], { weeklyGoalSessions: 3, sessionsThisWeek: 2, streakDays: 4 }),
-    );
-    expect(state).toEqual({ kind: "in_progress", done: 2, goal: 3, streak: 4 });
-  });
-
-  it("reports met when the goal is reached or passed", () => {
-    expect(
-      weeklyGoalState(progressWith([], { weeklyGoalSessions: 3, sessionsThisWeek: 3 })).kind,
-    ).toBe("met");
-    expect(
-      weeklyGoalState(progressWith([], { weeklyGoalSessions: 3, sessionsThisWeek: 4 })).kind,
-    ).toBe("met");
-  });
-});
-
-describe("readinessSummary", () => {
-  const items = [
-    { id: "resume", label: "Resume", done: true },
-    { id: "github", label: "GitHub", done: false },
-    { id: "linkedin", label: "LinkedIn", done: false },
-  ];
-
-  it("picks the first incomplete item", () => {
-    expect(readinessSummary(items)).toMatchObject({ done: 1, total: 3, allDone: false });
-    expect(readinessSummary(items).next?.id).toBe("github");
-  });
-
-  it("reports allDone with no next item", () => {
-    const all = items.map((item) => ({ ...item, done: true }));
-    expect(readinessSummary(all)).toMatchObject({ next: null, allDone: true });
-  });
-
-  it("is not allDone when there are no items at all", () => {
-    expect(readinessSummary([])).toMatchObject({ next: null, allDone: false });
+  it("covers first run, in progress and met", () => {
+    expect(weeklyGoalState(emptyProgress()).kind).toBe("first_run");
+    expect(weeklyGoalState({ ...emptyProgress(), weeklyGoalSessions: 3, sessionsThisWeek: 1 }).kind).toBe("in_progress");
+    expect(weeklyGoalState({ ...emptyProgress(), weeklyGoalSessions: 3, sessionsThisWeek: 3 }).kind).toBe("met");
   });
 });

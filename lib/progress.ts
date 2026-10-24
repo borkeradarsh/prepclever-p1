@@ -1,117 +1,90 @@
-// Every derivation the dashboard needs, as pure functions over plain data.
-// Widgets render these results; they never recompute them.
+// Every progress derivation the roadmap and dashboard need, as pure functions
+// over plain data. Widgets render these results; they never recompute them.
 
-import type {
-  Course,
-  LessonRef,
-  Path,
-  PathProgress,
-  Progress,
-  ReadinessItem,
-  StageProgress,
-  StageState,
-} from "@/types/domain";
+import type { Block, BlockId, BlockProgress, Checklist, ChecklistItem, Progress } from "@/types/domain";
 
-export function orderedLessons(course: Course) {
-  return [...course.lessons].sort((a, b) => a.order - b.order);
-}
+/** The key a block item is stored under in `doneItems` and `lastItem`. */
+export const itemKey = (blockId: BlockId, itemSlug: string) => `${blockId}/${itemSlug}`;
+/** The key a concept is stored under in `doneItems` and `lastItem`. */
+export const conceptKey = (conceptId: string) => `concept:${conceptId}`;
 
-function orderedStages(path: Path) {
-  return [...path.stages].sort((a, b) => a.order - b.order);
-}
-
-/** Courses of a stage, in the order the stage lists them. */
-function stageCourses(stageCourseIds: string[], courses: Course[]) {
-  const byId = new Map(courses.map((course) => [course.id, course]));
-  return stageCourseIds
-    .map((id) => byId.get(id))
-    .filter((course): course is Course => Boolean(course));
-}
-
-export function courseProgress(course: Course, progress: Progress) {
-  const done = new Set(progress.completedLessonIds);
-  const total = course.lessons.length;
-  const completed = course.lessons.filter((lesson) => done.has(lesson.id)).length;
-  return { completed, total, ratio: total === 0 ? 0 : completed / total };
+export function emptyProgress(): Progress {
+  return {
+    completedLessonIds: [],
+    auditRatings: {},
+    checklistDone: [],
+    doneItems: [],
+    lastItem: null,
+    weeklyGoalSessions: null,
+    sessionsThisWeek: 0,
+    streakDays: 0,
+  };
 }
 
 export function isLessonComplete(lessonId: string, progress: Progress) {
   return progress.completedLessonIds.includes(lessonId);
 }
 
-export function deriveStageProgress(
-  path: Path,
-  courses: Course[],
-  progress: Progress,
-): PathProgress {
-  const done = new Set(progress.completedLessonIds);
-  let seenUnfinished = false;
-
-  const stages: StageProgress[] = orderedStages(path).map((stage) => {
-    const lessons = stageCourses(stage.courseIds, courses).flatMap((course) => course.lessons);
-    const total = lessons.length;
-    const completed = lessons.filter((lesson) => done.has(lesson.id)).length;
-    const isDone = total > 0 && completed === total;
-
-    let state: StageState;
-    if (isDone) {
-      state = "done";
-    } else if (seenUnfinished) {
-      // An earlier stage is still open, so this one is not reachable yet.
-      state = "locked";
-    } else {
-      seenUnfinished = true;
-      state = completed > 0 ? "in_progress" : "up_next";
-    }
-
-    return { stageId: stage.id, state, completed, total, ratio: total === 0 ? 0 : completed / total };
-  });
-
-  const total = stages.reduce((sum, stage) => sum + stage.total, 0);
-  const completed = stages.reduce((sum, stage) => sum + stage.completed, 0);
-
-  return { stages, total, completed, allComplete: total > 0 && completed === total };
-}
-
-/**
- * The first lesson the user has not completed, in stage then course then lesson
- * order. Null when the whole path is done.
- */
-export function findNextLesson(
-  path: Path,
-  courses: Course[],
-  progress: Progress,
-): LessonRef | null {
-  const done = new Set(progress.completedLessonIds);
-
-  for (const stage of orderedStages(path)) {
-    for (const course of stageCourses(stage.courseIds, courses)) {
-      for (const lesson of orderedLessons(course)) {
-        if (!done.has(lesson.id)) return { course, lesson };
-      }
-    }
-  }
-
-  return null;
-}
-
-/** The last free lesson the user can open, for the locked card's fallback link. */
-export function findLastFreeLesson(path: Path, courses: Course[]): LessonRef | null {
-  let found: LessonRef | null = null;
-
-  for (const stage of orderedStages(path)) {
-    for (const course of stageCourses(stage.courseIds, courses)) {
-      for (const lesson of orderedLessons(course)) {
-        if (lesson.access === "free") found = { course, lesson };
-      }
-    }
-  }
-
-  return found;
+export function isItemDone(key: string, progress: Progress) {
+  return progress.doneItems.includes(key);
 }
 
 export function isFirstRun(progress: Progress) {
-  return progress.completedLessonIds.length === 0 && progress.lastLessonId === null;
+  return (
+    progress.doneItems.length === 0 &&
+    progress.completedLessonIds.length === 0 &&
+    Object.keys(progress.auditRatings).length === 0 &&
+    progress.lastItem === null
+  );
+}
+
+/**
+ * Done over total for a block. Only available items count: a coming-soon item
+ * can never be finished, so it must not hold a block below 100%. `extraKeys`
+ * adds Block 3's concepts, which are per role and not in the block config.
+ */
+export function blockProgress(block: Block, progress: Progress, extraKeys: string[] = []): BlockProgress {
+  const keys = [
+    ...block.items.filter((item) => item.status === "available").map((item) => itemKey(block.slug, item.slug)),
+    ...extraKeys,
+  ];
+  const done = keys.filter((key) => progress.doneItems.includes(key)).length;
+  const total = keys.length;
+  return {
+    blockId: block.slug,
+    done,
+    total,
+    ratio: total === 0 ? 0 : done / total,
+    state: done === 0 ? "not_started" : done === total ? "done" : "in_progress",
+  };
+}
+
+export function checklistProgress(checklist: Checklist, progress: Progress) {
+  const done = new Set(progress.checklistDone);
+  const total = checklist.items.length;
+  const completed = checklist.items.filter((item) => done.has(item.id)).length;
+  return {
+    done: completed,
+    total,
+    ratio: total === 0 ? 0 : completed / total,
+    next: checklist.items.find((item) => !done.has(item.id)) ?? null,
+  };
+}
+
+/** Profile readiness: Block 4's checklists taken together. Hidden when complete. */
+export function profileReadiness(checklists: Checklist[], progress: Progress) {
+  const done = new Set(progress.checklistDone);
+  let next: { checklistId: Checklist["id"]; item: ChecklistItem } | null = null;
+  let total = 0;
+  let completed = 0;
+  for (const list of checklists) {
+    for (const item of list.items) {
+      total += 1;
+      if (done.has(item.id)) completed += 1;
+      else if (!next) next = { checklistId: list.id, item };
+    }
+  }
+  return { done: completed, total, next, allDone: total > 0 && completed === total };
 }
 
 export type WeeklyGoalKind = "first_run" | "in_progress" | "met";
@@ -121,15 +94,4 @@ export function weeklyGoalState(progress: Progress) {
   const done = progress.sessionsThisWeek;
   const kind: WeeklyGoalKind = goal === null ? "first_run" : done >= goal ? "met" : "in_progress";
   return { kind, done, goal, streak: progress.streakDays };
-}
-
-export function readinessSummary(items: ReadinessItem[]) {
-  const total = items.length;
-  const doneItems = items.filter((item) => item.done);
-  return {
-    next: items.find((item) => !item.done) ?? null,
-    done: doneItems.length,
-    total,
-    allDone: total > 0 && doneItems.length === total,
-  };
 }
