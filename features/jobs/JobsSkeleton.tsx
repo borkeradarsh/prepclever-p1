@@ -25,8 +25,8 @@ export function JobFilterBarSkeleton() {
         <Skeleton width="4rem" height={LABEL_HEIGHT} />
         <Skeleton height={CONTROL_HEIGHT} />
       </div>
-      <div className="grid grid-cols-2 gap-[var(--space-sm)] md:grid-cols-3 lg:grid-cols-5">
-        {Array.from({ length: 5 }, (_, index) => (
+      <div className="grid grid-cols-2 gap-[var(--space-sm)] md:grid-cols-3 lg:grid-cols-6">
+        {Array.from({ length: 6 }, (_, index) => (
           <ControlSkeleton key={index} />
         ))}
       </div>
@@ -48,6 +48,9 @@ export function JobCardSkeleton() {
         {["6rem", "5rem", "7rem", "4.5rem"].map((width) => (
           <Skeleton key={width} width={width} height="1.6rem" radius="pill" />
         ))}
+      </div>
+      <div className="grid min-h-11 content-center">
+        <Skeleton width="6rem" height="1.6rem" radius="pill" />
       </div>
       <div className="mt-auto flex items-end justify-between gap-[var(--space-sm)]">
         <Skeleton width="55%" height="0.8rem" />

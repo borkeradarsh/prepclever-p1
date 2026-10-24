@@ -8,6 +8,7 @@ import type {
   JobPage,
   JobPostedWithin,
   JobSeniority,
+  JobSort,
   RoleId,
 } from "@/types/domain";
 import { normalizeRoleId } from "./normalize-role";
@@ -18,6 +19,7 @@ export const ALL_ROLES = "all";
 
 export const SENIORITIES: JobSeniority[] = ["fresher", "switcher", "mid", "senior"];
 export const POSTED_WITHIN: JobPostedWithin[] = [7, 30];
+export const SORTS: JobSort[] = ["newest", "best_match"];
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -52,6 +54,7 @@ export function parseJobFilters(raw: RawParams, defaultRoleId: RoleId | null): J
   const seniority = params.get("seniority");
   const posted = Number(params.get("posted"));
   const page = Number.parseInt(params.get("page") ?? "", 10);
+  const sort = params.get("sort");
 
   return {
     roleId,
@@ -60,7 +63,7 @@ export function parseJobFilters(raw: RawParams, defaultRoleId: RoleId | null): J
     seniority: (SENIORITIES as string[]).includes(seniority ?? "") ? (seniority as JobSeniority) : null,
     postedWithinDays: (POSTED_WITHIN as number[]).includes(posted) ? (posted as JobPostedWithin) : null,
     q: text(params.get("q")) ?? "",
-    sort: "newest",
+    sort: (SORTS as string[]).includes(sort ?? "") ? (sort as JobSort) : "newest",
     page: Number.isFinite(page) && page >= 1 ? page : 1,
     devSample: params.get("devSample") === "1",
   };
@@ -122,11 +125,29 @@ export function matchesFilters(job: Job, filters: JobFilters, now: Date): boolea
   return true;
 }
 
-/** Newest first; ties by title, then id, so the order is stable across pages. */
-export function sortJobs(jobs: Job[]): Job[] {
+/** A job's match percent for the best-match sort; null sorts after every score. */
+export type JobScore = (job: Job) => number | null;
+
+/**
+ * Newest first; ties by title, then id, so the order is stable across pages.
+ * With a score (best match), highest score first, then the same order.
+ */
+export function sortJobs(jobs: Job[], score?: JobScore): Job[] {
+  const scores = score ? new Map(jobs.map((job) => [job.id, score(job)])) : null;
+  const byScore = (a: Job, b: Job) => {
+    if (!scores) return 0;
+    const [sa, sb] = [scores.get(a.id) ?? null, scores.get(b.id) ?? null];
+    if (sa === sb) return 0;
+    if (sa === null) return 1;
+    if (sb === null) return -1;
+    return sb - sa;
+  };
   return [...jobs].sort(
     (a, b) =>
-      listedAt(b).localeCompare(listedAt(a)) || a.title.localeCompare(b.title) || a.id.localeCompare(b.id),
+      byScore(a, b) ||
+      listedAt(b).localeCompare(listedAt(a)) ||
+      a.title.localeCompare(b.title) ||
+      a.id.localeCompare(b.id),
   );
 }
 
@@ -143,8 +164,14 @@ export function selectJobs(
   all: Job[],
   filters: JobFilters,
   now: Date,
+  /** Only used for the best-match sort; without one, best match falls back to newest. */
+  score?: JobScore,
 ): Pick<JobPage, "jobs" | "total" | "page" | "pageCount" | "pageSize" | "totalUnfiltered"> {
-  const matching = sortJobs(all.filter((job) => matchesFilters(job, filters, now)));
+  const ranked = filters.sort === "best_match" ? score : undefined;
+  const matching = sortJobs(
+    all.filter((job) => matchesFilters(job, filters, now)),
+    ranked,
+  );
   const { items, page, pageCount, pageSize } = paginate(matching, filters.page);
   return { jobs: items, total: matching.length, page, pageCount, pageSize, totalUnfiltered: all.length };
 }

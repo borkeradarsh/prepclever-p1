@@ -5,9 +5,9 @@ import { SoftCard } from "@/components/ui/SoftCard";
 import { jobsCopy, seniorityLabels } from "@/content/jobs.config";
 import { experienceRange, formatJobDate } from "@/lib/jobs/format";
 import { routes } from "@/lib/routes";
-import type { Job } from "@/types/domain";
+import type { Job, JobMatch } from "@/types/domain";
 import { SkillTags } from "./SkillTags";
-import { secondaryLink } from "@/components/ui/link-styles";
+import { secondaryLink, textLink } from "@/components/ui/link-styles";
 
 const copy = jobsCopy.card;
 
@@ -25,13 +25,34 @@ function dateLine(job: Job): string {
   return job.postedAt ? copy.posted(formatJobDate(job.postedAt)) : copy.firstSeen(formatJobDate(job.firstSeenAt));
 }
 
-type JobCardProps = { job: Job; roleTitle: string | null };
+type JobCardProps = { job: Job; roleTitle: string | null; match: JobMatch | null };
+
+/**
+ * The match row: the badge once the user has an audit, the audit prompt before
+ * that. A job with no skills has nothing to match, so the row stays empty
+ * (but keeps its height, so every card in the grid is the same size).
+ */
+function MatchRow({ job, match }: { job: Job; match: JobMatch | null }) {
+  if (match) {
+    return (
+      <Badge aria-label={copy.matchLabel(match.percent)} className="justify-self-start">
+        {copy.match(match.percent)}
+      </Badge>
+    );
+  }
+  if (job.conceptIds.length === 0) return null;
+  return (
+    <Link href={routes.skillAudit} className={`${textLink} text-[length:var(--font-size-small)]`}>
+      {jobsCopy.auditPrompt}
+    </Link>
+  );
+}
 
 /**
  * One job in the list. Every card has the same rows in the same order, and the
  * grid stretches them to one height, so a group of cards is identical in size.
  */
-export function JobCard({ job, roleTitle }: JobCardProps) {
+export function JobCard({ job, roleTitle, match }: JobCardProps) {
   const experience = experienceRange(job.expMin, job.expMax) ?? copy.experienceMissing;
   const seniority = job.seniority ? ` · ${seniorityLabels[job.seniority]}` : "";
 
@@ -63,7 +84,9 @@ export function JobCard({ job, roleTitle }: JobCardProps) {
         <SkillTags conceptIds={job.conceptIds} />
       </div>
 
-      {/* TODO(match): the match badge ("72% match" or the audit prompt) goes here once the skill audit exists. */}
+      <div className="grid min-h-11 content-center">
+        <MatchRow job={job} match={match} />
+      </div>
 
       <div className="mt-auto flex items-end justify-between gap-[var(--space-sm)]">
         <p className="min-w-0 text-[length:var(--font-size-small)] text-text-subtle">{dateLine(job)}</p>

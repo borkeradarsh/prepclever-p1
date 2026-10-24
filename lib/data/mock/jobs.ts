@@ -3,7 +3,7 @@
 // `fail:jobs` for the error state, and `scenario:first-run` for the state where
 // nothing has been collected yet.
 
-import { facetValues, selectJobs } from "@/lib/jobs/filters";
+import { facetValues, selectJobs, type JobScore } from "@/lib/jobs/filters";
 import type { Job, JobFacets, JobFilters, JobPage } from "@/types/domain";
 import {
   buildDevSampleJobs,
@@ -30,10 +30,10 @@ const examplesCheckedOn = examples.reduce<string | null>(
   null,
 );
 
-export async function getJobs(filters: JobFilters): Promise<JobPage> {
+export async function getJobs(filters: JobFilters, score?: JobScore): Promise<JobPage> {
   const active = (await loadJobs(filters.devSample)).filter((job) => job.status === "active");
   return {
-    ...selectJobs(active, filters, new Date()),
+    ...selectJobs(active, filters, new Date(), score),
     source: "examples",
     updatedAt: active.length > 0 ? examplesCheckedOn : null,
   };

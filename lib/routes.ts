@@ -10,6 +10,8 @@ export const routes = {
   block: (blockSlug: string) => `/roadmap/${seg(blockSlug)}`,
   blockItem: (blockSlug: string, itemSlug: string) => `/roadmap/${seg(blockSlug)}/${seg(itemSlug)}`,
   conceptMap: "/roadmap/concept-map",
+  skillAudit: "/roadmap/gap-analysis/skill-audit",
+  gapReport: "/roadmap/gap-analysis/gap-report",
   concept: (domainId: string, conceptId: string) => `/roadmap/upskilling/${seg(domainId)}/${seg(conceptId)}`,
   conceptLesson: (domainId: string, conceptId: string, lessonSlug: string) =>
     `/roadmap/upskilling/${seg(domainId)}/${seg(conceptId)}/${seg(lessonSlug)}`,

@@ -287,14 +287,24 @@ export type NextRecommended =
   | { kind: "item"; blockId: BlockId; itemSlug: string; title: string; href: string; locked: boolean }
   | { kind: "concept"; conceptId: string; title: string; href: string; locked: boolean };
 
-// Jobs (docs/jobs-spec.md section 6). TODO(match): JobMatch and getJobMatch
-// arrive with the skill audit; nothing here assumes one exists.
+// Jobs (docs/jobs-spec.md section 6).
 
 /** Same four values as Track: the spec classifies jobs on the user's ladder. */
 export type JobSeniority = Track;
 export type JobPostedWithin = 7 | 30;
-/** TODO(match): "best_match" once the skill audit exists. */
-export type JobSort = "newest";
+/** `best_match` falls back to `newest` until the user has taken the skill audit. */
+export type JobSort = "newest" | "best_match";
+
+/** How the user's skill audit covers one job's required concepts (lib/jobs/match.ts). */
+export interface JobMatch {
+  /** 0 to 100: audit points over the maximum for the required concepts. */
+  percent: number;
+  /** Required concepts rated confident. */
+  confident: number;
+  required: number;
+  /** Required concepts not yet confident that the user's role uses, in learning order. */
+  gaps: { id: string; title: string; domain: DomainId }[];
+}
 
 /**
  * Where a job came from. `example` is a research posting that may have closed;

@@ -210,3 +210,32 @@ describe("facetValues", () => {
     expect(facetValues(["Pune", null, "bengaluru", "pune", "Bengaluru"])).toEqual(["bengaluru", "Pune"]);
   });
 });
+
+describe("best match sort", () => {
+  const jobs = [
+    job({ id: "newest-low", postedAt: daysAgo(1) }),
+    job({ id: "older-high", postedAt: daysAgo(5) }),
+    job({ id: "no-skills", postedAt: daysAgo(0) }),
+    job({ id: "mid", postedAt: daysAgo(3) }),
+  ];
+  const scores: Record<string, number | null> = { "newest-low": 20, "older-high": 90, "no-skills": null, mid: 50 };
+  const score = (item: Job) => scores[item.id];
+
+  it("reads sort from the URL and writes it back", () => {
+    expect(parseJobFilters(new URLSearchParams("sort=best_match"), null).sort).toBe("best_match");
+    expect(parseJobFilters(new URLSearchParams("sort=salary"), null).sort).toBe("newest");
+    expect(jobsHref(all({ sort: "best_match" }))).toContain("sort=best_match");
+    expect(jobsHref(all())).not.toContain("sort=");
+  });
+
+  it("ranks by score, with unscored jobs last and newest breaking ties", () => {
+    const ids = selectJobs(jobs, all({ sort: "best_match" }), NOW, score).jobs.map((item) => item.id);
+    expect(ids).toEqual(["older-high", "mid", "newest-low", "no-skills"]);
+  });
+
+  it("falls back to newest without a score, and ignores a score under the newest sort", () => {
+    const newest = ["no-skills", "newest-low", "mid", "older-high"];
+    expect(selectJobs(jobs, all({ sort: "best_match" }), NOW).jobs.map((item) => item.id)).toEqual(newest);
+    expect(selectJobs(jobs, all(), NOW, score).jobs.map((item) => item.id)).toEqual(newest);
+  });
+});

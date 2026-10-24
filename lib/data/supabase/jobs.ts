@@ -7,14 +7,16 @@
 // same filters into the query. Until then every read fails loudly, so choosing
 // this source by mistake shows the error state rather than an empty list.
 
+import type { JobScore } from "@/lib/jobs/filters";
 import type { Job, JobFacets, JobFilters, JobPage } from "@/types/domain";
 
 function notConnected(): never {
   throw new Error("JOBS_SOURCE=supabase is not connected yet (Session J1). Use JOBS_SOURCE=mock.");
 }
 
-export async function getJobs(filters: JobFilters): Promise<JobPage> {
+export async function getJobs(filters: JobFilters, score?: JobScore): Promise<JobPage> {
   void filters;
+  void score;
   return notConnected();
 }
 

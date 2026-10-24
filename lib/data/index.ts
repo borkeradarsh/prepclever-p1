@@ -34,4 +34,12 @@ export {
   roleTitle,
 } from "./mock";
 
-export { getJobs, getJob, getJobFacets, getJobsAddedLast30Days, jobsSource } from "./jobs";
+export {
+  getJobs,
+  getJob,
+  getJobMatch,
+  getJobMatches,
+  getJobFacets,
+  getJobsAddedLast30Days,
+  jobsSource,
+} from "./jobs";

@@ -34,11 +34,15 @@ export const jobsCopy = {
     posted: "Posted",
     anyTime: "Any time",
     postedWithin: (days: number) => `Last ${days} days`,
+    sort: "Sort",
+    sortLabels: { newest: "Newest", best_match: "Best match" },
   },
 
   results: {
     heading: (total: number) => (total === 1 ? "1 job" : `${total} jobs`),
-    range: (from: number, to: number, total: number) => `Showing ${from}–${to} of ${total}, newest first`,
+    range: (from: number, to: number, total: number, bestMatch: boolean) =>
+      `Showing ${from}–${to} of ${total}, ${bestMatch ? "best match first" : "newest first"}`,
+    sortNeedsAudit: "Best match needs your skill audit, so these are newest first.",
     examplesFreshness: (checked: string) =>
       `Example postings from our research, checked ${checked}. They may have closed.`,
     collectedFreshness: (updated: string) => `Updated ${updated} from company careers pages`,
@@ -57,6 +61,21 @@ export const jobsCopy = {
     devSample: "DEV SAMPLE",
     example: "Example",
     roleSkills: "Core skills for this role",
+    match: (percent: number) => `${percent}% match`,
+    matchLabel: (percent: number) => `${percent}% match with your skill audit`,
+  },
+
+  /** Shown wherever a match would be, until the user has rated anything. */
+  auditPrompt: "Take the skill audit to see your match",
+
+  match: {
+    heading: "Your match",
+    summary: (confident: number, required: number) =>
+      `You're confident in ${confident} of ${required} required ${required === 1 ? "skill" : "skills"}.`,
+    gapsHeading: "Skills to close",
+    gapsNote: "Each opens its concept page. The overview is free; lessons are Pro.",
+    noGaps: "No gaps for your role in this posting.",
+    noAuditBody: "Rate your skills once and every job shows how well you match.",
   },
 
   paging: {

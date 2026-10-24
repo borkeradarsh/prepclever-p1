@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import type { ChangeEvent, FormEvent, ReactNode } from "react";
 import { Button } from "@/components/ui/Button";
 import { jobsCopy, seniorityLabels } from "@/content/jobs.config";
-import { ALL_ROLES, jobsHref, POSTED_WITHIN, SENIORITIES } from "@/lib/jobs/filters";
+import { ALL_ROLES, jobsHref, POSTED_WITHIN, SENIORITIES, SORTS } from "@/lib/jobs/filters";
 import type { JobFacets, JobFilters, RoleId } from "@/types/domain";
 
 const copy = jobsCopy.filters;
@@ -36,6 +36,7 @@ export function JobFilterBar({ filters, facets, roles }: JobFilterBarProps) {
     if (name === "city") go({ city: value || null });
     if (name === "seniority") go({ seniority: (value || null) as JobFilters["seniority"] });
     if (name === "posted") go({ postedWithinDays: value ? (Number(value) as 7 | 30) : null });
+    if (name === "sort") go({ sort: value as JobFilters["sort"] });
   };
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -81,7 +82,7 @@ export function JobFilterBar({ filters, facets, roles }: JobFilterBarProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-[var(--space-sm)] md:grid-cols-3 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-[var(--space-sm)] md:grid-cols-3 lg:grid-cols-6">
         <Field id="jobs-role" label={copy.role}>
           <select id="jobs-role" name="role" defaultValue={filters.roleId ?? ALL_ROLES} onChange={onSelect} className={controlClass}>
             <option value={ALL_ROLES}>{copy.allRoles}</option>
@@ -138,6 +139,16 @@ export function JobFilterBar({ filters, facets, roles }: JobFilterBarProps) {
             {POSTED_WITHIN.map((days) => (
               <option key={days} value={days}>
                 {copy.postedWithin(days)}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <Field id="jobs-sort" label={copy.sort}>
+          <select id="jobs-sort" name="sort" defaultValue={filters.sort} onChange={onSelect} className={controlClass}>
+            {SORTS.map((value) => (
+              <option key={value} value={value}>
+                {copy.sortLabels[value]}
               </option>
             ))}
           </select>

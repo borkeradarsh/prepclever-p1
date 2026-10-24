@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { jobsCopy } from "@/content/jobs.config";
-import { getJobs, roleTitle } from "@/lib/data";
+import { getJobMatches, getJobs, roleTitle } from "@/lib/data";
 import { clearedFilters, jobsHref } from "@/lib/jobs/filters";
 import { formatJobDate, isStale, relativeTime } from "@/lib/jobs/format";
 import type { JobFilters, JobPage } from "@/types/domain";
@@ -63,6 +63,9 @@ export async function JobResults({ filters }: { filters: JobFilters }) {
     );
   }
 
+  const matches = await getJobMatches(page.jobs);
+  // Best match only sorts once there is an audit to rank by; say so rather than pretend.
+  const ranked = filters.sort === "best_match" && Object.values(matches).some((match) => match !== null);
   const from = (page.page - 1) * page.pageSize + 1;
   const to = from + page.jobs.length - 1;
 
@@ -72,14 +75,17 @@ export async function JobResults({ filters }: { filters: JobFilters }) {
         <h2 id="jobs-results-heading" className="font-heading text-lg leading-tight text-text-primary">
           {copy.results.heading(page.total)}
         </h2>
-        <p className="text-text-subtle">{copy.results.range(from, to, page.total)}</p>
+        <p className="text-text-subtle">{copy.results.range(from, to, page.total, ranked)}</p>
+        {filters.sort === "best_match" && !ranked ? (
+          <p className="text-text-subtle">{copy.results.sortNeedsAudit}</p>
+        ) : null}
         <Freshness page={page} />
       </div>
 
       <ul className="grid auto-rows-fr gap-[var(--space-md)] md:grid-cols-2 lg:grid-cols-3">
         {page.jobs.map((job) => (
           <li key={job.id}>
-            <JobCard job={job} roleTitle={job.roleId ? roleTitle(job.roleId) : null} />
+            <JobCard job={job} roleTitle={job.roleId ? roleTitle(job.roleId) : null} match={matches[job.id] ?? null} />
           </li>
         ))}
       </ul>

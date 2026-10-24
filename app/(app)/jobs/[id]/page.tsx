@@ -8,15 +8,16 @@ import { notFound } from "next/navigation";
 import { cache, type ReactNode } from "react";
 import { AppContainer } from "@/components/layout/app/AppContainer";
 import { PageHeader } from "@/components/layout/app/PageHeader";
+import { ProgressBar } from "@/components/ui/Progress";
 import { SoftCard } from "@/components/ui/SoftCard";
 import { JOBS_CONTACT_EMAIL, jobsCopy, seniorityLabels } from "@/content/jobs.config";
 import { JobKindBadge } from "@/features/jobs/JobCard";
 import { SkillTags } from "@/features/jobs/SkillTags";
 import { primaryLink, textLink } from "@/components/ui/link-styles";
-import { getJob, roleTitle } from "@/lib/data";
+import { getJob, getJobMatch, roleTitle } from "@/lib/data";
 import { applyTarget, experienceRange, formatJobDate } from "@/lib/jobs/format";
 import { routes } from "@/lib/routes";
-import type { Job } from "@/types/domain";
+import type { Job, JobMatch } from "@/types/domain";
 
 const copy = jobsCopy.detail;
 
@@ -65,10 +66,57 @@ function Section({ id, title, children }: { id: string; title: string; children:
   );
 }
 
+/**
+ * The bridge from jobs to learning: how the user's audit covers this posting,
+ * and each gap linking to its concept page. Before an audit, the prompt.
+ */
+function MatchPanel({ match }: { match: JobMatch | null }) {
+  const matchCopy = jobsCopy.match;
+  if (!match) {
+    return (
+      <SoftCard tone="flat" className="grid justify-items-start gap-[var(--space-xs)]">
+        <p className="text-text-subtle">{matchCopy.noAuditBody}</p>
+        <Link href={routes.skillAudit} className={`${textLink} inline-flex min-h-11 items-center`}>
+          {jobsCopy.auditPrompt}
+        </Link>
+      </SoftCard>
+    );
+  }
+
+  return (
+    <SoftCard className="grid gap-[var(--space-sm)]">
+      <p className="flex flex-wrap items-baseline justify-between gap-[var(--space-sm)] text-text-primary">
+        <span>{matchCopy.summary(match.confident, match.required)}</span>
+        <span className="font-heading text-lg">{jobsCopy.card.match(match.percent)}</span>
+      </p>
+      <ProgressBar value={match.percent} max={100} label={jobsCopy.card.matchLabel(match.percent)} />
+      {match.gaps.length === 0 ? (
+        <p className="text-text-subtle">{matchCopy.noGaps}</p>
+      ) : (
+        <div className="grid gap-[var(--space-xs)]">
+          <h3 className="font-medium text-text-primary">{matchCopy.gapsHeading}</h3>
+          <p className="text-[length:var(--font-size-small)] text-text-subtle">{matchCopy.gapsNote}</p>
+          <ul className="flex flex-wrap gap-x-[var(--space-md)]">
+            {match.gaps.map((gap) => (
+              <li key={gap.id}>
+                <Link href={routes.concept(gap.domain, gap.id)} className={`${textLink} inline-flex min-h-11 items-center`}>
+                  {gap.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </SoftCard>
+  );
+}
+
 export default async function JobDetailPage({ params }: JobParams) {
   const { id } = await params;
   const job = await loadJob(id);
   if (!job) notFound();
+  // A job with no skills has nothing to match against: no panel at all.
+  const match = job.conceptIds.length > 0 ? await getJobMatch(job.id) : null;
 
   const role = job.roleId ? roleTitle(job.roleId) : null;
   const target = applyTarget(job.applyUrl);
@@ -121,8 +169,11 @@ export default async function JobDetailPage({ params }: JobParams) {
           <p className="max-w-prose text-text-primary">{job.summary ?? copy.summaryMissing}</p>
         </Section>
 
-        {/* TODO(match): the match panel ("You're confident in x of y required skills" and the gaps,
-            each linking to its concept page) goes here once the skill audit exists. */}
+        {job.conceptIds.length > 0 ? (
+          <Section id="job-match" title={jobsCopy.match.heading}>
+            <MatchPanel match={match} />
+          </Section>
+        ) : null}
 
         {job.conceptIds.length > 0 ? (
           <Section id="job-skills" title={copy.skills}>
