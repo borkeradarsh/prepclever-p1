@@ -7,7 +7,7 @@ import { formatJobDate, isStale, relativeTime } from "@/lib/jobs/format";
 import type { JobFilters, JobPage } from "@/types/domain";
 import { JobCard } from "./JobCard";
 import { JobsPagination } from "./JobsPagination";
-import { secondaryLink } from "./styles";
+import { secondaryLink } from "@/components/ui/link-styles";
 
 const copy = jobsCopy;
 

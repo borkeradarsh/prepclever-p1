@@ -12,7 +12,7 @@ import { SoftCard } from "@/components/ui/SoftCard";
 import { JOBS_CONTACT_EMAIL, jobsCopy, seniorityLabels } from "@/content/jobs.config";
 import { JobKindBadge } from "@/features/jobs/JobCard";
 import { SkillTags } from "@/features/jobs/SkillTags";
-import { primaryLink, textLink } from "@/features/jobs/styles";
+import { primaryLink, textLink } from "@/components/ui/link-styles";
 import { getJob, roleTitle } from "@/lib/data";
 import { applyTarget, experienceRange, formatJobDate } from "@/lib/jobs/format";
 import { routes } from "@/lib/routes";

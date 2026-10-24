@@ -2,7 +2,7 @@ import Link from "next/link";
 import { jobsCopy } from "@/content/jobs.config";
 import { jobsHref } from "@/lib/jobs/filters";
 import type { JobFilters } from "@/types/domain";
-import { secondaryLink } from "./styles";
+import { secondaryLink } from "@/components/ui/link-styles";
 
 const copy = jobsCopy.paging;
 

@@ -7,7 +7,7 @@ import { experienceRange, formatJobDate } from "@/lib/jobs/format";
 import { routes } from "@/lib/routes";
 import type { Job } from "@/types/domain";
 import { SkillTags } from "./SkillTags";
-import { secondaryLink } from "./styles";
+import { secondaryLink } from "@/components/ui/link-styles";
 
 const copy = jobsCopy.card;
 

@@ -1,4 +1,4 @@
-// Link-styled-as-button classes for the jobs pages. The Button primitive is a
+// Link-styled-as-button classes, shared by the app pages. The Button primitive is a
 // <button>, and these are navigations, so they stay links with the same look.
 
 const base =
