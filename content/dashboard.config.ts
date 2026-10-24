@@ -14,6 +14,13 @@ export const dashboardCopy = {
     planPro: "Pro",
   },
 
+  /** TODO(session-c): the temporary home until the widgets are rebuilt on the six blocks. */
+  temporary: {
+    title: "Your roadmap is ready",
+    body: "Six blocks, from knowing the market to sitting the interview. Blocks 1 and 2 are free.",
+    cta: "Start your roadmap",
+  },
+
   states: {
     errorMessage: "Couldn't load this. Try again.",
     retryLabel: "Try again",

@@ -1,55 +1,24 @@
-// TODO(widgets): TEMPORARY PAGE. This exists only to prove the shell, the 1120px
-// container, the two-column grid and the mobile stacking order. Next session
-// replaces every placeholder below with the real widget, each wrapped in its own
-// Suspense and error boundary and each implementing all five states.
+// TODO(session-c): TEMPORARY HOME. The course-model widget placeholders are
+// gone; Session C rebuilds Continue, Journey, This week, GCC pulse and Profile
+// readiness on the six blocks, each with its own Suspense, error boundary and
+// five states. Until then: the greeting row and one way into the roadmap.
 
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AppContainer } from "@/components/layout/app/AppContainer";
 import { PageHeader } from "@/components/layout/app/PageHeader";
+import { Badge } from "@/components/ui/Badge";
 import { Chip } from "@/components/ui/Chip";
-import { Skeleton, SkeletonText } from "@/components/ui/Skeleton";
 import { SoftCard } from "@/components/ui/SoftCard";
+import { primaryLink } from "@/components/ui/link-styles";
 import { dashboardCopy } from "@/content/dashboard.config";
 import { getProfile, getUser, roleTitle } from "@/lib/data";
 import { routes } from "@/lib/routes";
+import { trackLabel } from "@/lib/tracks";
 
 export const metadata: Metadata = { title: "Home · PrepClever" };
 
 const copy = dashboardCopy;
-
-/** Reserved heights, so a skeleton and its loaded content are the same size. */
-const placeholders = {
-  main: [
-    { key: "continue", heading: copy.continueCard.heading, height: "13rem", tone: "accent" as const },
-    { key: "path", heading: copy.pathOverview.heading, height: "22rem", tone: "default" as const },
-  ],
-  side: [
-    { key: "goal", heading: copy.weeklyGoal.heading, height: "9.5rem", tone: "default" as const },
-    { key: "pulse", heading: copy.gccPulse.heading, height: "9rem", tone: "default" as const },
-    { key: "readiness", heading: copy.profileReadiness.heading, height: "10rem", tone: "default" as const },
-  ],
-};
-
-function WidgetPlaceholder({
-  heading,
-  height,
-  tone,
-}: {
-  heading: string;
-  height: string;
-  tone: "default" | "accent";
-}) {
-  return (
-    <SoftCard tone={tone} padding="lg">
-      <p className="font-heading text-base leading-tight text-text-primary">{heading}</p>
-      <div className="mt-[var(--space-md)] grid content-start gap-[var(--space-sm)]" style={{ minHeight: height }}>
-        <Skeleton width="40%" height="0.7rem" />
-        <SkeletonText lines={3} />
-      </div>
-    </SoftCard>
-  );
-}
 
 export default async function DashboardPage() {
   const [user, profile] = await Promise.all([getUser(), getProfile()]);
@@ -61,36 +30,26 @@ export default async function DashboardPage() {
         title={firstName ? copy.greeting.withName(firstName) : copy.greeting.withoutName}
         subtext={copy.greeting.subtext}
         action={
-          <Link href={routes.profile} aria-label={copy.greeting.roleChipHint}>
-            <Chip>
-              {copy.greeting.roleChipPrefix} {roleTitle(profile.roleId)}
-            </Chip>
-          </Link>
+          <>
+            <Link href={routes.profile} aria-label={`${copy.greeting.roleChipHint}: ${roleTitle(profile.roleId)}`}>
+              <Chip>
+                {copy.greeting.roleChipPrefix} {roleTitle(profile.roleId)} · {trackLabel(profile.track, profile.situation)}
+              </Chip>
+            </Link>
+            <Badge>{user.plan === "pro" ? copy.greeting.planPro : copy.greeting.planFree}</Badge>
+          </>
         }
       />
 
-      <div className="grid items-start gap-6 pb-[var(--space-xl)] lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-        <div className="grid gap-6">
-          {placeholders.main.map((item) => (
-            <WidgetPlaceholder
-              key={item.key}
-              heading={item.heading}
-              height={item.height}
-              tone={item.tone}
-            />
-          ))}
-        </div>
-        <div className="grid gap-6">
-          {placeholders.side.map((item) => (
-            <WidgetPlaceholder
-              key={item.key}
-              heading={item.heading}
-              height={item.height}
-              tone={item.tone}
-            />
-          ))}
-        </div>
-      </div>
+      <SoftCard tone="accent" padding="lg" className="mb-[var(--space-xl)] grid justify-items-start gap-[var(--space-sm)]">
+        <h2 className="font-heading text-[length:var(--font-size-h3)] leading-[var(--line-height-h3)] text-text-primary">
+          {copy.temporary.title}
+        </h2>
+        <p className="max-w-prose text-text-subtle">{copy.temporary.body}</p>
+        <Link href={routes.roadmap} className={`${primaryLink} mt-[var(--space-xs)]`}>
+          {copy.temporary.cta}
+        </Link>
+      </SoftCard>
     </AppContainer>
   );
 }
