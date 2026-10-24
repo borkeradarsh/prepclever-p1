@@ -1,0 +1,552 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>AI Roles Concept Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a skill-tree map. Domains are columns read left to right, foundations first; a side panel teaches the selected concept or role path. */
+:root{
+  --bg:#F2F5F4; --surface:#FFFFFF; --lane:#E7ECEA; --ink:#14201B; --muted:#5A6964; --line:#CFD8D4;
+  --edge:#9AA9A3; --accent:#2B4FC7; --accent-ink:#FFFFFF; --accent-soft:#E2E8FB; --learned:#1D8253; --on-learned:#FFFFFF;
+  --f-display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1214; --surface:#151C1F; --lane:#11181A; --ink:#E4ECE8; --muted:#94A39D; --line:#2A363A;
+  --edge:#4C5B60; --accent:#88A3FF; --accent-ink:#0B1020; --accent-soft:#1B2545; --learned:#4CC48A; --on-learned:#06150D; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1214; --surface:#151C1F; --lane:#11181A; --ink:#E4ECE8; --muted:#94A39D; --line:#2A363A;
+  --edge:#4C5B60; --accent:#88A3FF; --accent-ink:#0B1020; --accent-soft:#1B2545; --learned:#4CC48A; --on-learned:#06150D; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:14px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.top{display:flex;flex-wrap:wrap;align-items:end;gap:12px 24px;justify-content:space-between}
+.brand h1{font-family:var(--f-display);font-weight:700;font-size:26px;line-height:1.1;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.brand p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:7px 12px;cursor:pointer;font-weight:600;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.search{position:relative}
+.search input{font:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);width:220px;max-width:100%}
+
+.roles-wrap{overflow-x:auto;margin-top:12px;padding-bottom:2px}
+.roles{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;display:inline-flex;gap:8px;align-items:center}
+.chip .n{font-family:var(--f-mono);font-size:11px;color:var(--muted);font-weight:400}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip[aria-pressed="true"] .n{color:var(--accent-ink);opacity:.8}
+
+.main{margin-top:12px;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:12px}
+.stage{position:relative;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden;min-height:0;min-width:0}
+#graph{display:block;width:100%;height:100%;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+#graph.dragging{cursor:grabbing}
+#vp.anim{transition:transform .45s cubic-bezier(.2,.7,.2,1)}
+.zoom{position:absolute;right:calc(10px + env(safe-area-inset-right,0px));bottom:10px;display:flex;flex-direction:column;gap:4px}
+.zoom button{width:32px;height:32px;border:1px solid var(--line);background:var(--surface);border-radius:8px;cursor:pointer;font-size:16px;font-weight:600;display:grid;place-items:center}
+.zoom button.fit{font-size:10px;font-family:var(--f-mono)}
+.legend{position:absolute;left:10px;bottom:10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--muted);max-width:calc(100% - 70px)}
+.legend .k{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:10px;border-radius:3px;border:1.5px solid var(--line);background:var(--surface);display:inline-block}
+.sw.core{background:var(--accent);border-color:var(--accent)}
+.sw.useful{background:var(--accent-soft);border:1.5px dashed var(--accent)}
+.sw.none{opacity:.35}
+.sw.learned{background:var(--learned);border-color:var(--learned);border-radius:50%;width:10px}
+.dotk{font-family:var(--f-mono);letter-spacing:.05em}
+
+/* SVG */
+.lane{fill:var(--lane)}
+.lane-h{font-family:var(--f-mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;fill:var(--muted)}
+.edge{fill:none;stroke:var(--edge);stroke-width:1;opacity:.45;transition:opacity .2s}
+.edge.off{opacity:.08}
+.edge.on{opacity:.7}
+.edge.fade{opacity:.05}
+.edge.anc{stroke:var(--accent);stroke-width:2;opacity:1;marker-end:url(#arA)}
+.edge.dep{stroke:var(--ink);stroke-width:1.4;stroke-dasharray:4 3;opacity:.8;marker-end:url(#arD)}
+#arA path{fill:var(--accent)} #arD path{fill:var(--ink)}
+.node{cursor:pointer;transition:opacity .2s}
+.node rect.box{fill:var(--surface);stroke:var(--line);stroke-width:1.2}
+.node text{font-family:var(--f-body);font-size:11.5px;font-weight:600;fill:var(--ink);pointer-events:none}
+.node .dot{pointer-events:none}
+.node .dot.c2{fill:var(--muted)}
+.node .dot.c1{fill:none;stroke:var(--muted);stroke-width:1}
+.node .dot.c0{fill:var(--line)}
+.node.core rect.box{fill:var(--accent);stroke:var(--accent)}
+.node.core text{fill:var(--accent-ink)}
+.node.core .dot.c2{fill:var(--accent-ink)}
+.node.core .dot.c1{stroke:var(--accent-ink)}
+.node.core .dot.c0{fill:var(--accent-ink);opacity:.3}
+.node.useful rect.box{fill:var(--accent-soft);stroke:var(--accent);stroke-dasharray:4 3;stroke-width:1.4}
+.node.none{opacity:.28}
+.node.dim{opacity:.14}
+.node.nomatch{opacity:.15}
+.node.match rect.box{stroke:var(--ink);stroke-width:2.4;stroke-dasharray:none}
+.node.sel{opacity:1}
+.node.sel rect.ring{stroke:var(--ink);stroke-width:2;fill:none}
+.node rect.ring{fill:none;stroke:none}
+.node:hover rect.box{stroke-width:2}
+.node:focus{outline:none}
+.node:focus-visible rect.ring{stroke:var(--accent);stroke-width:2.5}
+.node .check{display:none}
+.node.learned .check{display:inline}
+.check circle{fill:var(--learned);stroke:var(--surface);stroke-width:2}
+.check path{fill:none;stroke:var(--on-learned);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* Matrix */
+.matrix{position:absolute;inset:0;overflow:auto}
+.matrix table{border-collapse:separate;border-spacing:0;font-size:13px;min-width:640px;width:100%}
+.matrix th,.matrix td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:center}
+.matrix thead th{position:sticky;top:0;background:var(--surface);z-index:2;font-size:11px;font-weight:700;vertical-align:bottom;cursor:pointer;line-height:1.2}
+.matrix thead th:first-child{text-align:left;cursor:default;left:0;z-index:3}
+.matrix td.nm{text-align:left;position:sticky;left:0;background:var(--surface);cursor:pointer;font-weight:500;white-space:nowrap;z-index:1}
+.matrix td.nm:hover{color:var(--accent)}
+.matrix tr.grp td{background:var(--lane);font-family:var(--f-mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);text-align:left;position:sticky;left:0}
+.matrix .cur{background:var(--accent-soft)}
+.matrix thead th.cur{background:var(--accent);color:var(--accent-ink)}
+.mdot{display:inline-block;width:10px;height:10px;border-radius:50%}
+.mdot.c2{background:var(--accent)}
+.mdot.c1{border:1.5px solid var(--accent)}
+.mdot.c0{width:4px;height:4px;background:var(--line)}
+.matrix tfoot td{font-family:var(--f-mono);font-size:11px;color:var(--muted);position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--line)}
+.matrix tfoot td:first-child{text-align:left;left:0;z-index:2}
+.lm{color:var(--learned);font-weight:700;margin-left:4px}
+
+/* Panel */
+.panel{border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:auto;min-height:0;min-width:0;padding:18px 18px 22px}
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0}
+.panel h2{font-family:var(--f-display);font-weight:700;font-size:24px;line-height:1.15;margin:4px 0 8px;text-wrap:balance}
+.panel h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:18px 0 6px}
+.panel p{margin:0 0 8px;max-width:65ch}
+.back{background:none;border:0;padding:0;color:var(--accent);cursor:pointer;font-size:13px;font-weight:600;margin-bottom:10px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 12px;cursor:pointer;font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:8px}
+.btn.on{background:var(--learned);border-color:var(--learned);color:var(--on-learned)}
+.panel ul.topics{margin:0;padding-left:18px}
+.panel ul.topics li{margin:2px 0}
+.build{background:var(--lane);border-radius:8px;padding:10px 12px}
+.res{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.res a{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 10px;align-items:baseline;padding:8px 10px;border:1px solid var(--line);border-radius:8px;text-decoration:none;color:var(--ink)}
+.res a:hover{border-color:var(--accent)}
+.res a:hover .rti{color:var(--accent)}
+.rtype{font-family:var(--f-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);grid-row:span 2;min-width:62px}
+.rti{font-weight:600;font-size:13px;line-height:1.35}
+.rhost{font-family:var(--f-mono);font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+.links{display:flex;flex-wrap:wrap;gap:6px}
+.lk{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:3px 8px;cursor:pointer;font-size:12.5px;font-weight:500;display:inline-flex;gap:6px;align-items:center}
+.lk:hover{border-color:var(--accent)}
+.lk .ok{color:var(--learned);font-weight:700}
+.muted{color:var(--muted)}
+.rt{width:100%;border-collapse:collapse;font-size:13px}
+.rt td{padding:5px 0;border-bottom:1px solid var(--line)}
+.rt tr{cursor:pointer}
+.rt tr:hover td:first-child{color:var(--accent)}
+.rt tr.cur td{font-weight:700}
+.rt td:last-child{text-align:right}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;letter-spacing:.02em}
+.pill.c2{background:var(--accent);color:var(--accent-ink)}
+.pill.c1{background:var(--accent-soft);color:var(--accent);border:1px dashed var(--accent)}
+.pill.c0{color:var(--muted);font-weight:500}
+.bar{height:8px;border-radius:99px;background:var(--lane);overflow:hidden;margin:6px 0 4px}
+.bar i{display:block;height:100%;background:var(--learned);border-radius:99px;transition:width .3s}
+.stat{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.rolecards{display:grid;gap:8px;margin-top:10px}
+.rc{border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;background:var(--surface);text-align:left;width:100%}
+.rc:hover{border-color:var(--accent)}
+.rc b{font-size:14px}
+.rc p{font-size:12.5px;color:var(--muted);margin:2px 0 4px}
+.path{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:2px}
+.path li{display:grid;grid-template-columns:22px 22px minmax(0,1fr) auto;gap:8px;align-items:center;padding:4px 0;border-bottom:1px solid var(--line)}
+.path .num{font-family:var(--f-mono);font-size:11px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.path .nm{background:none;border:0;padding:0;text-align:left;cursor:pointer;font-weight:600;font-size:13px;min-width:0}
+.path .nm small{display:block;font-weight:400;color:var(--muted);font-size:11.5px}
+.path .nm:hover{color:var(--accent)}
+.path li.done .nm{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+.cb{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;display:grid;place-items:center;padding:0}
+.cb.on{background:var(--learned);border-color:var(--learned)}
+.cb svg{width:12px;height:12px}
+.cb.on path{stroke:var(--on-learned)}
+.cb path{stroke:transparent;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.toggle{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;cursor:pointer;color:var(--muted)}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.hint{font-size:12.5px;color:var(--muted)}
+
+@media (min-width:960px){
+  html,body{height:100%}
+  body{display:flex;flex-direction:column}
+  .main{flex:1;min-height:0}
+}
+@media (max-width:959px){
+  .main{grid-template-columns:minmax(0,1fr)}
+  .stage{height:64vh;min-height:380px}
+  .roles{flex-wrap:nowrap}
+  .search input{width:160px}
+  .legend{font-size:11px;gap:8px}
+}
+@media (prefers-reduced-motion: reduce){
+  #vp.anim{transition:none} .edge,.node,.bar i{transition:none}
+}
+</style>
+
+<header class="top">
+  <div class="brand">
+    <h1>AI Roles Concept Map</h1>
+    <p id="sub">71 concepts, 8 domains, 7 roles. Pick a role, then click any concept to learn it.</p>
+  </div>
+  <div class="tools">
+    <div class="seg" role="group" aria-label="View">
+      <button id="vGraph" aria-pressed="true">Graph</button>
+      <button id="vMatrix" aria-pressed="false">Role matrix</button>
+    </div>
+    <div class="search"><input id="q" type="search" placeholder="Search concepts…" aria-label="Search concepts"></div>
+  </div>
+</header>
+<div class="roles-wrap"><nav class="roles" id="roles" aria-label="Roles"></nav></div>
+
+<div class="main">
+  <section class="stage" id="stage">
+    <svg id="graph" role="img" aria-label="Concept graph">
+      <defs>
+        <marker id="arA" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z"/></marker>
+        <marker id="arD" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L8,4 L0,8 z"/></marker>
+      </defs>
+      <g id="vp"><g id="lanes"></g><g id="edges"></g><g id="nodes"></g></g>
+    </svg>
+    <div class="matrix" id="matrix" hidden></div>
+    <div class="legend" id="legend"></div>
+    <div class="zoom" id="zoomCtl">
+      <button id="zIn" aria-label="Zoom in">+</button>
+      <button id="zOut" aria-label="Zoom out">−</button>
+      <button id="zFit" class="fit" aria-label="Fit graph to view">FIT</button>
+    </div>
+  </section>
+  <aside class="panel" id="panel" aria-live="polite"></aside>
+</div>
+
+<script>
+const ROLES=[
+ {k:"mle",n:"ML Engineer",d:"Builds, trains and ships models into production systems."},
+ {k:"genai",n:"GenAI / LLM Engineer",d:"Builds products on foundation models: prompting, RAG, agents, fine-tuning and evals."},
+ {k:"mlops",n:"AI Platform / MLOps",d:"Runs the infrastructure that trains, deploys and monitors models reliably."},
+ {k:"dataeng",n:"AI / ML Data Engineer",d:"Builds the pipelines and datasets that models learn from and serve on."},
+ {k:"scientist",n:"Data / Applied Scientist",d:"Turns data into decisions and models through statistics, experiments and research."},
+ {k:"aibackend",n:"AI Backend / SWE",d:"Integrates AI into product backends: APIs, LLM calls, retrieval and reliability."},
+ {k:"architect",n:"AI Architect / Lead",d:"Designs end-to-end AI systems and guides teams on cost, risk and strategy."}
+];
+const DOMAINS=[
+ {k:"math",n:"Math & Stats"},{k:"cs",n:"Programming & CS"},{k:"data",n:"Data"},{k:"ml",n:"Classical ML"},
+ {k:"dl",n:"Deep Learning"},{k:"llm",n:"LLMs & GenAI"},{k:"ops",n:"MLOps & Infra"},{k:"lead",n:"Systems & Leadership"}
+];
+// id, name, domain, prerequisites, role levels (order of ROLES; 2 core, 1 good to know, 0 not needed), description, topics, practice project
+const RAW=[
+["linalg","Linear Algebra","math","","2100201","Vectors, matrices and the operations on them. Model parameters, embeddings and data batches are all matrices, so this is the language ML is written in.","Vectors, dot products and norms|Matrix multiplication and transposes|Eigenvalues and eigenvectors|SVD and low-rank approximation","Implement PCA from scratch with NumPy using SVD and compare it with scikit-learn."],
+["calc","Calculus","math","","2100201","Derivatives, partial derivatives and the chain rule. Backpropagation is the chain rule applied to a computation graph.","Derivatives and partial derivatives|The chain rule|Gradients and Jacobians|Taylor approximations","Hand-derive the gradient of the logistic regression loss, then check it numerically."],
+["prob","Probability","math","","2101201","Random variables, distributions and expectation. Models output probabilities, and most losses are built from likelihoods.","Conditional probability and Bayes' rule|Common distributions|Expectation and variance|Maximum likelihood","Simulate a naive Bayes spam filter on a small email dataset."],
+["stats","Statistical Inference","math","prob","1101201","Drawing conclusions from samples: estimates, uncertainty and tests. It tells you whether a metric change is real or noise.","Sampling distributions|Confidence intervals|Hypothesis tests and p-values|Bootstrapping","Bootstrap confidence intervals for a model's accuracy on a held-out set."],
+["experiment","A/B Testing","math","stats","1101211","Designing controlled experiments to measure the impact of a change on real users. The final word on whether a model ships.","Randomisation units|Power and sample size|Guardrail metrics|Peeking and multiple testing","Write an experiment plan for a new ranking model, including sample size and stopping rules."],
+["optim","Optimization","math","calc,linalg","2100201","How models find good parameters: gradient descent and its variants. Explains learning rates, schedules and why training diverges.","Gradient descent and SGD|Momentum, Adam and AdamW|Learning-rate schedules|Convexity and local minima","Train linear regression with your own SGD and plot loss curves for three learning rates."],
+["causal","Causal Inference","math","stats,experiment","0000200","Estimating cause and effect when you cannot run an experiment. Used for pricing, policy and uplift questions.","Confounders and DAGs|Difference-in-differences|Propensity scores|Uplift modelling","Estimate the effect of a promotion from observational data using difference-in-differences."],
+
+["python","Python","cs","","2222222","The working language of AI. Every one of the seven roles reads and writes it daily.","Data types, functions and classes|Virtual environments and packaging|Type hints|Comprehensions and generators","Build a small CLI tool with typed functions, a test suite and a pyproject.toml."],
+["git","Git & Linux CLI","cs","","2222121","Version control, the shell and remote machines. You will spend real time in a terminal on GPU boxes and CI runners.","Branching, rebasing and pull requests|Shell scripting basics|SSH and remote work|Processes, logs and permissions","Automate a data download and cleanup with a shell script and review it through a pull request."],
+["sql","SQL","cs","","1112221","Querying relational data. Most training data and product metrics start life as a SQL query.","Joins and aggregations|Window functions|CTEs and subqueries|Query plans and indexes","Answer ten product questions on a public dataset using window functions."],
+["dsa","Data Structures & Algorithms","cs","python","2111121","Complexity, core data structures and classic algorithms. Needed to write code that scales, and to pass interviews.","Big-O analysis|Hash maps, heaps and trees|Graphs and search|Dynamic programming","Implement an LRU cache and a top-k heap, with tests and complexity notes."],
+["numpy","NumPy & Pandas","cs","python","2112200","Vectorised numerical computing and tabular data wrangling in Python.","Arrays, broadcasting and vectorisation|DataFrames, groupby and joins|Missing data|Memory and dtypes","Clean and profile a messy one-million-row CSV without Python loops."],
+["testing","Testing & Code Quality","cs","python","2222121","Unit, integration and data tests, plus linting and review habits that keep ML code maintainable.","pytest and fixtures|Mocking external services|Linting and formatting|Testing data and model code","Add tests and a linter to an existing notebook-turned-script."],
+["api","APIs & Web Services","cs","python","2211022","Designing and building HTTP APIs. Models and LLM features reach users through them.","REST and JSON schemas|FastAPI and Pydantic|Auth and rate limiting|Versioning and errors","Wrap a trained model in a FastAPI service with request validation and health checks."],
+["concurrency","Concurrency & Async","cs","dsa","1211021","Running many things at once with threads, processes and async IO. LLM apps spend most of their time waiting on network calls.","asyncio and event loops|Threads vs processes|Queues and backpressure|Timeouts and retries","Call an LLM API for 1,000 prompts concurrently with a rate limiter and retries."],
+["systemdesign","System Design","cs","api,dsa","2122022","Designing services that are scalable, reliable and maintainable: caching, queues, databases and their trade-offs.","Load balancing and caching|Queues and event-driven design|Databases and consistency|Availability and failure modes","Design a URL shortener, then a notification service, and write up the trade-offs."],
+
+["datamodel","Data Modeling & Warehousing","data","sql","0002111","Structuring data for analytics and ML with schemas, warehouses and lakehouses.","Star and snowflake schemas|Slowly changing dimensions|Lakehouse table formats (Iceberg, Delta)|Partitioning","Model an e-commerce dataset as a star schema in DuckDB."],
+["eda","Exploratory Data Analysis","data","numpy,stats","1001200","Profiling and visualising data to find patterns, errors and leakage before modelling.","Distributions and outliers|Correlation and leakage checks|Plotting with matplotlib or seaborn|Writing up findings","Publish a short EDA notebook on a public dataset with five clear findings."],
+["etl","Pipelines & Orchestration","data","sql,python","1012001","Moving and transforming data on a schedule, reliably, with tools like Airflow, Dagster and dbt.","Batch ETL vs ELT|DAGs, scheduling and backfills|Idempotency|dbt models and tests","Build a daily pipeline that ingests an API, transforms with dbt and loads a warehouse."],
+["spark","Distributed Processing","data","etl","1012101","Processing data that does not fit on one machine with Spark, Dask or Ray Data.","Partitions and shuffles|Lazy evaluation|Joins at scale|Tuning memory and skew","Compute features over a 50 GB dataset with PySpark and profile the slowest stage."],
+["streaming","Streaming Data","data","etl,concurrency","1012011","Handling events in real time with Kafka, Flink or similar, for fresh features and online systems.","Topics, partitions and consumers|Event time and windows|Exactly-once semantics|Schema registry","Stream clickstream events through Kafka and compute rolling five-minute counts."],
+["dataquality","Data Quality & Contracts","data","etl","1112101","Validating data before it breaks a model, with tests, expectations and contracts between teams.","Schema and range checks|Freshness and volume monitors|Data contracts|Quarantine and alerting","Add validation checks to your pipeline that fail the run on bad data."],
+["featurestore","Feature Engineering","data","numpy,etl","2012201","Turning raw data into model inputs, and serving the same features in training and in production.","Encoding, scaling and aggregates|Point-in-time correctness|Training–serving skew|Feature stores (Feast)","Build time-correct features for a churn model and serve them from Feast."],
+["labeling","Dataset Curation","data","dataquality","1202100","Collecting, labelling and cleaning training and evaluation data. Better data usually beats a better model.","Annotation guidelines|Inter-annotator agreement|Finding label errors|Deduplication and splits","Write labelling guidelines for 200 examples, label them and measure agreement."],
+["governance","Data Governance & Privacy","data","datamodel","0112012","Knowing what data you have, where it came from and who may use it. Covers PII, lineage and regulation.","PII detection and masking|Lineage and catalogues|Access control|GDPR and retention","Trace one ML feature from source to model and flag every PII field on the way."],
+
+["mlfund","ML Fundamentals","ml","stats,linalg,numpy","2211212","The core ideas behind learning from data: generalisation, overfitting and how to split data honestly.","Bias–variance trade-off|Train, validation and test splits|Regularisation|Cross-validation|Data leakage","Show overfitting on a small dataset and fix it with regularisation and cross-validation."],
+["supervised","Supervised Learning","ml","mlfund,optim","2101201","Predicting labels from features with linear models, trees and gradient boosting, still the workhorses on tabular data.","Linear and logistic regression|Decision trees and random forests|Gradient boosting|Class imbalance","Beat a logistic-regression baseline with gradient boosting on a tabular dataset."],
+["unsupervised","Unsupervised Learning","ml","mlfund","1100200","Finding structure without labels: clustering, dimensionality reduction and anomaly detection.","k-means and DBSCAN|PCA, UMAP and t-SNE|Anomaly detection|Topic modelling","Cluster customer behaviour and explain each segment in plain language."],
+["evaluation","Model Evaluation","ml","mlfund","2211212","Choosing metrics that match the business goal, and measuring them correctly.","Precision, recall, F1 and AUC|Calibration|Ranking metrics (NDCG, MRR)|Offline vs online metrics|Error analysis","Pick a threshold for a fraud model from a cost matrix instead of from accuracy."],
+["sklearn","scikit-learn & XGBoost","ml","supervised","2011200","The standard libraries for classical ML: pipelines, preprocessing and boosted trees.","Pipelines and ColumnTransformer|Hyperparameter search|XGBoost and LightGBM|Model persistence","Package a full preprocessing and model pipeline into one saved artefact."],
+["timeseries","Time Series Forecasting","ml","supervised","1000200","Forecasting values over time, where order matters and random splits leak the future.","Trend and seasonality|ARIMA and ETS|Backtesting|Gradient boosting with lag features","Forecast daily demand and backtest against a seasonal-naive baseline."],
+["recsys","Recommenders & Ranking","ml","supervised,evaluation","1000101","Ordering items for a user. Retrieval, ranking and feedback loops sit behind every feed and search box.","Collaborative filtering|Two-tower retrieval|Learning to rank|Cold start and feedback loops","Build a two-stage movie recommender and report NDCG@10."],
+
+["nn","Neural Networks","dl","optim,mlfund","2200201","Layers, activations and backpropagation: the basis of every modern model.","Perceptrons and MLPs|Activations and initialisation|Backpropagation|Dropout and normalisation","Build a tiny autograd engine and train an MLP with it."],
+["pytorch","PyTorch","dl","nn,numpy","2210100","The main framework for building and training neural networks.","Tensors and autograd|Modules and optimisers|Datasets and DataLoaders|Debugging shapes and devices","Write a clean training loop with checkpointing and validation."],
+["cnn","Computer Vision","dl","nn","1100100","Convolutional and vision-transformer models for images: classification, detection and segmentation.","Convolutions and pooling|Transfer learning|Object detection|Data augmentation","Fine-tune a pretrained image model on a small custom dataset."],
+["seq","Sequence Models & Attention","dl","nn","1100100","Modelling ordered data, and the attention mechanism that replaced recurrence.","RNNs and LSTMs|Sequence-to-sequence|Attention|Positional information","Implement scaled dot-product attention and visualise the attention weights."],
+["embeddings","Embeddings","dl","nn","2201111","Dense vectors that capture meaning, so similar things sit close together. They power search, RAG and recommenders.","Word and sentence embeddings|Contrastive learning|Similarity metrics|Choosing and evaluating embedding models","Build semantic search over your notes and compare two embedding models."],
+["transformers","Transformers","dl","seq,pytorch","2200101","The architecture behind LLMs: self-attention, multi-head attention and stacked residual blocks.","Self-attention and multi-head attention|Encoder, decoder and encoder–decoder|Layer norm and residuals|Scaling laws","Train a character-level GPT on a small text corpus."],
+["training","Training at Scale","dl","pytorch","2120001","Training large models efficiently across GPUs: numeric precision, parallelism and memory.","Mixed precision (bf16, fp8)|Data parallel, FSDP and ZeRO|Gradient checkpointing|Throughput profiling","Scale a training job from one GPU to four with DDP and measure the speed-up."],
+["diffusion","Diffusion & Multimodal","dl","cnn,transformers","0100100","Models that generate images, audio and video, and models that read several modalities at once.","Denoising diffusion|Latent diffusion|Vision-language models|Text-to-image conditioning","Fine-tune a small diffusion model with LoRA on 20 images."],
+
+["llmfund","LLM Fundamentals","llm","transformers","1210122","How large language models work: tokens, pretraining, context windows, sampling and their failure modes.","Tokenisation|Pretraining and instruction tuning|Context windows|Temperature and sampling|Hallucination","Show a colleague, with a live demo, why the same prompt can give different answers."],
+["prompting","Prompt Engineering","llm","llmfund","1200121","Writing instructions, examples and structure that get reliable output from a model.","System prompts and roles|Few-shot examples|Step-by-step reasoning|Structured output (JSON)","Turn a flaky extraction prompt into one that passes 50 test cases."],
+["llmapi","LLM APIs & SDKs","llm","prompting,api","1210021","Calling hosted models in production: tool use, streaming, caching, batching and error handling.","Messages and tool-use APIs|Streaming responses|Prompt caching|Rate limits and retries|Model selection","Build a chat endpoint that streams, calls one tool and caches the system prompt."],
+["vectordb","Vector Search","llm","embeddings","1212021","Storing and searching embeddings fast, with ANN indexes, metadata filters and hybrid keyword search.","ANN indexes (HNSW, IVF)|Hybrid search with BM25|Metadata filtering|pgvector and dedicated stores","Index 100k documents in pgvector and compare recall with exact search."],
+["rag","Retrieval-Augmented Generation","llm","vectordb,prompting","1201022","Grounding model answers in your own documents by retrieving relevant context at query time.","Chunking strategies|Retrieval and re-ranking|Contextual retrieval|Citations|Evaluating retrieval vs generation","Build a RAG assistant over product docs that cites sources, and measure answer accuracy."],
+["agents","Agents & Tool Use","llm","llmapi,rag","1200022","Letting models plan, call tools and act over many steps, including workflows, MCP and multi-agent patterns.","Workflows vs agents|Tool design|Model Context Protocol (MCP)|Memory and state|Human-in-the-loop","Build an agent that triages GitHub issues with two tools and an approval step."],
+["finetune","Fine-tuning","llm","llmfund,training","2210101","Adapting a pretrained model to a task or style with supervised fine-tuning and parameter-efficient methods.","When to fine-tune vs prompt|Supervised fine-tuning|LoRA and QLoRA|Dataset formatting|Catastrophic forgetting","LoRA fine-tune a small open model for a classification task and compare it with prompting."],
+["alignment","Preference Tuning","llm","finetune","1100100","Shaping model behaviour with human or AI feedback through RLHF, DPO and reward models.","Reward models|RLHF and PPO|DPO and its variants|Constitutional approaches","Run DPO on a small preference dataset and evaluate the change."],
+["llmeval","LLM Evaluation","llm","evaluation,prompting","2210212","Measuring whether an LLM system is good, with test sets, graders, LLM-as-judge and regression tracking.","Building eval sets from real traffic|Code-based and LLM-as-judge graders|Benchmarks and their limits|Regression-testing prompts","Create a 100-case eval for your RAG app and run it in CI on every prompt change."],
+["inference","LLM Inference & Serving","llm","llmfund","2220011","Running models fast and cheaply with batching, KV caching, quantisation and serving engines.","KV cache and paged attention|Continuous batching|Quantisation (int8, int4)|Speculative decoding|Latency vs throughput","Serve an open model with vLLM and benchmark tokens per second at different batch sizes."],
+["guardrails","AI Safety & Security","llm","agents","1210022","Protecting LLM systems and their users from prompt injection, data leakage, jailbreaks and policy violations.","Prompt injection|Output filtering|Least-privilege tools|Red-teaming|PII leakage","Red-team your own agent with ten injection attacks and fix what gets through."],
+["syntheticdata","Synthetic Data","llm","prompting,labeling","1101100","Using models to generate training and evaluation data, and checking that it actually helps.","Self-instruct style generation|Diversity and deduplication|Filtering with graders|Distillation","Generate 1,000 synthetic Q&A pairs, filter them and measure the effect on your eval."],
+
+["docker","Containers","ops","git","2122021","Packaging code and dependencies into images that run the same everywhere.","Dockerfiles and layers|Multi-stage builds|GPU containers|Compose for local stacks","Containerise your model API with a slim multi-stage image."],
+["cloud","Cloud Platforms","ops","docker","2122022","Running workloads on AWS, GCP or Azure: compute, storage, networking and identity.","IAM and least privilege|Object storage|VPCs and networking|Managed ML services","Deploy your container to a managed service with a tightly scoped IAM role."],
+["k8s","Kubernetes","ops","docker","1021011","Orchestrating containers at scale: scheduling, scaling and self-healing.","Pods, deployments and services|Autoscaling|Helm|Resource requests and limits","Deploy a model service on a local kind cluster with autoscaling."],
+["iac","Infrastructure as Code","ops","cloud","0021011","Defining infrastructure in version-controlled code so every environment is reproducible.","Terraform modules|State and drift|Environments and workspaces|Policy as code","Recreate your cloud deployment entirely in Terraform."],
+["cicd","CI/CD for ML","ops","testing,docker","2121021","Automating tests, builds and deploys, including checks on data and models.","CI pipelines|Model and data tests in CI|Canary and blue-green deploys|Artefact versioning","Set up a GitHub Actions pipeline that tests, builds and deploys your service."],
+["tracking","Experiment Tracking","ops","evaluation","2120101","Recording runs, parameters, metrics and models so results are reproducible and comparable.","Run tracking (MLflow, W&B)|Model registry|Dataset versioning|Reproducibility","Track 20 training runs and promote the best one through a model registry."],
+["serving","Model Deployment","ops","api,docker,tracking","2120011","Getting models to users through batch scoring, online APIs or the edge, with safe rollouts.","Batch vs online inference|Model servers (Triton, BentoML)|Shadow and canary releases|Rollbacks","Deploy a model behind an API with a shadow release of a second version."],
+["pipelines","ML Pipelines","ops","etl,tracking","2021001","Automating the train, evaluate and deploy loop, including scheduled retraining.","Workflow tools (Kubeflow, Ray, Metaflow)|Retraining triggers|Step caching|Lineage","Build a pipeline that retrains weekly and deploys only if the eval improves."],
+["monitoring","Monitoring & Observability","ops","serving","2221111","Knowing how models behave in production: drift, quality, latency, cost and traces.","Data and prediction drift|LLM tracing|Latency and error SLOs|Feedback collection|Alerting","Add tracing and a drift dashboard to a deployed model, and set one alert."],
+["gpu","GPU Infrastructure","ops","k8s","1120001","Provisioning, scheduling and sharing accelerators for training and inference.","CUDA and GPU memory basics|GPU scheduling on Kubernetes|Multi-instance and fractional GPUs|Interconnects (NVLink, InfiniBand)","Profile a training job's GPU utilisation and remove one bottleneck."],
+["cost","Cost & Performance","ops","cloud,inference","1121012","Keeping AI systems fast and affordable through unit economics, caching, right-sizing and model routing.","Cost per request|Caching and batching|Right-sizing instances|Routing to smaller models","Cut the cost of an LLM feature by half without lowering its eval scores."],
+
+["comms","Technical Communication","lead","","1111212","Explaining technical work to engineers, product and leadership, in writing and in person.","Design docs|Results write-ups|Presenting trade-offs|Saying what you don't know","Write a one-page design doc for a model you built and get it reviewed."],
+["productsense","Problem Framing","lead","mlfund","1100212","Deciding whether ML is the right tool, and turning a business problem into a measurable one.","Is ML needed at all?|Defining success metrics|Baselines and heuristics|Scoping an MVP","Take a vague request and write the problem statement, metric and baseline."],
+["research","Reading Research","lead","nn,experiment","1100201","Reading papers critically and turning new results into working experiments.","Reading a paper in three passes|Reproducing results|Ablations|Spotting weak baselines","Reproduce one table from a recent paper and write up what held up."],
+["mlsysdesign","ML System Design","lead","systemdesign,serving,evaluation","2110012","Designing end-to-end ML systems: data, features, training, serving, feedback and failure modes.","Requirements and constraints|Online vs offline architecture|Feedback loops|Failure modes and fallbacks","Design a fraud-detection system end to end and defend it in a mock interview."],
+["llmsysdesign","GenAI Architecture","lead","rag,agents,inference","0210012","Architecting production LLM systems where gateways, routing, caching, fallbacks, evals and guardrails work together.","LLM gateways and routing|Caching layers|Fallbacks and graceful degradation|Multi-tenant isolation|Eval-driven releases","Draw the architecture for a company-wide AI assistant, with cost and risk notes."],
+["responsible","Responsible AI","lead","evaluation,governance","1101102","Fairness, transparency and compliance, including regulation such as the EU AI Act.","Bias and fairness metrics|Model and system cards|Risk tiers and regulation|Incident response","Write a model card and risk assessment for a system you built."],
+["buildvsbuy","Build vs Buy","lead","cloud,llmapi","0110002","Choosing between hosted APIs, open models, vendors and in-house builds without getting locked in.","Total cost of ownership|Open vs closed models|Vendor evaluation|Lock-in and portability","Write a build-vs-buy memo for one AI capability your team needs."],
+["leadership","Technical Leadership","lead","comms,mlsysdesign","0000002","Setting direction for AI work through roadmaps, standards, mentoring and aligning teams.","Roadmaps and prioritisation|Architecture reviews|Mentoring|Managing risk and ambiguity","Run an architecture review of a teammate's design and write the decision record."]
+];
+
+// Top 3 learning resources per concept: [format, title, url]
+const LINKS={"linalg":[["Video","3Blue1Brown: Essence of Linear Algebra","https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab"],["Course","MIT 18.06 Linear Algebra (Gilbert Strang)","https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/"],["Book","Mathematics for Machine Learning, Part I","https://mml-book.github.io/"]],"calc":[["Video","3Blue1Brown: Essence of Calculus","https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr"],["Article","The Matrix Calculus You Need for Deep Learning","https://explained.ai/matrix-calculus/"],["Course","Khan Academy: Multivariable Calculus","https://www.khanacademy.org/math/multivariable-calculus"]],"prob":[["Interactive","Seeing Theory (Brown University)","https://seeing-theory.brown.edu/"],["Video","Harvard Stat 110: Probability (lectures)","https://www.youtube.com/playlist?list=PL2SOU6wwxB0uwwH80KTQ6ht66KWxbzTIo"],["Video","StatQuest: Probability is not Likelihood","https://www.youtube.com/watch?v=pYxNSUDSFH4"]],"stats":[["Video","StatQuest: Statistics Fundamentals playlist","https://www.youtube.com/playlist?list=PLblh5JKOoLUK0FLuzwntyYI10UQFUhsY9"],["Book","OpenIntro Statistics (free)","https://www.openintro.org/book/os/"],["Book","Think Stats (Allen Downey, free)","https://allendowney.github.io/ThinkStats/"]],"experiment":[["Article","Evan Miller: How Not to Run an A/B Test","https://www.evanmiller.org/how-not-to-run-an-ab-test.html"],["Course","Udacity: A/B Testing by Google","https://www.udacity.com/course/ab-testing--ud257"],["Book","Trustworthy Online Controlled Experiments (Kohavi et al.)","https://experimentguide.com/"]],"optim":[["Article","Sebastian Ruder: An overview of gradient descent optimizers","https://www.ruder.io/optimizing-gradient-descent/"],["Article","Distill: Why Momentum Really Works","https://distill.pub/2017/momentum/"],["Video","3Blue1Brown: Gradient descent, how neural networks learn","https://www.youtube.com/watch?v=IHZwWFHWa-w"]],"causal":[["Book","Causal Inference: The Mixtape","https://mixtape.scunning.com/"],["Book","Causal Inference for the Brave and True","https://matheusfacure.github.io/python-causality-handbook/landing-page.html"],["Course","Brady Neal: Introduction to Causal Inference","https://www.bradyneal.com/causal-inference-course"]],"python":[["Docs","The Official Python Tutorial","https://docs.python.org/3/tutorial/"],["Video","Corey Schafer: Python Beginner Tutorials","https://www.youtube.com/playlist?list=PL-osiE80TeTt2d9bfVyTiXJA-UTHn6WwU"],["Article","Real Python tutorials","https://realpython.com/"]],"git":[["Course","MIT: The Missing Semester of Your CS Education","https://missing.csail.mit.edu/"],["Book","Pro Git (free)","https://git-scm.com/book/en/v2"],["Interactive","Learn Git Branching","https://learngitbranching.js.org/"]],"sql":[["Interactive","SQLBolt","https://sqlbolt.com/"],["Interactive","Select Star SQL","https://selectstarsql.com/"],["Book","Use The Index, Luke (SQL performance)","https://use-the-index-luke.com/"]],"dsa":[["Roadmap","NeetCode Roadmap","https://neetcode.io/roadmap"],["Course","MIT 6.006 Introduction to Algorithms","https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/"],["Video","freeCodeCamp: Data Structures Easy to Advanced","https://www.youtube.com/watch?v=RBSGKlAvoiM"]],"numpy":[["Book","Python for Data Analysis (Wes McKinney, free)","https://wesmckinney.com/book/"],["Docs","NumPy: the absolute basics for beginners","https://numpy.org/doc/stable/user/absolute_beginners.html"],["Docs","pandas: 10 minutes to pandas","https://pandas.pydata.org/docs/user_guide/10min.html"]],"testing":[["Docs","pytest documentation","https://docs.pytest.org/"],["Article","Real Python: Getting Started With Testing in Python","https://realpython.com/python-testing/"],["Article","Eugene Yan: How to Test Machine Learning Code and Systems","https://eugeneyan.com/writing/testing-ml/"]],"api":[["Docs","FastAPI Tutorial","https://fastapi.tiangolo.com/tutorial/"],["Article","Microsoft REST API Guidelines","https://github.com/microsoft/api-guidelines"],["Video","freeCodeCamp: Python API Development course","https://www.youtube.com/watch?v=0sOvCWFmrtA"]],"concurrency":[["Article","Real Python: Async IO in Python","https://realpython.com/async-io-python/"],["Docs","Python asyncio documentation","https://docs.python.org/3/library/asyncio.html"],["Video","Raymond Hettinger: Thinking About Concurrency","https://www.youtube.com/watch?v=9zinZmE3Ogk"]],"systemdesign":[["Article","The System Design Primer","https://github.com/donnemartin/system-design-primer"],["Book","Designing Data-Intensive Applications","https://dataintensive.net/"],["Blog","ByteByteGo blog","https://blog.bytebytego.com/"]],"datamodel":[["Article","Kimball Group: Dimensional Modeling Techniques","https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/"],["Docs","dbt: How we structure our dbt projects","https://docs.getdbt.com/best-practices/how-we-structure/1-guide-overview"],["Article","Databricks: What is a data lakehouse?","https://www.databricks.com/glossary/data-lakehouse"]],"eda":[["Article","Comprehensive data exploration with Python (Kaggle)","https://www.kaggle.com/code/pmarcelino/comprehensive-data-exploration-with-python"],["Course","Kaggle Learn: Data Visualization","https://www.kaggle.com/learn/data-visualization"],["Book","R for Data Science: Exploratory data analysis","https://r4ds.hadley.nz/EDA.html"]],"etl":[["Course","DataTalksClub Data Engineering Zoomcamp","https://github.com/DataTalksClub/data-engineering-zoomcamp"],["Article","Maxime Beauchemin: Functional Data Engineering","https://maximebeauchemin.medium.com/functional-data-engineering-a-modern-paradigm-for-batch-data-processing-2327ec32c42a"],["Docs","Apache Airflow: Fundamental concepts tutorial","https://airflow.apache.org/docs/apache-airflow/stable/tutorial/fundamentals.html"]],"spark":[["Docs","Apache Spark Quick Start","https://spark.apache.org/docs/latest/quick-start.html"],["Docs","PySpark Getting Started","https://spark.apache.org/docs/latest/api/python/getting_started/index.html"],["Video","freeCodeCamp: PySpark Tutorial","https://www.youtube.com/watch?v=_C8kWso4ne4"]],"streaming":[["Docs","Apache Kafka: Introduction","https://kafka.apache.org/intro"],["Article","Tyler Akidau: Streaming 101","https://www.oreilly.com/radar/the-world-beyond-batch-streaming-101/"],["Course","Confluent: Apache Kafka 101","https://developer.confluent.io/courses/apache-kafka/events/"]],"dataquality":[["Docs","Great Expectations documentation","https://docs.greatexpectations.io/"],["Article","Chad Sanderson: The Rise of Data Contracts","https://dataproducts.substack.com/p/the-rise-of-data-contracts"],["Paper","Google: Data Validation for Machine Learning","https://mlsys.org/Conferences/2019/doc/2019/167.pdf"]],"featurestore":[["Course","Kaggle Learn: Feature Engineering","https://www.kaggle.com/learn/feature-engineering"],["Docs","Feast documentation","https://docs.feast.dev/"],["Article","Uber: Meet Michelangelo, Uber's ML platform","https://www.uber.com/in/en/blog/michelangelo-machine-learning-platform/"]],"labeling":[["Course","MIT: Introduction to Data-Centric AI","https://dcai.csail.mit.edu/"],["Article","Label Errors in ML Test Sets (Northcutt et al.)","https://labelerrors.com/"],["Article","Karpathy: A Recipe for Training Neural Networks","https://karpathy.github.io/2019/04/25/recipe/"]],"governance":[["Article","Google Cloud: What is data governance?","https://cloud.google.com/learn/what-is-data-governance"],["Docs","OpenLineage documentation","https://openlineage.io/docs/"],["Docs","GDPR full text, searchable","https://gdpr-info.eu/"]],"mlfund":[["Course","Google Machine Learning Crash Course","https://developers.google.com/machine-learning/crash-course"],["Course","Andrew Ng: Machine Learning Specialization","https://www.coursera.org/specializations/machine-learning-introduction"],["Video","StatQuest: Machine Learning playlist","https://www.youtube.com/playlist?list=PLblh5JKOoLUICTaGLRoHQDuF_7q2GfuJF"]],"supervised":[["Book","An Introduction to Statistical Learning (free)","https://www.statlearning.com/"],["Video","StatQuest: Gradient Boost Part 1","https://www.youtube.com/watch?v=3CC4N4z3GJc"],["Docs","XGBoost: Introduction to Boosted Trees","https://xgboost.readthedocs.io/en/stable/tutorials/model.html"]],"unsupervised":[["Docs","scikit-learn: Clustering guide","https://scikit-learn.org/stable/modules/clustering.html"],["Article","Distill: How to Use t-SNE Effectively","https://distill.pub/2016/misread-tsne/"],["Video","StatQuest: PCA Step-by-Step","https://www.youtube.com/watch?v=FgakZw6K1QQ"]],"evaluation":[["Docs","scikit-learn: Metrics and scoring","https://scikit-learn.org/stable/modules/model_evaluation.html"],["Course","Google MLCC: Accuracy, precision and recall","https://developers.google.com/machine-learning/crash-course/classification/accuracy-precision-recall"],["Video","StatQuest: ROC and AUC, Clearly Explained","https://www.youtube.com/watch?v=4jRBRDbJemM"]],"sklearn":[["Course","scikit-learn MOOC (Inria)","https://inria.github.io/scikit-learn-mooc/"],["Docs","scikit-learn: Getting Started","https://scikit-learn.org/stable/getting_started.html"],["Docs","scikit-learn User Guide","https://scikit-learn.org/stable/user_guide.html"]],"timeseries":[["Book","Forecasting: Principles and Practice (free)","https://otexts.com/fpp3/"],["Course","Kaggle Learn: Time Series","https://www.kaggle.com/learn/time-series"],["Video","Rob Mulla: Time Series Forecasting with XGBoost","https://www.youtube.com/watch?v=vV12dGe_Fho"]],"recsys":[["Course","Google: Recommendation Systems course","https://developers.google.com/machine-learning/recommendation"],["Article","Eugene Yan: System Design for Recommendations and Search","https://eugeneyan.com/writing/system-design-for-discovery/"],["Paper","Deep Neural Networks for YouTube Recommendations","https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/"]],"nn":[["Video","Karpathy: Neural Networks, Zero to Hero","https://karpathy.ai/zero-to-hero.html"],["Video","3Blue1Brown: Neural Networks series","https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi"],["Book","Michael Nielsen: Neural Networks and Deep Learning","http://neuralnetworksanddeeplearning.com/"]],"pytorch":[["Docs","PyTorch Tutorials","https://docs.pytorch.org/tutorials/"],["Course","Zero to Mastery: Learn PyTorch","https://www.learnpytorch.io/"],["Video","Daniel Bourke: PyTorch for Deep Learning full course","https://www.youtube.com/watch?v=V_xro1bcAuA"]],"cnn":[["Course","Stanford CS231n notes","https://cs231n.github.io/"],["Course","fast.ai: Practical Deep Learning for Coders","https://course.fast.ai/"],["Interactive","CNN Explainer","https://poloclub.github.io/cnn-explainer/"]],"seq":[["Article","Colah: Understanding LSTM Networks","https://colah.github.io/posts/2015-08-Understanding-LSTMs/"],["Article","Lilian Weng: Attention? Attention!","https://lilianweng.github.io/posts/2018-06-24-attention/"],["Book","Dive into Deep Learning (free)","https://d2l.ai/"]],"embeddings":[["Article","Jay Alammar: The Illustrated Word2vec","https://jalammar.github.io/illustrated-word2vec/"],["Article","Vicki Boykis: What are embeddings?","https://vickiboykis.com/what_are_embeddings/"],["Docs","Sentence Transformers documentation","https://www.sbert.net/"]],"transformers":[["Article","Jay Alammar: The Illustrated Transformer","https://jalammar.github.io/illustrated-transformer/"],["Video","Karpathy: Let's build GPT, from scratch","https://www.youtube.com/watch?v=kCc8FmEb1nY"],["Video","3Blue1Brown: Attention in transformers","https://www.youtube.com/watch?v=eMlx5fFNoYc"]],"training":[["Book","Hugging Face: The Ultra-Scale Playbook","https://huggingface.co/spaces/nanotron/ultrascale-playbook"],["Docs","PyTorch: Getting Started with DDP","https://docs.pytorch.org/tutorials/intermediate/ddp_tutorial.html"],["Book","Stas Bekman: Machine Learning Engineering Open Book","https://github.com/stas00/ml-engineering"]],"diffusion":[["Article","Lilian Weng: What are Diffusion Models?","https://lilianweng.github.io/posts/2021-07-11-diffusion-models/"],["Article","Jay Alammar: The Illustrated Stable Diffusion","https://jalammar.github.io/illustrated-stable-diffusion/"],["Course","Hugging Face Diffusion Models course","https://huggingface.co/learn/diffusion-course"]],"llmfund":[["Video","Karpathy: Deep Dive into LLMs like ChatGPT","https://www.youtube.com/watch?v=7xTGNNLPyMI"],["Video","Karpathy: Intro to Large Language Models","https://www.youtube.com/watch?v=zjkBMFhNj_g"],["Course","Hugging Face LLM Course","https://huggingface.co/learn/llm-course"]],"prompting":[["Docs","Anthropic: Prompt engineering overview","https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview"],["Course","Anthropic: Interactive prompt engineering tutorial","https://github.com/anthropics/prompt-eng-interactive-tutorial"],["Article","Prompt Engineering Guide (DAIR.AI)","https://www.promptingguide.ai/"]],"llmapi":[["Docs","Claude API documentation","https://platform.claude.com/docs/en/home"],["Docs","Claude: Tool use overview","https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview"],["Article","Claude Cookbooks (code recipes)","https://github.com/anthropics/claude-cookbooks"]],"vectordb":[["Article","Pinecone: HNSW explained","https://www.pinecone.io/learn/series/faiss/hnsw/"],["Docs","pgvector on GitHub","https://github.com/pgvector/pgvector"],["Docs","FAISS wiki","https://github.com/facebookresearch/faiss/wiki"]],"rag":[["Article","Anthropic: Introducing Contextual Retrieval","https://www.anthropic.com/research/contextual-retrieval"],["Article","Pinecone: Retrieval-Augmented Generation","https://www.pinecone.io/learn/retrieval-augmented-generation/"],["Paper","Lewis et al.: Retrieval-Augmented Generation (original paper)","https://arxiv.org/abs/2005.11401"]],"agents":[["Article","Anthropic: Building effective agents","https://www.anthropic.com/research/building-effective-agents"],["Docs","Model Context Protocol documentation","https://modelcontextprotocol.io/"],["Article","Lilian Weng: LLM Powered Autonomous Agents","https://lilianweng.github.io/posts/2023-06-23-agent/"]],"finetune":[["Article","Sebastian Raschka: Practical Tips for Finetuning LLMs with LoRA","https://magazine.sebastianraschka.com/p/practical-tips-for-finetuning-llms"],["Docs","Hugging Face PEFT documentation","https://huggingface.co/docs/peft"],["Paper","LoRA: Low-Rank Adaptation of LLMs","https://arxiv.org/abs/2106.09685"]],"alignment":[["Article","Hugging Face: Illustrating RLHF","https://huggingface.co/blog/rlhf"],["Paper","Direct Preference Optimization (DPO)","https://arxiv.org/abs/2305.18290"],["Docs","Hugging Face TRL documentation","https://huggingface.co/docs/trl"]],"llmeval":[["Article","Hamel Husain: Your AI Product Needs Evals","https://hamel.dev/blog/posts/evals/"],["Article","Eugene Yan: Task-Specific LLM Evals that Do and Don't Work","https://eugeneyan.com/writing/evals/"],["Docs","Anthropic: Create strong empirical evaluations","https://platform.claude.com/docs/en/test-and-evaluate/develop-tests"]],"inference":[["Article","vLLM: Easy, Fast and Cheap LLM Serving with PagedAttention","https://vllm.ai/blog/2023-06-20-vllm"],["Article","Lilian Weng: Large Transformer Model Inference Optimization","https://lilianweng.github.io/posts/2023-01-10-inference-optimization/"],["Docs","vLLM documentation","https://docs.vllm.ai/"]],"guardrails":[["Docs","OWASP Top 10 for LLM Applications","https://genai.owasp.org/"],["Blog","Simon Willison: Prompt injection series","https://simonwillison.net/series/prompt-injection/"],["Docs","Anthropic: Mitigate jailbreaks and prompt injections","https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/mitigate-jailbreaks"]],"syntheticdata":[["Article","Hugging Face: Synthetic data, save money, time and carbon","https://huggingface.co/blog/synthetic-data-save-costs"],["Paper","Self-Instruct: Aligning LMs with Self-Generated Instructions","https://arxiv.org/abs/2212.10560"],["Paper","Textbooks Are All You Need (phi-1)","https://arxiv.org/abs/2306.11644"]],"docker":[["Docs","Docker: Get started","https://docs.docker.com/get-started/"],["Video","TechWorld with Nana: Docker Tutorial for Beginners","https://www.youtube.com/watch?v=3c-iBn73dDE"],["Docs","Docker: Multi-stage builds","https://docs.docker.com/build/building/multi-stage/"]],"cloud":[["Course","AWS Skill Builder","https://skillbuilder.aws/"],["Course","Google Skills (Google Cloud training)","https://www.skills.google/"],["Docs","AWS Well-Architected: Machine Learning Lens","https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/machine-learning-lens.html"]],"k8s":[["Video","TechWorld with Nana: Kubernetes Tutorial for Beginners","https://www.youtube.com/watch?v=X48VuDVv0do"],["Docs","Kubernetes Basics tutorial","https://kubernetes.io/docs/tutorials/kubernetes-basics/"],["Course","Kelsey Hightower: Kubernetes The Hard Way","https://github.com/kelseyhightower/kubernetes-the-hard-way"]],"iac":[["Docs","HashiCorp Terraform tutorials","https://developer.hashicorp.com/terraform/tutorials"],["Article","Gruntwork: A Comprehensive Guide to Terraform","https://www.gruntwork.io/blog/a-comprehensive-guide-to-terraform"],["Video","freeCodeCamp: Complete Terraform Course","https://www.youtube.com/watch?v=7xngnjfIlK4"]],"cicd":[["Article","Martin Fowler: Continuous Delivery for Machine Learning","https://martinfowler.com/articles/cd4ml.html"],["Article","Google Cloud: MLOps continuous delivery and automation pipelines","https://docs.cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning"],["Docs","GitHub Actions documentation","https://docs.github.com/en/actions"]],"tracking":[["Docs","MLflow documentation","https://mlflow.org/docs/latest/"],["Article","Made With ML: Experiment tracking","https://madewithml.com/courses/mlops/experiment-tracking/"],["Docs","DVC documentation (data versioning)","https://dvc.org/doc"]],"serving":[["Course","Made With ML (Goku Mohandas)","https://madewithml.com/"],["Docs","BentoML documentation","https://docs.bentoml.com/"],["Docs","NVIDIA Triton Inference Server user guide","https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/index.html"]],"pipelines":[["Course","DataTalksClub MLOps Zoomcamp","https://github.com/DataTalksClub/mlops-zoomcamp"],["Paper","Hidden Technical Debt in Machine Learning Systems","https://papers.nips.cc/paper/2015/hash/86df7dcfd896fcaf2674f757a2463eba-Abstract.html"],["Docs","Ray documentation","https://docs.ray.io/"]],"monitoring":[["Article","Chip Huyen: Data Distribution Shifts and Monitoring","https://huyenchip.com/2022/02/07/data-distribution-shifts-and-monitoring.html"],["Course","Evidently AI: ML Observability course","https://www.evidentlyai.com/ml-observability-course"],["Docs","OpenTelemetry documentation","https://opentelemetry.io/docs/"]],"gpu":[["Article","Horace He: Making Deep Learning Go Brrrr From First Principles","https://horace.io/brrr_intro.html"],["Article","Tim Dettmers: Which GPU(s) to Get for Deep Learning","https://timdettmers.com/2023/01/30/which-gpu-for-deep-learning/"],["Docs","NVIDIA CUDA C++ Programming Guide","https://docs.nvidia.com/cuda/cuda-c-programming-guide/"]],"cost":[["Article","FinOps Foundation: What is FinOps?","https://www.finops.org/introduction/what-is-finops/"],["Docs","Anthropic: Prompt caching","https://platform.claude.com/docs/en/build-with-claude/prompt-caching"],["Docs","AWS Well-Architected: Cost Optimization Pillar","https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html"]],"comms":[["Article","Malte Ubl: Design Docs at Google","https://www.industrialempathy.com/posts/design-docs-at-google/"],["Course","Google: Technical Writing courses","https://developers.google.com/tech-writing"],["Article","Paul Graham: Writing, Briefly","https://paulgraham.com/writing44.html"]],"productsense":[["Article","Google: Rules of Machine Learning","https://developers.google.com/machine-learning/guides/rules-of-ml"],["Article","Eugene Yan: How to Write Design Docs for ML Systems","https://eugeneyan.com/writing/ml-design-docs/"],["Article","Google PAIR: People + AI Guidebook","https://pair.withgoogle.com/guidebook/"]],"research":[["Article","S. Keshav: How to Read a Paper (PDF)","https://web.stanford.edu/class/ee384m/Handouts/HowtoReadPaper.pdf"],["Course","Stanford CS197: AI research for beginners","https://cs197.stanford.edu/"],["Video","Yannic Kilcher: paper explainer videos","https://www.youtube.com/@YannicKilcher"]],"mlsysdesign":[["Course","Stanford CS329S: Machine Learning Systems Design","https://stanford-cs329s.github.io/"],["Article","Evidently AI: ML and LLM system design case studies","https://www.evidentlyai.com/ml-system-design"],["Book","Chip Huyen: Designing Machine Learning Systems","https://www.oreilly.com/library/view/designing-machine-learning/9781098107956/"]],"llmsysdesign":[["Article","Eugene Yan: Patterns for Building LLM-based Systems","https://eugeneyan.com/writing/llm-patterns/"],["Article","What We Learned from a Year of Building with LLMs","https://applied-llms.org/"],["Article","Chip Huyen: Building a Generative AI Platform","https://huyenchip.com/2024/07/25/genai-platform.html"]],"responsible":[["Docs","NIST AI Risk Management Framework","https://www.nist.gov/itl/ai-risk-management-framework"],["Docs","EU Artificial Intelligence Act explorer","https://artificialintelligenceact.eu/"],["Paper","Model Cards for Model Reporting","https://arxiv.org/abs/1810.03993"]],"buildvsbuy":[["Article","a16z: Emerging Architectures for LLM Applications","https://a16z.com/emerging-architectures-for-llm-applications/"],["Tool","Artificial Analysis: model quality, price and speed","https://artificialanalysis.ai/"],["Book","Chip Huyen: AI Engineering","https://www.oreilly.com/library/view/ai-engineering/9781098166298/"]],"leadership":[["Article","StaffEng: stories and guides for Staff+ engineers","https://staffeng.com/"],["Docs","Architecture Decision Records (ADR)","https://adr.github.io/"],["Book","Tanya Reilly: The Staff Engineer's Path","https://www.oreilly.com/library/view/the-staff-engineers/9781098118723/"]]};
+
+const RI={};ROLES.forEach((r,i)=>RI[r.k]=i);
+const DI={};DOMAINS.forEach((d,i)=>DI[d.k]=i);
+const N={};const nodes=RAW.map((a,i)=>{const n={id:a[0],name:a[1],dom:a[2],pre:a[3]?a[3].split(","):[],roles:[...a[4]].map(Number),desc:a[5],topics:a[6].split("|"),build:a[7],links:LINKS[a[0]],i,deps:[]};N[n.id]=n;return n});
+nodes.forEach(n=>n.pre.forEach(p=>N[p].deps.push(n.id)));
+const lvl=id=>{const n=N[id];if(n.lv!=null)return n.lv;n.lv=n.pre.length?1+Math.max(...n.pre.map(lvl)):0;return n.lv};
+nodes.forEach(n=>lvl(n.id));
+
+// Layout
+const NW=136,NH=48,COLW=172,ROWH=60,PAD=20,HEAD=34;
+const cols=DOMAINS.map(d=>nodes.filter(n=>n.dom===d.k).sort((a,b)=>a.lv-b.lv||a.i-b.i));
+cols.forEach((c,ci)=>c.forEach((n,ri)=>{n.col=ci;n.row=ri;n.x=PAD+14+ci*COLW;n.y=PAD+HEAD+ri*ROWH}));
+const maxRows=Math.max(...cols.map(c=>c.length));
+const W=PAD*2+(DOMAINS.length-1)*COLW+NW+28, H=PAD+HEAD+maxRows*ROWH+PAD-ROWH+NH+14;
+const edges=[];nodes.forEach(n=>n.pre.forEach(p=>edges.push({a:p,b:n.id})));
+
+const SVGNS="http://www.w3.org/2000/svg";
+const mk=(t,at,parent)=>{const e=document.createElementNS(SVGNS,t);for(const k in at)e.setAttribute(k,at[k]);parent&&parent.appendChild(e);return e};
+const $=s=>document.querySelector(s);
+const svg=$("#graph"),vp=$("#vp");
+
+DOMAINS.forEach((d,ci)=>{
+  const x=PAD+ci*COLW;
+  mk("rect",{class:"lane",x,y:PAD,width:NW+28,height:H-PAD*2+6,rx:10},$("#lanes"));
+  const t=mk("text",{class:"lane-h",x:x+14,y:PAD+20},$("#lanes"));t.textContent=d.n;
+});
+function wrap(s,max=19){const L=[""];for(const w of s.split(" ")){const c=L[L.length-1];if(!c)L[L.length-1]=w;else if((c+" "+w).length<=max)L[L.length-1]=c+" "+w;else L.push(w)}return L.slice(0,2)}
+edges.forEach(e=>{
+  const s=N[e.a],t=N[e.b];let d;
+  if(s.col===t.col){const y1=s.y+NH/2,y2=t.y+NH/2,b=10+Math.min(14,(t.row-s.row)*3);d=`M${s.x},${y1} C${s.x-b},${y1} ${t.x-b},${y2} ${t.x},${y2}`}
+  else{const x1=s.x+NW,y1=s.y+NH/2,x2=t.x,y2=t.y+NH/2,c=Math.max(24,(x2-x1)*.45);d=`M${x1},${y1} C${x1+c},${y1} ${x2-c},${y2} ${x2},${y2}`}
+  e.el=mk("path",{class:"edge",d},$("#edges"));
+});
+nodes.forEach(n=>{
+  const g=mk("g",{class:"node",transform:`translate(${n.x},${n.y})`,tabindex:"0",role:"button","aria-label":n.name},$("#nodes"));
+  g.dataset.id=n.id;
+  mk("rect",{class:"ring",x:-3,y:-3,width:NW+6,height:NH+6,rx:9},g);
+  mk("rect",{class:"box",width:NW,height:NH,rx:7},g);
+  const L=wrap(n.name);
+  L.forEach((l,i)=>{const t=mk("text",{x:NW/2,y:(L.length===1?23:16)+i*13,"text-anchor":"middle"},g);t.textContent=l});
+  n.roles.forEach((v,i)=>{const cx=NW/2-24+i*8,cy=NH-8;mk("circle",{class:"dot c"+v,cx,cy,r:v===0?1.4:2.4},g)});
+  const ck=mk("g",{class:"check",transform:`translate(${NW-2},2)`},g);
+  mk("circle",{r:7},ck);mk("path",{d:"M-3,0 L-1,2.2 L3,-2.4"},ck);
+  n.el=g;
+  g.addEventListener("keydown",ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();select(n.id,false)}});
+  g.addEventListener("pointerenter",ev=>{if(ev.pointerType==="mouse"&&!drag.active){state.hover=n.id;paint()}});
+  g.addEventListener("pointerleave",ev=>{if(state.hover===n.id){state.hover=null;paint()}});
+});
+
+// State
+const KEY="ai-roles-concept-map.v1";
+const state={role:"all",sel:null,hover:null,coreOnly:false,view:"graph",q:""};
+const learned=new Set();
+try{const s=JSON.parse(localStorage.getItem(KEY)||"{}");(s.learned||[]).forEach(id=>N[id]&&learned.add(id));if(s.role&&RI[s.role]!=null)state.role=s.role;if(s.coreOnly)state.coreOnly=true}catch(e){}
+const h=(location.hash||"").slice(1);if(RI[h]!=null)state.role=h;else if(N[h])state.sel=h;
+function save(){try{localStorage.setItem(KEY,JSON.stringify({learned:[...learned],role:state.role,coreOnly:state.coreOnly}))}catch(e){}}
+
+const lvOf=(n,r=state.role)=>r==="all"?-1:n.roles[RI[r]];
+function ancestors(id,acc=new Set()){for(const p of N[id].pre){if(!acc.has(p)){acc.add(p);ancestors(p,acc)}}return acc}
+const matchQ=(n,q)=>n.name.toLowerCase().includes(q)||n.topics.some(t=>t.toLowerCase().includes(q))||n.desc.toLowerCase().includes(q);
+const roleSet=(k,coreOnly)=>nodes.filter(n=>{const v=n.roles[RI[k]];return coreOnly?v===2:v>0}).sort((a,b)=>a.lv-b.lv||a.col-b.col||a.row-b.row);
+
+function paint(){
+  const focus=state.hover||state.sel, q=state.q.trim().toLowerCase();
+  let anc=null,deps=null,rel=null;
+  if(focus){anc=ancestors(focus);deps=new Set(N[focus].deps);rel=new Set([...anc,focus,...deps])}
+  for(const n of nodes){
+    const v=lvOf(n),c=n.el.classList,m=q&&matchQ(n,q);
+    c.toggle("core",v===2);c.toggle("useful",v===1);c.toggle("none",v===0);
+    c.toggle("sel",n.id===state.sel);c.toggle("dim",!!rel&&!rel.has(n.id));
+    c.toggle("learned",learned.has(n.id));c.toggle("match",!!m);c.toggle("nomatch",!!q&&!m&&!rel);
+  }
+  for(const e of edges){
+    const c=e.el.classList;let k="";
+    if(focus){
+      if(anc.has(e.a)&&(e.b===focus||anc.has(e.b)))k="anc";
+      else if(e.a===focus)k="dep";else k="fade";
+    }else if(state.role!=="all"){k=(lvOf(N[e.a])>0&&lvOf(N[e.b])>0)?"on":"off"}
+    else if(q)k="off";
+    e.el.setAttribute("class","edge"+(k?" "+k:""));
+  }
+  // bring highlighted edges to front
+  if(focus)edges.forEach(e=>{if(e.el.classList.contains("anc")||e.el.classList.contains("dep"))e.el.parentNode.appendChild(e.el)});
+}
+
+function render(){paint();renderChips();renderLegend();renderPanel();if(state.view==="matrix")renderMatrix()}
+
+// Chips
+function renderChips(){
+  const el=$("#roles");
+  el.innerHTML=`<button class="chip" data-role="all" aria-pressed="${state.role==="all"}">All roles</button>`+
+   ROLES.map(r=>`<button class="chip" data-role="${r.k}" aria-pressed="${state.role===r.k}">${r.n}<span class="n">${roleSet(r.k,true).length}</span></button>`).join("");
+}
+$("#roles").addEventListener("click",e=>{const b=e.target.closest("[data-role]");if(b)setRole(b.dataset.role,true)});
+function setRole(k,clearSel){
+  state.role=k;if(clearSel)state.sel=null;save();
+  try{history.replaceState(null,"",k==="all"?location.pathname+location.search:"#"+k)}catch(e){}
+  render();
+}
+
+function renderLegend(){
+  const L=$("#legend");
+  if(state.view==="matrix"){L.innerHTML=`<span class="k"><span class="mdot c2"></span>Core</span><span class="k"><span class="mdot c1"></span>Good to know</span><span class="k">Click a row to open it</span>`;return}
+  L.innerHTML=state.role==="all"
+   ?`<span class="k dotk">●○ · ×7</span><span>Dots show the 7 roles in chip order: ● core, ○ good to know</span><span class="k"><span class="sw learned"></span>Learned</span>`
+   :`<span class="k"><span class="sw core"></span>Core</span><span class="k"><span class="sw useful"></span>Good to know</span><span class="k"><span class="sw none"></span>Not needed</span><span class="k"><span class="sw learned"></span>Learned</span>`;
+}
+
+// Panel
+const CK=`<svg viewBox="0 0 12 12"><path d="M2.5 6.2 L5 8.6 L9.6 3.6"/></svg>`;
+const LBL=["Not needed","Good to know","Core"];
+function progressFor(k){const s=roleSet(k,true);const d=s.filter(n=>learned.has(n.id)).length;return{d,t:s.length,p:s.length?Math.round(d/s.length*100):0}}
+function chip(id){const n=N[id];return `<button class="lk" data-sel="${id}">${learned.has(id)?'<span class="ok">✓</span>':""}${n.name}</button>`}
+function renderPanel(){
+  const P=$("#panel");
+  if(state.sel){
+    const n=N[state.sel],r=state.role,on=learned.has(n.id);
+    const backTo=r==="all"?"overview":ROLES[RI[r]].n+" path";
+    P.innerHTML=`<button class="back" data-back>← Back to ${backTo}</button>
+     <p class="eyebrow">${DOMAINS[DI[n.dom]].n}</p>
+     <h2>${n.name}</h2>
+     <p>${n.desc}</p>
+     <div class="row" style="margin-top:10px"><button class="btn ${on?"on":""}" data-learn="${n.id}">${on?"✓ Learned":"Mark as learned"}</button>
+     ${r!=="all"?`<span class="pill c${lvOf(n)}">${LBL[lvOf(n)]} for ${ROLES[RI[r]].n}</span>`:""}</div>
+     <h3>What to learn</h3><ul class="topics">${n.topics.map(t=>`<li>${t}</li>`).join("")}</ul>
+     <h3>Build this</h3><p class="build">${n.build}</p>
+     <h3>Top resources</h3><ol class="res">${n.links.map(([t,ti,u])=>`<li><a href="${u}" target="_blank" rel="noopener"><span class="rtype">${t}</span><span class="rti">${ti} ↗</span><span class="rhost">${new URL(u).hostname.replace(/^www\./,"")}</span></a></li>`).join("")}</ol>
+     <h3>Learn first</h3>${n.pre.length?`<div class="links">${n.pre.map(chip).join("")}</div>`:`<p class="muted">Nothing. This is a starting point.</p>`}
+     <h3>Unlocks</h3>${n.deps.length?`<div class="links">${n.deps.map(chip).join("")}</div>`:`<p class="muted">Nothing further on this map.</p>`}
+     <h3>Needed by role</h3>
+     <table class="rt">${ROLES.map((ro,i)=>`<tr data-role-keep="${ro.k}" class="${r===ro.k?"cur":""}"><td>${ro.n}</td><td><span class="pill c${n.roles[i]}">${LBL[n.roles[i]]}</span></td></tr>`).join("")}</table>`;
+    return;
+  }
+  if(state.role==="all"){
+    P.innerHTML=`<p class="eyebrow">Overview</p><h2>Seven AI roles, one map</h2>
+     <p>Each of the ${nodes.length} concepts is tagged Core or Good to know for every role. Arrows run from prerequisites to what they unlock, so columns read left to right from foundations to leadership.</p>
+     <p class="hint">Hover a concept to trace its prerequisites. Click it to see what to learn, a project to build and where to start. Your progress is saved in this browser.</p>
+     <div class="rolecards">${ROLES.map(r=>{const p=progressFor(r.k),u=roleSet(r.k,false).length-p.t;return `<button class="rc" data-role="${r.k}"><b>${r.n}</b><p>${r.d}</p><div class="bar"><i style="width:${p.p}%"></i></div><span class="stat">${p.t} core · ${u} good to know · ${p.d}/${p.t} core learned</span></button>`}).join("")}</div>`;
+    return;
+  }
+  const r=ROLES[RI[state.role]],p=progressFor(r.k),list=roleSet(r.k,state.coreOnly);
+  P.innerHTML=`<p class="eyebrow">Learning path</p><h2>${r.n}</h2><p>${r.d}</p>
+   <div class="bar"><i style="width:${p.p}%"></i></div><span class="stat">${p.d} of ${p.t} core concepts learned · ${p.p}%</span>
+   <div class="row" style="margin-top:14px"><h3 style="margin:0">${list.length} concepts in order</h3>
+   <label class="toggle"><input type="checkbox" id="coreOnly" ${state.coreOnly?"checked":""}> Core only</label></div>
+   <p class="hint" style="margin-top:4px">Ordered so prerequisites come first. Concepts outside this role that sit on the way are still shown in the graph.</p>
+   <ol class="path">${list.map((n,i)=>{const on=learned.has(n.id),v=n.roles[RI[r.k]];return `<li class="${on?"done":""}"><span class="num">${i+1}</span><button class="cb ${on?"on":""}" data-learn="${n.id}" aria-label="${on?"Unmark":"Mark"} ${n.name} as learned">${CK}</button><button class="nm" data-sel="${n.id}">${n.name}<small>${DOMAINS[DI[n.dom]].n}</small></button><span class="pill c${v}">${v===2?"Core":"Good to know"}</span></li>`}).join("")}</ol>`;
+}
+$("#panel").addEventListener("click",e=>{
+  const t=e.target.closest("[data-sel],[data-learn],[data-role],[data-role-keep],[data-back]");if(!t)return;
+  if(t.dataset.learn){const id=t.dataset.learn;learned.has(id)?learned.delete(id):learned.add(id);save();render()}
+  else if(t.dataset.sel)select(t.dataset.sel,true);
+  else if(t.dataset.roleKeep)setRole(t.dataset.roleKeep,false);
+  else if(t.dataset.role)setRole(t.dataset.role,true);
+  else if("back" in t.dataset){state.sel=null;render()}
+});
+$("#panel").addEventListener("change",e=>{if(e.target.id==="coreOnly"){state.coreOnly=e.target.checked;save();renderPanel()}});
+
+function select(id,center){
+  state.sel=id;state.hover=null;
+  if(state.view!=="graph"){setView("graph")}
+  render();if(center)centerOn(id);
+  $("#panel").scrollTop=0;
+}
+
+// Matrix
+function renderMatrix(){
+  const ci=state.role==="all"?-1:RI[state.role];
+  let html=`<table><thead><tr><th>Concept</th>${ROLES.map((r,i)=>`<th data-role="${r.k}" class="${i===ci?"cur":""}">${r.n.replace(" / ","<br>/ ")}</th>`).join("")}</tr></thead><tbody>`;
+  DOMAINS.forEach(d=>{
+    html+=`<tr class="grp"><td colspan="8">${d.n}</td></tr>`;
+    cols[DI[d.k]].forEach(n=>{html+=`<tr><td class="nm" data-sel="${n.id}">${n.name}${learned.has(n.id)?'<span class="lm">✓</span>':""}</td>${n.roles.map((v,i)=>`<td class="${i===ci?"cur":""}" title="${ROLES[i].n}: ${LBL[v]}"><span class="mdot c${v}"></span></td>`).join("")}</tr>`});
+  });
+  html+=`</tbody><tfoot><tr><td>Core / good to know</td>${ROLES.map((r,i)=>{const c=nodes.filter(n=>n.roles[i]===2).length,u=nodes.filter(n=>n.roles[i]===1).length;return `<td class="${i===ci?"cur":""}">${c} / ${u}</td>`}).join("")}</tr></tfoot></table>`;
+  $("#matrix").innerHTML=html;
+}
+$("#matrix").addEventListener("click",e=>{const t=e.target.closest("[data-sel],[data-role]");if(!t)return;if(t.dataset.sel)select(t.dataset.sel,true);else setRole(t.dataset.role,false)});
+function setView(v){
+  state.view=v;$("#vGraph").setAttribute("aria-pressed",v==="graph");$("#vMatrix").setAttribute("aria-pressed",v==="matrix");
+  svg.style.visibility=v==="graph"?"visible":"hidden";$("#matrix").hidden=v!=="matrix";$("#zoomCtl").hidden=v!=="graph";
+  if(v==="matrix")renderMatrix();renderLegend();
+}
+$("#vGraph").onclick=()=>{setView("graph")};$("#vMatrix").onclick=()=>{setView("matrix")};
+
+// Search
+$("#q").addEventListener("input",e=>{state.q=e.target.value;paint()});
+$("#q").addEventListener("keydown",e=>{if(e.key==="Enter"){const q=state.q.trim().toLowerCase();const m=q&&nodes.find(n=>matchQ(n,q));if(m){select(m.id,true)}}if(e.key==="Escape"){e.target.value="";state.q="";paint()}});
+
+// Pan & zoom
+const T={x:0,y:0,k:1};
+function applyT(anim){vp.classList.toggle("anim",!!anim);vp.style.transform=`translate(${T.x}px,${T.y}px) scale(${T.k})`;if(anim)setTimeout(()=>vp.classList.remove("anim"),480)}
+const clampK=k=>Math.min(2.4,Math.max(.25,k));
+function fit(anim){const r=svg.getBoundingClientRect();if(!r.width)return;let k=Math.min(r.width/W,(r.height-44)/H,1.15);const narrow=r.width<700;if(narrow)k=Math.max(k,.62);T.k=k;T.x=narrow?0:(r.width-W*k)/2;T.y=narrow?0:Math.max(0,(r.height-44-H*k)/2);applyT(anim)}
+function zoomAt(f,cx,cy,anim){const k=clampK(T.k*f);T.x=cx-(cx-T.x)*(k/T.k);T.y=cy-(cy-T.y)*(k/T.k);T.k=k;applyT(anim)}
+function centerOn(id){const n=N[id],r=svg.getBoundingClientRect();const k=Math.max(T.k,.85);T.k=k;T.x=r.width/2-(n.x+NW/2)*k;T.y=r.height/2-(n.y+NH/2)*k;applyT(true)}
+$("#zIn").onclick=()=>{const r=svg.getBoundingClientRect();zoomAt(1.25,r.width/2,r.height/2,true)};
+$("#zOut").onclick=()=>{const r=svg.getBoundingClientRect();zoomAt(.8,r.width/2,r.height/2,true)};
+$("#zFit").onclick=()=>fit(true);
+svg.addEventListener("wheel",e=>{e.preventDefault();const r=svg.getBoundingClientRect();zoomAt(Math.exp(-e.deltaY*(e.ctrlKey?.01:.0015)),e.clientX-r.left,e.clientY-r.top)},{passive:false});
+const pts=new Map();const drag={active:false,moved:false,node:null,sx:0,sy:0,tx:0,ty:0,pinch:null};
+svg.addEventListener("pointerdown",e=>{
+  pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  try{svg.setPointerCapture(e.pointerId)}catch(_){}
+  if(pts.size===1){drag.active=true;drag.moved=false;drag.node=e.target.closest(".node")?.dataset.id||null;drag.sx=e.clientX;drag.sy=e.clientY;drag.tx=T.x;drag.ty=T.y}
+  else if(pts.size===2){const[a,b]=[...pts.values()];drag.pinch={d:Math.hypot(a.x-b.x,a.y-b.y),k:T.k,tx:T.x,ty:T.y,cx:(a.x+b.x)/2,cy:(a.y+b.y)/2};drag.moved=true}
+});
+svg.addEventListener("pointermove",e=>{
+  if(!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pts.size===2&&drag.pinch){const[a,b]=[...pts.values()],p=drag.pinch,r=svg.getBoundingClientRect();const k=clampK(p.k*Math.hypot(a.x-b.x,a.y-b.y)/p.d);const cx=p.cx-r.left,cy=p.cy-r.top;T.x=cx-(cx-p.tx)*(k/p.k);T.y=cy-(cy-p.ty)*(k/p.k);T.k=k;applyT()}
+  else if(pts.size===1&&drag.active){const dx=e.clientX-drag.sx,dy=e.clientY-drag.sy;if(!drag.moved&&Math.hypot(dx,dy)>4){drag.moved=true;svg.classList.add("dragging")}if(drag.moved){T.x=drag.tx+dx;T.y=drag.ty+dy;applyT()}}
+});
+function endPtr(e){
+  if(!pts.has(e.pointerId))return;pts.delete(e.pointerId);
+  if(pts.size===1){const[a]=[...pts.values()];drag.pinch=null;drag.sx=a.x;drag.sy=a.y;drag.tx=T.x;drag.ty=T.y;return}
+  if(pts.size===0){svg.classList.remove("dragging");if(!drag.moved&&e.type==="pointerup"){if(drag.node)select(drag.node,false);else if(state.sel){state.sel=null;render()}}drag.active=false;drag.pinch=null}
+}
+svg.addEventListener("pointerup",endPtr);svg.addEventListener("pointercancel",endPtr);
+
+$("#sub").textContent=`${nodes.length} concepts, ${DOMAINS.length} domains, ${ROLES.length} roles. Pick a role, then click any concept to learn it.`;
+render();
+requestAnimationFrame(()=>{fit(false);if(state.sel)centerOn(state.sel)});
+let rz;window.addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(()=>fit(false),150)});
+</script>
+
+</body></html>

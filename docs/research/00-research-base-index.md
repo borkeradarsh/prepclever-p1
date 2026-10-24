@@ -46,20 +46,22 @@ Raw research base for a separate website (not PrepNLevel) that gives candidates 
 
 ## Segments
 
-[01 · GCC Landscape in India](https://app.notion.com/p/01-GCC-Landscape-in-India-dffdca8825b683a0844581a85dcb5700?pvs=21)
+[01 · GCC Landscape in India](01%20%C2%B7%20GCC%20Landscape%20in%20India%20dffdca8825b683a0844581a85dcb5700.md)
 
-[02 · AI Engineering Roles in GCCs](https://app.notion.com/p/02-AI-Engineering-Roles-in-GCCs-a88dca8825b6834587e381ff2384fade?pvs=21)
+[02 · AI Engineering Roles in GCCs](02%20%C2%B7%20AI%20Engineering%20Roles%20in%20GCCs%20a88dca8825b6834587e381ff2384fade.md)
 
-[03 · Skill Syllabus per Role](https://app.notion.com/p/03-Skill-Syllabus-per-Role-8eadca8825b68304be1e81d42630d235?pvs=21)
+[03 · Skill Syllabus per Role](03%20%C2%B7%20Skill%20Syllabus%20per%20Role%208eadca8825b68304be1e81d42630d235.md)
 
-[04 · How GCCs Hire & Who Does the Hiring](https://app.notion.com/p/04-How-GCCs-Hire-Who-Does-the-Hiring-b69dca8825b68375b86c81e806d6d1ad?pvs=21)
+[04 · How GCCs Hire & Who Does the Hiring](04%20%C2%B7%20How%20GCCs%20Hire%20&%20Who%20Does%20the%20Hiring%20b69dca8825b68375b86c81e806d6d1ad.md)
 
-[05 · Role Tracks by Experience Level](https://app.notion.com/p/05-Role-Tracks-by-Experience-Level-996dca8825b683038814013cfa364b09?pvs=21)
+[05 · Role Tracks by Experience Level](05%20%C2%B7%20Role%20Tracks%20by%20Experience%20Level%20996dca8825b683038814013cfa364b09.md)
 
-[06 · Profile Prep: Resume, GitHub, LinkedIn, Interviews](https://app.notion.com/p/06-Profile-Prep-Resume-GitHub-LinkedIn-Interviews-f6ddca8825b683eeb11b81144d32e301?pvs=21)
+[06 · Profile Prep: Resume, GitHub, LinkedIn, Interviews](06%20%C2%B7%20Profile%20Prep%20Resume,%20GitHub,%20LinkedIn,%20Interv%20f6ddca8825b683eeb11b81144d32e301.md)
 
-[07 · Resource Library](https://app.notion.com/p/07-Resource-Library-759dca8825b683c0b7c78136f8f301f2?pvs=21)
+[07 · Resource Library](07%20%C2%B7%20Resource%20Library%20759dca8825b683c0b7c78136f8f301f2.md)
 
-[08 · Website Outline & Next Steps](https://app.notion.com/p/08-Website-Outline-Next-Steps-abbdca8825b683f89919012b377bdb56?pvs=21)
+[08 · Website Outline & Next Steps](08%20%C2%B7%20Website%20Outline%20&%20Next%20Steps%20abbdca8825b683f89919012b377bdb56.md)
 
-[A · Appendix — Every Link in Full](https://app.notion.com/p/A-Appendix-Every-Link-in-Full-3d3dca8825b68264b18a81b346a982ba?pvs=21)
+[A · Appendix — Every Link in Full](A%20%C2%B7%20Appendix%20%E2%80%94%20Every%20Link%20in%20Full%203d3dca8825b68264b18a81b346a982ba.md)
+
+[Website Structure](Website%20Structure%20402dca8825b6809c809dde40aeba411f.md)

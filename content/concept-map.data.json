@@ -1,0 +1,1889 @@
+{
+ "_note": "Generated from docs/research/14-ai-roles-concept-map.html. levels: 2 = core, 1 = good to know, 0 = not needed for that role.",
+ "roles": [
+  {
+   "id": "ml_engineer",
+   "sourceKey": "mle",
+   "title": "ML Engineer",
+   "description": "Builds, trains and ships models into production systems."
+  },
+  {
+   "id": "genai_llm",
+   "sourceKey": "genai",
+   "title": "GenAI / LLM Engineer",
+   "description": "Builds products on foundation models: prompting, RAG, agents, fine-tuning and evals."
+  },
+  {
+   "id": "ai_platform_mlops",
+   "sourceKey": "mlops",
+   "title": "AI Platform / MLOps",
+   "description": "Runs the infrastructure that trains, deploys and monitors models reliably."
+  },
+  {
+   "id": "ai_data_engineer",
+   "sourceKey": "dataeng",
+   "title": "AI / ML Data Engineer",
+   "description": "Builds the pipelines and datasets that models learn from and serve on."
+  },
+  {
+   "id": "applied_scientist",
+   "sourceKey": "scientist",
+   "title": "Data / Applied Scientist",
+   "description": "Turns data into decisions and models through statistics, experiments and research."
+  },
+  {
+   "id": "ai_backend",
+   "sourceKey": "aibackend",
+   "title": "AI Backend / SWE",
+   "description": "Integrates AI into product backends: APIs, LLM calls, retrieval and reliability."
+  },
+  {
+   "id": "ai_architect",
+   "sourceKey": "architect",
+   "title": "AI Architect / Lead",
+   "description": "Designs end-to-end AI systems and guides teams on cost, risk and strategy."
+  }
+ ],
+ "domains": [
+  {
+   "id": "math",
+   "title": "Math & Stats"
+  },
+  {
+   "id": "cs",
+   "title": "Programming & CS"
+  },
+  {
+   "id": "data",
+   "title": "Data"
+  },
+  {
+   "id": "ml",
+   "title": "Classical ML"
+  },
+  {
+   "id": "dl",
+   "title": "Deep Learning"
+  },
+  {
+   "id": "llm",
+   "title": "LLMs & GenAI"
+  },
+  {
+   "id": "ops",
+   "title": "MLOps & Infra"
+  },
+  {
+   "id": "lead",
+   "title": "Systems & Leadership"
+  }
+ ],
+ "concepts": [
+  {
+   "id": "linalg",
+   "title": "Linear Algebra",
+   "domain": "math",
+   "prerequisites": [],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 1,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 0,
+    "applied_scientist": 2,
+    "ai_backend": 0,
+    "ai_architect": 1
+   },
+   "description": "Vectors, matrices and the operations on them. Model parameters, embeddings and data batches are all matrices, so this is the language ML is written in.",
+   "topics": [
+    "Vectors, dot products and norms",
+    "Matrix multiplication and transposes",
+    "Eigenvalues and eigenvectors",
+    "SVD and low-rank approximation"
+   ],
+   "practiceProject": "Implement PCA from scratch with NumPy using SVD and compare it with scikit-learn."
+  },
+  {
+   "id": "calc",
+   "title": "Calculus",
+   "domain": "math",
+   "prerequisites": [],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 1,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 0,
+    "applied_scientist": 2,
+    "ai_backend": 0,
+    "ai_architect": 1
+   },
+   "description": "Derivatives, partial derivatives and the chain rule. Backpropagation is the chain rule applied to a computation graph.",
+   "topics": [
+    "Derivatives and partial derivatives",
+    "The chain rule",
+    "Gradients and Jacobians",
+    "Taylor approximations"
+   ],
+   "practiceProject": "Hand-derive the gradient of the logistic regression loss, then check it numerically."
+  },
+  {
+   "id": "prob",
+   "title": "Probability",
+   "domain": "math",
+   "prerequisites": [],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 1,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 1,
+    "applied_scientist": 2,
+    "ai_backend": 0,
+    "ai_architect": 1
+   },
+   "description": "Random variables, distributions and expectation. Models output probabilities, and most losses are built from likelihoods.",
+   "topics": [
+    "Conditional probability and Bayes' rule",
+    "Common distributions",
+    "Expectation and variance",
+    "Maximum likelihood"
+   ],
+   "practiceProject": "Simulate a naive Bayes spam filter on a small email dataset."
+  },
+  {
+   "id": "stats",
+   "title": "Statistical Inference",
+   "domain": "math",
+   "prerequisites": [
+    "prob"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 1,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 1,
+    "applied_scientist": 2,
+    "ai_backend": 0,
+    "ai_architect": 1
+   },
+   "description": "Drawing conclusions from samples: estimates, uncertainty and tests. It tells you whether a metric change is real or noise.",
+   "topics": [
+    "Sampling distributions",
+    "Confidence intervals",
+    "Hypothesis tests and p-values",
+    "Bootstrapping"
+   ],
+   "practiceProject": "Bootstrap confidence intervals for a model's accuracy on a held-out set."
+  },
+  {
+   "id": "experiment",
+   "title": "A/B Testing",
+   "domain": "math",
+   "prerequisites": [
+    "stats"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 1,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 1,
+    "applied_scientist": 2,
+    "ai_backend": 1,
+    "ai_architect": 1
+   },
+   "description": "Designing controlled experiments to measure the impact of a change on real users. The final word on whether a model ships.",
+   "topics": [
+    "Randomisation units",
+    "Power and sample size",
+    "Guardrail metrics",
+    "Peeking and multiple testing"
+   ],
+   "practiceProject": "Write an experiment plan for a new ranking model, including sample size and stopping rules."
+  },
+  {
+   "id": "optim",
+   "title": "Optimization",
+   "domain": "math",
+   "prerequisites": [
+    "calc",
+    "linalg"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 1,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 0,
+    "applied_scientist": 2,
+    "ai_backend": 0,
+    "ai_architect": 1
+   },
+   "description": "How models find good parameters: gradient descent and its variants. Explains learning rates, schedules and why training diverges.",
+   "topics": [
+    "Gradient descent and SGD",
+    "Momentum, Adam and AdamW",
+    "Learning-rate schedules",
+    "Convexity and local minima"
+   ],
+   "practiceProject": "Train linear regression with your own SGD and plot loss curves for three learning rates."
+  },
+  {
+   "id": "causal",
+   "title": "Causal Inference",
+   "domain": "math",
+   "prerequisites": [
+    "stats",
+    "experiment"
+   ],
+   "levels": {
+    "ml_engineer": 0,
+    "genai_llm": 0,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 0,
+    "applied_scientist": 2,
+    "ai_backend": 0,
+    "ai_architect": 0
+   },
+   "description": "Estimating cause and effect when you cannot run an experiment. Used for pricing, policy and uplift questions.",
+   "topics": [
+    "Confounders and DAGs",
+    "Difference-in-differences",
+    "Propensity scores",
+    "Uplift modelling"
+   ],
+   "practiceProject": "Estimate the effect of a promotion from observational data using difference-in-differences."
+  },
+  {
+   "id": "python",
+   "title": "Python",
+   "domain": "cs",
+   "prerequisites": [],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 2,
+    "ai_platform_mlops": 2,
+    "ai_data_engineer": 2,
+    "applied_scientist": 2,
+    "ai_backend": 2,
+    "ai_architect": 2
+   },
+   "description": "The working language of AI. Every one of the seven roles reads and writes it daily.",
+   "topics": [
+    "Data types, functions and classes",
+    "Virtual environments and packaging",
+    "Type hints",
+    "Comprehensions and generators"
+   ],
+   "practiceProject": "Build a small CLI tool with typed functions, a test suite and a pyproject.toml."
+  },
+  {
+   "id": "git",
+   "title": "Git & Linux CLI",
+   "domain": "cs",
+   "prerequisites": [],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 2,
+    "ai_platform_mlops": 2,
+    "ai_data_engineer": 2,
+    "applied_scientist": 1,
+    "ai_backend": 2,
+    "ai_architect": 1
+   },
+   "description": "Version control, the shell and remote machines. You will spend real time in a terminal on GPU boxes and CI runners.",
+   "topics": [
+    "Branching, rebasing and pull requests",
+    "Shell scripting basics",
+    "SSH and remote work",
+    "Processes, logs and permissions"
+   ],
+   "practiceProject": "Automate a data download and cleanup with a shell script and review it through a pull request."
+  },
+  {
+   "id": "sql",
+   "title": "SQL",
+   "domain": "cs",
+   "prerequisites": [],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 1,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 2,
+    "applied_scientist": 2,
+    "ai_backend": 2,
+    "ai_architect": 1
+   },
+   "description": "Querying relational data. Most training data and product metrics start life as a SQL query.",
+   "topics": [
+    "Joins and aggregations",
+    "Window functions",
+    "CTEs and subqueries",
+    "Query plans and indexes"
+   ],
+   "practiceProject": "Answer ten product questions on a public dataset using window functions."
+  },
+  {
+   "id": "dsa",
+   "title": "Data Structures & Algorithms",
+   "domain": "cs",
+   "prerequisites": [
+    "python"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 1,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 1,
+    "applied_scientist": 1,
+    "ai_backend": 2,
+    "ai_architect": 1
+   },
+   "description": "Complexity, core data structures and classic algorithms. Needed to write code that scales, and to pass interviews.",
+   "topics": [
+    "Big-O analysis",
+    "Hash maps, heaps and trees",
+    "Graphs and search",
+    "Dynamic programming"
+   ],
+   "practiceProject": "Implement an LRU cache and a top-k heap, with tests and complexity notes."
+  },
+  {
+   "id": "numpy",
+   "title": "NumPy & Pandas",
+   "domain": "cs",
+   "prerequisites": [
+    "python"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 1,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 2,
+    "applied_scientist": 2,
+    "ai_backend": 0,
+    "ai_architect": 0
+   },
+   "description": "Vectorised numerical computing and tabular data wrangling in Python.",
+   "topics": [
+    "Arrays, broadcasting and vectorisation",
+    "DataFrames, groupby and joins",
+    "Missing data",
+    "Memory and dtypes"
+   ],
+   "practiceProject": "Clean and profile a messy one-million-row CSV without Python loops."
+  },
+  {
+   "id": "testing",
+   "title": "Testing & Code Quality",
+   "domain": "cs",
+   "prerequisites": [
+    "python"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 2,
+    "ai_platform_mlops": 2,
+    "ai_data_engineer": 2,
+    "applied_scientist": 1,
+    "ai_backend": 2,
+    "ai_architect": 1
+   },
+   "description": "Unit, integration and data tests, plus linting and review habits that keep ML code maintainable.",
+   "topics": [
+    "pytest and fixtures",
+    "Mocking external services",
+    "Linting and formatting",
+    "Testing data and model code"
+   ],
+   "practiceProject": "Add tests and a linter to an existing notebook-turned-script."
+  },
+  {
+   "id": "api",
+   "title": "APIs & Web Services",
+   "domain": "cs",
+   "prerequisites": [
+    "python"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 2,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 1,
+    "applied_scientist": 0,
+    "ai_backend": 2,
+    "ai_architect": 2
+   },
+   "description": "Designing and building HTTP APIs. Models and LLM features reach users through them.",
+   "topics": [
+    "REST and JSON schemas",
+    "FastAPI and Pydantic",
+    "Auth and rate limiting",
+    "Versioning and errors"
+   ],
+   "practiceProject": "Wrap a trained model in a FastAPI service with request validation and health checks."
+  },
+  {
+   "id": "concurrency",
+   "title": "Concurrency & Async",
+   "domain": "cs",
+   "prerequisites": [
+    "dsa"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 2,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 1,
+    "applied_scientist": 0,
+    "ai_backend": 2,
+    "ai_architect": 1
+   },
+   "description": "Running many things at once with threads, processes and async IO. LLM apps spend most of their time waiting on network calls.",
+   "topics": [
+    "asyncio and event loops",
+    "Threads vs processes",
+    "Queues and backpressure",
+    "Timeouts and retries"
+   ],
+   "practiceProject": "Call an LLM API for 1,000 prompts concurrently with a rate limiter and retries."
+  },
+  {
+   "id": "systemdesign",
+   "title": "System Design",
+   "domain": "cs",
+   "prerequisites": [
+    "api",
+    "dsa"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 1,
+    "ai_platform_mlops": 2,
+    "ai_data_engineer": 2,
+    "applied_scientist": 0,
+    "ai_backend": 2,
+    "ai_architect": 2
+   },
+   "description": "Designing services that are scalable, reliable and maintainable: caching, queues, databases and their trade-offs.",
+   "topics": [
+    "Load balancing and caching",
+    "Queues and event-driven design",
+    "Databases and consistency",
+    "Availability and failure modes"
+   ],
+   "practiceProject": "Design a URL shortener, then a notification service, and write up the trade-offs."
+  },
+  {
+   "id": "datamodel",
+   "title": "Data Modeling & Warehousing",
+   "domain": "data",
+   "prerequisites": [
+    "sql"
+   ],
+   "levels": {
+    "ml_engineer": 0,
+    "genai_llm": 0,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 2,
+    "applied_scientist": 1,
+    "ai_backend": 1,
+    "ai_architect": 1
+   },
+   "description": "Structuring data for analytics and ML with schemas, warehouses and lakehouses.",
+   "topics": [
+    "Star and snowflake schemas",
+    "Slowly changing dimensions",
+    "Lakehouse table formats (Iceberg, Delta)",
+    "Partitioning"
+   ],
+   "practiceProject": "Model an e-commerce dataset as a star schema in DuckDB."
+  },
+  {
+   "id": "eda",
+   "title": "Exploratory Data Analysis",
+   "domain": "data",
+   "prerequisites": [
+    "numpy",
+    "stats"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 0,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 1,
+    "applied_scientist": 2,
+    "ai_backend": 0,
+    "ai_architect": 0
+   },
+   "description": "Profiling and visualising data to find patterns, errors and leakage before modelling.",
+   "topics": [
+    "Distributions and outliers",
+    "Correlation and leakage checks",
+    "Plotting with matplotlib or seaborn",
+    "Writing up findings"
+   ],
+   "practiceProject": "Publish a short EDA notebook on a public dataset with five clear findings."
+  },
+  {
+   "id": "etl",
+   "title": "Pipelines & Orchestration",
+   "domain": "data",
+   "prerequisites": [
+    "sql",
+    "python"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 0,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 2,
+    "applied_scientist": 0,
+    "ai_backend": 0,
+    "ai_architect": 1
+   },
+   "description": "Moving and transforming data on a schedule, reliably, with tools like Airflow, Dagster and dbt.",
+   "topics": [
+    "Batch ETL vs ELT",
+    "DAGs, scheduling and backfills",
+    "Idempotency",
+    "dbt models and tests"
+   ],
+   "practiceProject": "Build a daily pipeline that ingests an API, transforms with dbt and loads a warehouse."
+  },
+  {
+   "id": "spark",
+   "title": "Distributed Processing",
+   "domain": "data",
+   "prerequisites": [
+    "etl"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 0,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 2,
+    "applied_scientist": 1,
+    "ai_backend": 0,
+    "ai_architect": 1
+   },
+   "description": "Processing data that does not fit on one machine with Spark, Dask or Ray Data.",
+   "topics": [
+    "Partitions and shuffles",
+    "Lazy evaluation",
+    "Joins at scale",
+    "Tuning memory and skew"
+   ],
+   "practiceProject": "Compute features over a 50 GB dataset with PySpark and profile the slowest stage."
+  },
+  {
+   "id": "streaming",
+   "title": "Streaming Data",
+   "domain": "data",
+   "prerequisites": [
+    "etl",
+    "concurrency"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 0,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 2,
+    "applied_scientist": 0,
+    "ai_backend": 1,
+    "ai_architect": 1
+   },
+   "description": "Handling events in real time with Kafka, Flink or similar, for fresh features and online systems.",
+   "topics": [
+    "Topics, partitions and consumers",
+    "Event time and windows",
+    "Exactly-once semantics",
+    "Schema registry"
+   ],
+   "practiceProject": "Stream clickstream events through Kafka and compute rolling five-minute counts."
+  },
+  {
+   "id": "dataquality",
+   "title": "Data Quality & Contracts",
+   "domain": "data",
+   "prerequisites": [
+    "etl"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 1,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 2,
+    "applied_scientist": 1,
+    "ai_backend": 0,
+    "ai_architect": 1
+   },
+   "description": "Validating data before it breaks a model, with tests, expectations and contracts between teams.",
+   "topics": [
+    "Schema and range checks",
+    "Freshness and volume monitors",
+    "Data contracts",
+    "Quarantine and alerting"
+   ],
+   "practiceProject": "Add validation checks to your pipeline that fail the run on bad data."
+  },
+  {
+   "id": "featurestore",
+   "title": "Feature Engineering",
+   "domain": "data",
+   "prerequisites": [
+    "numpy",
+    "etl"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 0,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 2,
+    "applied_scientist": 2,
+    "ai_backend": 0,
+    "ai_architect": 1
+   },
+   "description": "Turning raw data into model inputs, and serving the same features in training and in production.",
+   "topics": [
+    "Encoding, scaling and aggregates",
+    "Point-in-time correctness",
+    "Training–serving skew",
+    "Feature stores (Feast)"
+   ],
+   "practiceProject": "Build time-correct features for a churn model and serve them from Feast."
+  },
+  {
+   "id": "labeling",
+   "title": "Dataset Curation",
+   "domain": "data",
+   "prerequisites": [
+    "dataquality"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 2,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 2,
+    "applied_scientist": 1,
+    "ai_backend": 0,
+    "ai_architect": 0
+   },
+   "description": "Collecting, labelling and cleaning training and evaluation data. Better data usually beats a better model.",
+   "topics": [
+    "Annotation guidelines",
+    "Inter-annotator agreement",
+    "Finding label errors",
+    "Deduplication and splits"
+   ],
+   "practiceProject": "Write labelling guidelines for 200 examples, label them and measure agreement."
+  },
+  {
+   "id": "governance",
+   "title": "Data Governance & Privacy",
+   "domain": "data",
+   "prerequisites": [
+    "datamodel"
+   ],
+   "levels": {
+    "ml_engineer": 0,
+    "genai_llm": 1,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 2,
+    "applied_scientist": 0,
+    "ai_backend": 1,
+    "ai_architect": 2
+   },
+   "description": "Knowing what data you have, where it came from and who may use it. Covers PII, lineage and regulation.",
+   "topics": [
+    "PII detection and masking",
+    "Lineage and catalogues",
+    "Access control",
+    "GDPR and retention"
+   ],
+   "practiceProject": "Trace one ML feature from source to model and flag every PII field on the way."
+  },
+  {
+   "id": "mlfund",
+   "title": "ML Fundamentals",
+   "domain": "ml",
+   "prerequisites": [
+    "stats",
+    "linalg",
+    "numpy"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 2,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 1,
+    "applied_scientist": 2,
+    "ai_backend": 1,
+    "ai_architect": 2
+   },
+   "description": "The core ideas behind learning from data: generalisation, overfitting and how to split data honestly.",
+   "topics": [
+    "Bias–variance trade-off",
+    "Train, validation and test splits",
+    "Regularisation",
+    "Cross-validation",
+    "Data leakage"
+   ],
+   "practiceProject": "Show overfitting on a small dataset and fix it with regularisation and cross-validation."
+  },
+  {
+   "id": "supervised",
+   "title": "Supervised Learning",
+   "domain": "ml",
+   "prerequisites": [
+    "mlfund",
+    "optim"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 1,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 1,
+    "applied_scientist": 2,
+    "ai_backend": 0,
+    "ai_architect": 1
+   },
+   "description": "Predicting labels from features with linear models, trees and gradient boosting, still the workhorses on tabular data.",
+   "topics": [
+    "Linear and logistic regression",
+    "Decision trees and random forests",
+    "Gradient boosting",
+    "Class imbalance"
+   ],
+   "practiceProject": "Beat a logistic-regression baseline with gradient boosting on a tabular dataset."
+  },
+  {
+   "id": "unsupervised",
+   "title": "Unsupervised Learning",
+   "domain": "ml",
+   "prerequisites": [
+    "mlfund"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 1,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 0,
+    "applied_scientist": 2,
+    "ai_backend": 0,
+    "ai_architect": 0
+   },
+   "description": "Finding structure without labels: clustering, dimensionality reduction and anomaly detection.",
+   "topics": [
+    "k-means and DBSCAN",
+    "PCA, UMAP and t-SNE",
+    "Anomaly detection",
+    "Topic modelling"
+   ],
+   "practiceProject": "Cluster customer behaviour and explain each segment in plain language."
+  },
+  {
+   "id": "evaluation",
+   "title": "Model Evaluation",
+   "domain": "ml",
+   "prerequisites": [
+    "mlfund"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 2,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 1,
+    "applied_scientist": 2,
+    "ai_backend": 1,
+    "ai_architect": 2
+   },
+   "description": "Choosing metrics that match the business goal, and measuring them correctly.",
+   "topics": [
+    "Precision, recall, F1 and AUC",
+    "Calibration",
+    "Ranking metrics (NDCG, MRR)",
+    "Offline vs online metrics",
+    "Error analysis"
+   ],
+   "practiceProject": "Pick a threshold for a fraud model from a cost matrix instead of from accuracy."
+  },
+  {
+   "id": "sklearn",
+   "title": "scikit-learn & XGBoost",
+   "domain": "ml",
+   "prerequisites": [
+    "supervised"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 0,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 1,
+    "applied_scientist": 2,
+    "ai_backend": 0,
+    "ai_architect": 0
+   },
+   "description": "The standard libraries for classical ML: pipelines, preprocessing and boosted trees.",
+   "topics": [
+    "Pipelines and ColumnTransformer",
+    "Hyperparameter search",
+    "XGBoost and LightGBM",
+    "Model persistence"
+   ],
+   "practiceProject": "Package a full preprocessing and model pipeline into one saved artefact."
+  },
+  {
+   "id": "timeseries",
+   "title": "Time Series Forecasting",
+   "domain": "ml",
+   "prerequisites": [
+    "supervised"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 0,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 0,
+    "applied_scientist": 2,
+    "ai_backend": 0,
+    "ai_architect": 0
+   },
+   "description": "Forecasting values over time, where order matters and random splits leak the future.",
+   "topics": [
+    "Trend and seasonality",
+    "ARIMA and ETS",
+    "Backtesting",
+    "Gradient boosting with lag features"
+   ],
+   "practiceProject": "Forecast daily demand and backtest against a seasonal-naive baseline."
+  },
+  {
+   "id": "recsys",
+   "title": "Recommenders & Ranking",
+   "domain": "ml",
+   "prerequisites": [
+    "supervised",
+    "evaluation"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 0,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 0,
+    "applied_scientist": 1,
+    "ai_backend": 0,
+    "ai_architect": 1
+   },
+   "description": "Ordering items for a user. Retrieval, ranking and feedback loops sit behind every feed and search box.",
+   "topics": [
+    "Collaborative filtering",
+    "Two-tower retrieval",
+    "Learning to rank",
+    "Cold start and feedback loops"
+   ],
+   "practiceProject": "Build a two-stage movie recommender and report NDCG@10."
+  },
+  {
+   "id": "nn",
+   "title": "Neural Networks",
+   "domain": "dl",
+   "prerequisites": [
+    "optim",
+    "mlfund"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 2,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 0,
+    "applied_scientist": 2,
+    "ai_backend": 0,
+    "ai_architect": 1
+   },
+   "description": "Layers, activations and backpropagation: the basis of every modern model.",
+   "topics": [
+    "Perceptrons and MLPs",
+    "Activations and initialisation",
+    "Backpropagation",
+    "Dropout and normalisation"
+   ],
+   "practiceProject": "Build a tiny autograd engine and train an MLP with it."
+  },
+  {
+   "id": "pytorch",
+   "title": "PyTorch",
+   "domain": "dl",
+   "prerequisites": [
+    "nn",
+    "numpy"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 2,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 0,
+    "applied_scientist": 1,
+    "ai_backend": 0,
+    "ai_architect": 0
+   },
+   "description": "The main framework for building and training neural networks.",
+   "topics": [
+    "Tensors and autograd",
+    "Modules and optimisers",
+    "Datasets and DataLoaders",
+    "Debugging shapes and devices"
+   ],
+   "practiceProject": "Write a clean training loop with checkpointing and validation."
+  },
+  {
+   "id": "cnn",
+   "title": "Computer Vision",
+   "domain": "dl",
+   "prerequisites": [
+    "nn"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 1,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 0,
+    "applied_scientist": 1,
+    "ai_backend": 0,
+    "ai_architect": 0
+   },
+   "description": "Convolutional and vision-transformer models for images: classification, detection and segmentation.",
+   "topics": [
+    "Convolutions and pooling",
+    "Transfer learning",
+    "Object detection",
+    "Data augmentation"
+   ],
+   "practiceProject": "Fine-tune a pretrained image model on a small custom dataset."
+  },
+  {
+   "id": "seq",
+   "title": "Sequence Models & Attention",
+   "domain": "dl",
+   "prerequisites": [
+    "nn"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 1,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 0,
+    "applied_scientist": 1,
+    "ai_backend": 0,
+    "ai_architect": 0
+   },
+   "description": "Modelling ordered data, and the attention mechanism that replaced recurrence.",
+   "topics": [
+    "RNNs and LSTMs",
+    "Sequence-to-sequence",
+    "Attention",
+    "Positional information"
+   ],
+   "practiceProject": "Implement scaled dot-product attention and visualise the attention weights."
+  },
+  {
+   "id": "embeddings",
+   "title": "Embeddings",
+   "domain": "dl",
+   "prerequisites": [
+    "nn"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 2,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 1,
+    "applied_scientist": 1,
+    "ai_backend": 1,
+    "ai_architect": 1
+   },
+   "description": "Dense vectors that capture meaning, so similar things sit close together. They power search, RAG and recommenders.",
+   "topics": [
+    "Word and sentence embeddings",
+    "Contrastive learning",
+    "Similarity metrics",
+    "Choosing and evaluating embedding models"
+   ],
+   "practiceProject": "Build semantic search over your notes and compare two embedding models."
+  },
+  {
+   "id": "transformers",
+   "title": "Transformers",
+   "domain": "dl",
+   "prerequisites": [
+    "seq",
+    "pytorch"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 2,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 0,
+    "applied_scientist": 1,
+    "ai_backend": 0,
+    "ai_architect": 1
+   },
+   "description": "The architecture behind LLMs: self-attention, multi-head attention and stacked residual blocks.",
+   "topics": [
+    "Self-attention and multi-head attention",
+    "Encoder, decoder and encoder–decoder",
+    "Layer norm and residuals",
+    "Scaling laws"
+   ],
+   "practiceProject": "Train a character-level GPT on a small text corpus."
+  },
+  {
+   "id": "training",
+   "title": "Training at Scale",
+   "domain": "dl",
+   "prerequisites": [
+    "pytorch"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 1,
+    "ai_platform_mlops": 2,
+    "ai_data_engineer": 0,
+    "applied_scientist": 0,
+    "ai_backend": 0,
+    "ai_architect": 1
+   },
+   "description": "Training large models efficiently across GPUs: numeric precision, parallelism and memory.",
+   "topics": [
+    "Mixed precision (bf16, fp8)",
+    "Data parallel, FSDP and ZeRO",
+    "Gradient checkpointing",
+    "Throughput profiling"
+   ],
+   "practiceProject": "Scale a training job from one GPU to four with DDP and measure the speed-up."
+  },
+  {
+   "id": "diffusion",
+   "title": "Diffusion & Multimodal",
+   "domain": "dl",
+   "prerequisites": [
+    "cnn",
+    "transformers"
+   ],
+   "levels": {
+    "ml_engineer": 0,
+    "genai_llm": 1,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 0,
+    "applied_scientist": 1,
+    "ai_backend": 0,
+    "ai_architect": 0
+   },
+   "description": "Models that generate images, audio and video, and models that read several modalities at once.",
+   "topics": [
+    "Denoising diffusion",
+    "Latent diffusion",
+    "Vision-language models",
+    "Text-to-image conditioning"
+   ],
+   "practiceProject": "Fine-tune a small diffusion model with LoRA on 20 images."
+  },
+  {
+   "id": "llmfund",
+   "title": "LLM Fundamentals",
+   "domain": "llm",
+   "prerequisites": [
+    "transformers"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 2,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 0,
+    "applied_scientist": 1,
+    "ai_backend": 2,
+    "ai_architect": 2
+   },
+   "description": "How large language models work: tokens, pretraining, context windows, sampling and their failure modes.",
+   "topics": [
+    "Tokenisation",
+    "Pretraining and instruction tuning",
+    "Context windows",
+    "Temperature and sampling",
+    "Hallucination"
+   ],
+   "practiceProject": "Show a colleague, with a live demo, why the same prompt can give different answers."
+  },
+  {
+   "id": "prompting",
+   "title": "Prompt Engineering",
+   "domain": "llm",
+   "prerequisites": [
+    "llmfund"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 2,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 0,
+    "applied_scientist": 1,
+    "ai_backend": 2,
+    "ai_architect": 1
+   },
+   "description": "Writing instructions, examples and structure that get reliable output from a model.",
+   "topics": [
+    "System prompts and roles",
+    "Few-shot examples",
+    "Step-by-step reasoning",
+    "Structured output (JSON)"
+   ],
+   "practiceProject": "Turn a flaky extraction prompt into one that passes 50 test cases."
+  },
+  {
+   "id": "llmapi",
+   "title": "LLM APIs & SDKs",
+   "domain": "llm",
+   "prerequisites": [
+    "prompting",
+    "api"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 2,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 0,
+    "applied_scientist": 0,
+    "ai_backend": 2,
+    "ai_architect": 1
+   },
+   "description": "Calling hosted models in production: tool use, streaming, caching, batching and error handling.",
+   "topics": [
+    "Messages and tool-use APIs",
+    "Streaming responses",
+    "Prompt caching",
+    "Rate limits and retries",
+    "Model selection"
+   ],
+   "practiceProject": "Build a chat endpoint that streams, calls one tool and caches the system prompt."
+  },
+  {
+   "id": "vectordb",
+   "title": "Vector Search",
+   "domain": "llm",
+   "prerequisites": [
+    "embeddings"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 2,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 2,
+    "applied_scientist": 0,
+    "ai_backend": 2,
+    "ai_architect": 1
+   },
+   "description": "Storing and searching embeddings fast, with ANN indexes, metadata filters and hybrid keyword search.",
+   "topics": [
+    "ANN indexes (HNSW, IVF)",
+    "Hybrid search with BM25",
+    "Metadata filtering",
+    "pgvector and dedicated stores"
+   ],
+   "practiceProject": "Index 100k documents in pgvector and compare recall with exact search."
+  },
+  {
+   "id": "rag",
+   "title": "Retrieval-Augmented Generation",
+   "domain": "llm",
+   "prerequisites": [
+    "vectordb",
+    "prompting"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 2,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 1,
+    "applied_scientist": 0,
+    "ai_backend": 2,
+    "ai_architect": 2
+   },
+   "description": "Grounding model answers in your own documents by retrieving relevant context at query time.",
+   "topics": [
+    "Chunking strategies",
+    "Retrieval and re-ranking",
+    "Contextual retrieval",
+    "Citations",
+    "Evaluating retrieval vs generation"
+   ],
+   "practiceProject": "Build a RAG assistant over product docs that cites sources, and measure answer accuracy."
+  },
+  {
+   "id": "agents",
+   "title": "Agents & Tool Use",
+   "domain": "llm",
+   "prerequisites": [
+    "llmapi",
+    "rag"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 2,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 0,
+    "applied_scientist": 0,
+    "ai_backend": 2,
+    "ai_architect": 2
+   },
+   "description": "Letting models plan, call tools and act over many steps, including workflows, MCP and multi-agent patterns.",
+   "topics": [
+    "Workflows vs agents",
+    "Tool design",
+    "Model Context Protocol (MCP)",
+    "Memory and state",
+    "Human-in-the-loop"
+   ],
+   "practiceProject": "Build an agent that triages GitHub issues with two tools and an approval step."
+  },
+  {
+   "id": "finetune",
+   "title": "Fine-tuning",
+   "domain": "llm",
+   "prerequisites": [
+    "llmfund",
+    "training"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 2,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 0,
+    "applied_scientist": 1,
+    "ai_backend": 0,
+    "ai_architect": 1
+   },
+   "description": "Adapting a pretrained model to a task or style with supervised fine-tuning and parameter-efficient methods.",
+   "topics": [
+    "When to fine-tune vs prompt",
+    "Supervised fine-tuning",
+    "LoRA and QLoRA",
+    "Dataset formatting",
+    "Catastrophic forgetting"
+   ],
+   "practiceProject": "LoRA fine-tune a small open model for a classification task and compare it with prompting."
+  },
+  {
+   "id": "alignment",
+   "title": "Preference Tuning",
+   "domain": "llm",
+   "prerequisites": [
+    "finetune"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 1,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 0,
+    "applied_scientist": 1,
+    "ai_backend": 0,
+    "ai_architect": 0
+   },
+   "description": "Shaping model behaviour with human or AI feedback through RLHF, DPO and reward models.",
+   "topics": [
+    "Reward models",
+    "RLHF and PPO",
+    "DPO and its variants",
+    "Constitutional approaches"
+   ],
+   "practiceProject": "Run DPO on a small preference dataset and evaluate the change."
+  },
+  {
+   "id": "llmeval",
+   "title": "LLM Evaluation",
+   "domain": "llm",
+   "prerequisites": [
+    "evaluation",
+    "prompting"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 2,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 0,
+    "applied_scientist": 2,
+    "ai_backend": 1,
+    "ai_architect": 2
+   },
+   "description": "Measuring whether an LLM system is good, with test sets, graders, LLM-as-judge and regression tracking.",
+   "topics": [
+    "Building eval sets from real traffic",
+    "Code-based and LLM-as-judge graders",
+    "Benchmarks and their limits",
+    "Regression-testing prompts"
+   ],
+   "practiceProject": "Create a 100-case eval for your RAG app and run it in CI on every prompt change."
+  },
+  {
+   "id": "inference",
+   "title": "LLM Inference & Serving",
+   "domain": "llm",
+   "prerequisites": [
+    "llmfund"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 2,
+    "ai_platform_mlops": 2,
+    "ai_data_engineer": 0,
+    "applied_scientist": 0,
+    "ai_backend": 1,
+    "ai_architect": 1
+   },
+   "description": "Running models fast and cheaply with batching, KV caching, quantisation and serving engines.",
+   "topics": [
+    "KV cache and paged attention",
+    "Continuous batching",
+    "Quantisation (int8, int4)",
+    "Speculative decoding",
+    "Latency vs throughput"
+   ],
+   "practiceProject": "Serve an open model with vLLM and benchmark tokens per second at different batch sizes."
+  },
+  {
+   "id": "guardrails",
+   "title": "AI Safety & Security",
+   "domain": "llm",
+   "prerequisites": [
+    "agents"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 2,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 0,
+    "applied_scientist": 0,
+    "ai_backend": 2,
+    "ai_architect": 2
+   },
+   "description": "Protecting LLM systems and their users from prompt injection, data leakage, jailbreaks and policy violations.",
+   "topics": [
+    "Prompt injection",
+    "Output filtering",
+    "Least-privilege tools",
+    "Red-teaming",
+    "PII leakage"
+   ],
+   "practiceProject": "Red-team your own agent with ten injection attacks and fix what gets through."
+  },
+  {
+   "id": "syntheticdata",
+   "title": "Synthetic Data",
+   "domain": "llm",
+   "prerequisites": [
+    "prompting",
+    "labeling"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 1,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 1,
+    "applied_scientist": 1,
+    "ai_backend": 0,
+    "ai_architect": 0
+   },
+   "description": "Using models to generate training and evaluation data, and checking that it actually helps.",
+   "topics": [
+    "Self-instruct style generation",
+    "Diversity and deduplication",
+    "Filtering with graders",
+    "Distillation"
+   ],
+   "practiceProject": "Generate 1,000 synthetic Q&A pairs, filter them and measure the effect on your eval."
+  },
+  {
+   "id": "docker",
+   "title": "Containers",
+   "domain": "ops",
+   "prerequisites": [
+    "git"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 1,
+    "ai_platform_mlops": 2,
+    "ai_data_engineer": 2,
+    "applied_scientist": 0,
+    "ai_backend": 2,
+    "ai_architect": 1
+   },
+   "description": "Packaging code and dependencies into images that run the same everywhere.",
+   "topics": [
+    "Dockerfiles and layers",
+    "Multi-stage builds",
+    "GPU containers",
+    "Compose for local stacks"
+   ],
+   "practiceProject": "Containerise your model API with a slim multi-stage image."
+  },
+  {
+   "id": "cloud",
+   "title": "Cloud Platforms",
+   "domain": "ops",
+   "prerequisites": [
+    "docker"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 1,
+    "ai_platform_mlops": 2,
+    "ai_data_engineer": 2,
+    "applied_scientist": 0,
+    "ai_backend": 2,
+    "ai_architect": 2
+   },
+   "description": "Running workloads on AWS, GCP or Azure: compute, storage, networking and identity.",
+   "topics": [
+    "IAM and least privilege",
+    "Object storage",
+    "VPCs and networking",
+    "Managed ML services"
+   ],
+   "practiceProject": "Deploy your container to a managed service with a tightly scoped IAM role."
+  },
+  {
+   "id": "k8s",
+   "title": "Kubernetes",
+   "domain": "ops",
+   "prerequisites": [
+    "docker"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 0,
+    "ai_platform_mlops": 2,
+    "ai_data_engineer": 1,
+    "applied_scientist": 0,
+    "ai_backend": 1,
+    "ai_architect": 1
+   },
+   "description": "Orchestrating containers at scale: scheduling, scaling and self-healing.",
+   "topics": [
+    "Pods, deployments and services",
+    "Autoscaling",
+    "Helm",
+    "Resource requests and limits"
+   ],
+   "practiceProject": "Deploy a model service on a local kind cluster with autoscaling."
+  },
+  {
+   "id": "iac",
+   "title": "Infrastructure as Code",
+   "domain": "ops",
+   "prerequisites": [
+    "cloud"
+   ],
+   "levels": {
+    "ml_engineer": 0,
+    "genai_llm": 0,
+    "ai_platform_mlops": 2,
+    "ai_data_engineer": 1,
+    "applied_scientist": 0,
+    "ai_backend": 1,
+    "ai_architect": 1
+   },
+   "description": "Defining infrastructure in version-controlled code so every environment is reproducible.",
+   "topics": [
+    "Terraform modules",
+    "State and drift",
+    "Environments and workspaces",
+    "Policy as code"
+   ],
+   "practiceProject": "Recreate your cloud deployment entirely in Terraform."
+  },
+  {
+   "id": "cicd",
+   "title": "CI/CD for ML",
+   "domain": "ops",
+   "prerequisites": [
+    "testing",
+    "docker"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 1,
+    "ai_platform_mlops": 2,
+    "ai_data_engineer": 1,
+    "applied_scientist": 0,
+    "ai_backend": 2,
+    "ai_architect": 1
+   },
+   "description": "Automating tests, builds and deploys, including checks on data and models.",
+   "topics": [
+    "CI pipelines",
+    "Model and data tests in CI",
+    "Canary and blue-green deploys",
+    "Artefact versioning"
+   ],
+   "practiceProject": "Set up a GitHub Actions pipeline that tests, builds and deploys your service."
+  },
+  {
+   "id": "tracking",
+   "title": "Experiment Tracking",
+   "domain": "ops",
+   "prerequisites": [
+    "evaluation"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 1,
+    "ai_platform_mlops": 2,
+    "ai_data_engineer": 0,
+    "applied_scientist": 1,
+    "ai_backend": 0,
+    "ai_architect": 1
+   },
+   "description": "Recording runs, parameters, metrics and models so results are reproducible and comparable.",
+   "topics": [
+    "Run tracking (MLflow, W&B)",
+    "Model registry",
+    "Dataset versioning",
+    "Reproducibility"
+   ],
+   "practiceProject": "Track 20 training runs and promote the best one through a model registry."
+  },
+  {
+   "id": "serving",
+   "title": "Model Deployment",
+   "domain": "ops",
+   "prerequisites": [
+    "api",
+    "docker",
+    "tracking"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 1,
+    "ai_platform_mlops": 2,
+    "ai_data_engineer": 0,
+    "applied_scientist": 0,
+    "ai_backend": 1,
+    "ai_architect": 1
+   },
+   "description": "Getting models to users through batch scoring, online APIs or the edge, with safe rollouts.",
+   "topics": [
+    "Batch vs online inference",
+    "Model servers (Triton, BentoML)",
+    "Shadow and canary releases",
+    "Rollbacks"
+   ],
+   "practiceProject": "Deploy a model behind an API with a shadow release of a second version."
+  },
+  {
+   "id": "pipelines",
+   "title": "ML Pipelines",
+   "domain": "ops",
+   "prerequisites": [
+    "etl",
+    "tracking"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 0,
+    "ai_platform_mlops": 2,
+    "ai_data_engineer": 1,
+    "applied_scientist": 0,
+    "ai_backend": 0,
+    "ai_architect": 1
+   },
+   "description": "Automating the train, evaluate and deploy loop, including scheduled retraining.",
+   "topics": [
+    "Workflow tools (Kubeflow, Ray, Metaflow)",
+    "Retraining triggers",
+    "Step caching",
+    "Lineage"
+   ],
+   "practiceProject": "Build a pipeline that retrains weekly and deploys only if the eval improves."
+  },
+  {
+   "id": "monitoring",
+   "title": "Monitoring & Observability",
+   "domain": "ops",
+   "prerequisites": [
+    "serving"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 2,
+    "ai_platform_mlops": 2,
+    "ai_data_engineer": 1,
+    "applied_scientist": 1,
+    "ai_backend": 1,
+    "ai_architect": 1
+   },
+   "description": "Knowing how models behave in production: drift, quality, latency, cost and traces.",
+   "topics": [
+    "Data and prediction drift",
+    "LLM tracing",
+    "Latency and error SLOs",
+    "Feedback collection",
+    "Alerting"
+   ],
+   "practiceProject": "Add tracing and a drift dashboard to a deployed model, and set one alert."
+  },
+  {
+   "id": "gpu",
+   "title": "GPU Infrastructure",
+   "domain": "ops",
+   "prerequisites": [
+    "k8s"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 1,
+    "ai_platform_mlops": 2,
+    "ai_data_engineer": 0,
+    "applied_scientist": 0,
+    "ai_backend": 0,
+    "ai_architect": 1
+   },
+   "description": "Provisioning, scheduling and sharing accelerators for training and inference.",
+   "topics": [
+    "CUDA and GPU memory basics",
+    "GPU scheduling on Kubernetes",
+    "Multi-instance and fractional GPUs",
+    "Interconnects (NVLink, InfiniBand)"
+   ],
+   "practiceProject": "Profile a training job's GPU utilisation and remove one bottleneck."
+  },
+  {
+   "id": "cost",
+   "title": "Cost & Performance",
+   "domain": "ops",
+   "prerequisites": [
+    "cloud",
+    "inference"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 1,
+    "ai_platform_mlops": 2,
+    "ai_data_engineer": 1,
+    "applied_scientist": 0,
+    "ai_backend": 1,
+    "ai_architect": 2
+   },
+   "description": "Keeping AI systems fast and affordable through unit economics, caching, right-sizing and model routing.",
+   "topics": [
+    "Cost per request",
+    "Caching and batching",
+    "Right-sizing instances",
+    "Routing to smaller models"
+   ],
+   "practiceProject": "Cut the cost of an LLM feature by half without lowering its eval scores."
+  },
+  {
+   "id": "comms",
+   "title": "Technical Communication",
+   "domain": "lead",
+   "prerequisites": [],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 1,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 1,
+    "applied_scientist": 2,
+    "ai_backend": 1,
+    "ai_architect": 2
+   },
+   "description": "Explaining technical work to engineers, product and leadership, in writing and in person.",
+   "topics": [
+    "Design docs",
+    "Results write-ups",
+    "Presenting trade-offs",
+    "Saying what you don't know"
+   ],
+   "practiceProject": "Write a one-page design doc for a model you built and get it reviewed."
+  },
+  {
+   "id": "productsense",
+   "title": "Problem Framing",
+   "domain": "lead",
+   "prerequisites": [
+    "mlfund"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 1,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 0,
+    "applied_scientist": 2,
+    "ai_backend": 1,
+    "ai_architect": 2
+   },
+   "description": "Deciding whether ML is the right tool, and turning a business problem into a measurable one.",
+   "topics": [
+    "Is ML needed at all?",
+    "Defining success metrics",
+    "Baselines and heuristics",
+    "Scoping an MVP"
+   ],
+   "practiceProject": "Take a vague request and write the problem statement, metric and baseline."
+  },
+  {
+   "id": "research",
+   "title": "Reading Research",
+   "domain": "lead",
+   "prerequisites": [
+    "nn",
+    "experiment"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 1,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 0,
+    "applied_scientist": 2,
+    "ai_backend": 0,
+    "ai_architect": 1
+   },
+   "description": "Reading papers critically and turning new results into working experiments.",
+   "topics": [
+    "Reading a paper in three passes",
+    "Reproducing results",
+    "Ablations",
+    "Spotting weak baselines"
+   ],
+   "practiceProject": "Reproduce one table from a recent paper and write up what held up."
+  },
+  {
+   "id": "mlsysdesign",
+   "title": "ML System Design",
+   "domain": "lead",
+   "prerequisites": [
+    "systemdesign",
+    "serving",
+    "evaluation"
+   ],
+   "levels": {
+    "ml_engineer": 2,
+    "genai_llm": 1,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 0,
+    "applied_scientist": 0,
+    "ai_backend": 1,
+    "ai_architect": 2
+   },
+   "description": "Designing end-to-end ML systems: data, features, training, serving, feedback and failure modes.",
+   "topics": [
+    "Requirements and constraints",
+    "Online vs offline architecture",
+    "Feedback loops",
+    "Failure modes and fallbacks"
+   ],
+   "practiceProject": "Design a fraud-detection system end to end and defend it in a mock interview."
+  },
+  {
+   "id": "llmsysdesign",
+   "title": "GenAI Architecture",
+   "domain": "lead",
+   "prerequisites": [
+    "rag",
+    "agents",
+    "inference"
+   ],
+   "levels": {
+    "ml_engineer": 0,
+    "genai_llm": 2,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 0,
+    "applied_scientist": 0,
+    "ai_backend": 1,
+    "ai_architect": 2
+   },
+   "description": "Architecting production LLM systems where gateways, routing, caching, fallbacks, evals and guardrails work together.",
+   "topics": [
+    "LLM gateways and routing",
+    "Caching layers",
+    "Fallbacks and graceful degradation",
+    "Multi-tenant isolation",
+    "Eval-driven releases"
+   ],
+   "practiceProject": "Draw the architecture for a company-wide AI assistant, with cost and risk notes."
+  },
+  {
+   "id": "responsible",
+   "title": "Responsible AI",
+   "domain": "lead",
+   "prerequisites": [
+    "evaluation",
+    "governance"
+   ],
+   "levels": {
+    "ml_engineer": 1,
+    "genai_llm": 1,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 1,
+    "applied_scientist": 1,
+    "ai_backend": 0,
+    "ai_architect": 2
+   },
+   "description": "Fairness, transparency and compliance, including regulation such as the EU AI Act.",
+   "topics": [
+    "Bias and fairness metrics",
+    "Model and system cards",
+    "Risk tiers and regulation",
+    "Incident response"
+   ],
+   "practiceProject": "Write a model card and risk assessment for a system you built."
+  },
+  {
+   "id": "buildvsbuy",
+   "title": "Build vs Buy",
+   "domain": "lead",
+   "prerequisites": [
+    "cloud",
+    "llmapi"
+   ],
+   "levels": {
+    "ml_engineer": 0,
+    "genai_llm": 1,
+    "ai_platform_mlops": 1,
+    "ai_data_engineer": 0,
+    "applied_scientist": 0,
+    "ai_backend": 0,
+    "ai_architect": 2
+   },
+   "description": "Choosing between hosted APIs, open models, vendors and in-house builds without getting locked in.",
+   "topics": [
+    "Total cost of ownership",
+    "Open vs closed models",
+    "Vendor evaluation",
+    "Lock-in and portability"
+   ],
+   "practiceProject": "Write a build-vs-buy memo for one AI capability your team needs."
+  },
+  {
+   "id": "leadership",
+   "title": "Technical Leadership",
+   "domain": "lead",
+   "prerequisites": [
+    "comms",
+    "mlsysdesign"
+   ],
+   "levels": {
+    "ml_engineer": 0,
+    "genai_llm": 0,
+    "ai_platform_mlops": 0,
+    "ai_data_engineer": 0,
+    "applied_scientist": 0,
+    "ai_backend": 0,
+    "ai_architect": 2
+   },
+   "description": "Setting direction for AI work through roadmaps, standards, mentoring and aligning teams.",
+   "topics": [
+    "Roadmaps and prioritisation",
+    "Architecture reviews",
+    "Mentoring",
+    "Managing risk and ambiguity"
+   ],
+   "practiceProject": "Run an architecture review of a teammate's design and write the decision record."
+  }
+ ]
+}
