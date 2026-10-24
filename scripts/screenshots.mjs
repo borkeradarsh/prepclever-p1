@@ -17,20 +17,45 @@ const BASE_URL = process.env.BASE_URL ?? "http://localhost:3000";
 const OUT_DIR = path.resolve("screenshots");
 const WIDTHS = [375, 768, 1280];
 
-const LESSON_COURSE = "python-for-ai-engineers";
+// A concept lesson on the legacy URL (lessons are Pro, so free sees the lock).
+const LESSON = "/courses/linalg/lessons/vectors-dot-products-and-norms";
+
+/** An onboarding cookie at a given step, as the route handlers write it. */
+const onboarding = (patch) =>
+  encodeURIComponent(
+    JSON.stringify({
+      situation: "it_services",
+      yearsBand: "2-5",
+      roleId: null,
+      roleIsDefault: false,
+      currentStep: "situation",
+      completedAt: null,
+      updatedAt: "2026-10-24T00:00:00.000Z",
+      ...patch,
+    }),
+  );
 
 const PAGES = [
   { name: "landing", url: "/" },
   { name: "companies", url: "/companies" },
   { name: "roles", url: "/roles" },
   { name: "resume-evaluate", url: "/tools/resume-evaluate" },
+  // Screen 1 with the situation carried over from the landing page.
+  { name: "onboarding-intent", url: "/onboarding/situation", cookies: { "prepclever-intent": "it_services" } },
+  // The eight role cards, with the switcher track's "Popular for you" badge.
+  { name: "onboarding-role", url: "/onboarding/role", cookies: { "prepclever-onboarding": onboarding({ currentStep: "role" }) } },
+  {
+    name: "onboarding-payoff",
+    url: "/onboarding/payoff",
+    cookies: { "prepclever-onboarding": onboarding({ currentStep: "payoff", roleId: "ai_backend" }) },
+  },
   { name: "dashboard", url: "/dashboard" },
   { name: "path", url: "/path" },
   { name: "courses", url: "/courses" },
   { name: "profile", url: "/profile" },
   { name: "upgrade", url: "/upgrade" },
-  { name: "lesson-free", url: `/courses/${LESSON_COURSE}/lessons/typed-python-and-project-setup` },
-  { name: "lesson-locked", url: `/courses/${LESSON_COURSE}/lessons/async-code-and-http-clients` },
+  { name: "lesson-locked", url: LESSON },
+  { name: "lesson-pro", url: LESSON, cookies: { "prepclever-dev": "plan:pro" } },
 ];
 
 /** Runs in the page: the checks that need real layout, not markup. */
@@ -88,6 +113,12 @@ for (const width of WIDTHS) {
   });
 
   for (const page of PAGES) {
+    await context.clearCookies();
+    if (page.cookies) {
+      await context.addCookies(
+        Object.entries(page.cookies).map(([name, value]) => ({ name, value, url: BASE_URL })),
+      );
+    }
     const tab = await context.newPage();
     const response = await tab.goto(`${BASE_URL}${page.url}`, { waitUntil: "networkidle" });
     const status = response?.status() ?? 0;
