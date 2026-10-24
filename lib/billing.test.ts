@@ -1,5 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { billingMode, decideUpgrade } from "@/lib/billing";
+import { billingMode, decideUpgrade, parseUpgradeSource } from "@/lib/billing";
+
+describe("parseUpgradeSource", () => {
+  it("keeps a known entry point", () => {
+    expect(parseUpgradeSource("locked-page")).toBe("locked-page");
+    expect(parseUpgradeSource("sidebar")).toBe("sidebar");
+  });
+
+  it("counts anything else as the nav button", () => {
+    expect(parseUpgradeSource(undefined)).toBe("nav");
+    expect(parseUpgradeSource("<script>")).toBe("nav");
+    expect(parseUpgradeSource(["sidebar"])).toBe("nav");
+  });
+});
 
 describe("billing stub", () => {
   it("mocks the upgrade outside production, and has nothing to sell in production", () => {

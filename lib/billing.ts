@@ -13,6 +13,13 @@ import { safeReturnTo } from "@/lib/return-to";
 /** Every place an upgrade can start from; each one passes its own `from`. */
 export type UpgradeSource = "locked-page" | "sidebar" | "continue-card" | "gap-report" | "nav" | "profile";
 
+const UPGRADE_SOURCES: UpgradeSource[] = ["locked-page", "sidebar", "continue-card", "gap-report", "nav", "profile"];
+
+/** `?from=` as it arrives; anything unknown is counted as the nav button. */
+export function parseUpgradeSource(value: unknown): UpgradeSource {
+  return (UPGRADE_SOURCES as unknown[]).includes(value) ? (value as UpgradeSource) : "nav";
+}
+
 export type BillingMode = "mock" | "none";
 
 export type UpgradeDecision =

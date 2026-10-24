@@ -69,8 +69,34 @@ export const plans: PlanConfig[] = [
 
 export const planCopy = {
   comingSoon: "Coming soon",
+  available: "Available",
   contact: "Contact us",
+  /** The same address as the marketing footer's Contact link. */
+  contactHref: "mailto:hello@prepclever.com?subject=PrepClever%20Teams",
   everythingIn: (name: string) => `Everything in ${name}, plus`,
+  price: (min: number, max: number, per: string) => `$${min} to $${max} a ${per}`,
+};
+
+/** /upgrade. */
+export const upgradeCopy = {
+  title: "Upgrade to Pro",
+  subtext: "Pro opens Blocks 3 to 6 of the roadmap. Features marked Coming soon are not part of Pro yet.",
+  currentPlan: "Your plan",
+  action: "Upgrade to Pro",
+  pending: "Upgrading…",
+  notNow: "Not now, go back",
+  error: "Couldn't start the upgrade. Try again.",
+  openingSoon: {
+    title: "Pro is opening soon",
+    body: "Payments aren't live yet. We've noted your interest, and everything in Free stays open in the meantime.",
+    back: "Go back",
+  },
+  alreadyPro: {
+    title: "You're on Pro",
+    body: "Every block of the roadmap is open to you.",
+    back: "Go back",
+  },
+  teams: { title: "Teams" },
 };
 
 export function getPlan(id: PlanId): PlanConfig {
