@@ -12,6 +12,7 @@ export type AnalyticsEvent =
   | "lesson_opened"
   | "lesson_completed"
   | "upgrade_clicked"
+  | "upgrade_interest"
   | "role_change_started";
 
 export type AnalyticsProps = Record<string, string | number | boolean | null>;

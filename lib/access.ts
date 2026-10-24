@@ -1,13 +1,25 @@
-// The only place access logic lives (docs/dashboard-structure-spec.md section 6,
+// The only place access logic lives (docs/dashboard-v2-spec.md section 7,
 // CLAUDE.md section 4). Components must never test a plan inline: call these.
 
-import type { Access, Plan, User } from "@/types/domain";
+import type { Access, BlockId, Plan, User } from "@/types/domain";
 
-export const ACCESS_RULES = {
-  /** Who may see the courses and lessons inside each stage. */
-  roadmapDetail: "paid" as Access,
-  /** Access given to every lesson that is not deliberately free. */
-  defaultLessonAccess: "paid" as Access,
+export const ACCESS_RULES: {
+  blocks: Record<BlockId, Access>;
+  /** What a free user may see of a locked item: never its body. */
+  freePreview: { itemTitleAndSummary: boolean; conceptOverview: boolean };
+  jobs: Access;
+} = {
+  blocks: {
+    market: "free",
+    "gap-analysis": "free",
+    upskilling: "paid",
+    positioning: "paid",
+    referrals: "paid",
+    interviews: "paid",
+  },
+  // conceptOverview: the concept description, subtopics and practice project.
+  freePreview: { itemTitleAndSummary: true, conceptOverview: true },
+  jobs: "free",
 };
 
 type PlanHolder = Pick<User, "plan">;
@@ -22,6 +34,11 @@ export function canAccess(user: PlanHolder, item: AccessHolder): boolean {
   return planSatisfies(user.plan, item.access);
 }
 
-export function canViewRoadmapDetail(user: PlanHolder): boolean {
-  return planSatisfies(user.plan, ACCESS_RULES.roadmapDetail);
+/** An item's access: its own override, else its block's default. */
+export function resolveAccess(blockId: BlockId, override?: Access): Access {
+  return override ?? ACCESS_RULES.blocks[blockId];
+}
+
+export function canPreview(kind: keyof typeof ACCESS_RULES.freePreview): boolean {
+  return ACCESS_RULES.freePreview[kind];
 }
