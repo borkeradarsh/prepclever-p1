@@ -4,9 +4,9 @@
 // have. Pure and dependency-light, so client components can import it.
 
 import { canAccess } from "@/lib/access";
-import { itemKey } from "@/lib/progress";
+import { conceptKey, itemKey } from "@/lib/progress";
 import { routes } from "@/lib/routes";
-import type { BlockId, BlockState, BlockView, ItemStatus, Plan } from "@/types/domain";
+import type { BlockId, BlockState, BlockView, DomainId, ItemStatus, Plan, RoleSyllabus } from "@/types/domain";
 
 export interface NavBlockItem {
   slug: string;
@@ -15,6 +15,23 @@ export interface NavBlockItem {
   status: ItemStatus;
   locked: boolean;
   done: boolean;
+}
+
+/** One of the role's concepts in the Block 3 sidebar. */
+export interface NavConcept {
+  id: string;
+  title: string;
+  href: string;
+  /** 2 core, 1 good to know. */
+  level: 1 | 2;
+  done: boolean;
+  /** The concept page is a free preview; this marks its lessons as locked. */
+  locked: boolean;
+}
+
+export interface NavConceptGroup {
+  domain: { id: DomainId; title: string };
+  concepts: NavConcept[];
 }
 
 export interface NavBlock {
@@ -29,6 +46,8 @@ export interface NavBlock {
   done: number;
   total: number;
   items: NavBlockItem[];
+  /** Block 3 only: the role's concepts by domain, each domain in learning order. */
+  groups?: NavConceptGroup[];
 }
 
 /** Everything the shell renders, loaded once per request by the app layout. */
@@ -41,7 +60,27 @@ export interface ShellData {
   blocks: NavBlock[] | null;
 }
 
-export function buildNavBlocks(blocks: BlockView[], plan: Plan, doneItems: string[]): NavBlock[] {
+function conceptGroups(syllabus: RoleSyllabus, locked: boolean, done: Set<string>): NavConceptGroup[] {
+  return syllabus.domains.map((group) => ({
+    domain: { id: group.domain.id, title: group.domain.title },
+    concepts: group.concepts.map((entry) => ({
+      id: entry.concept.id,
+      title: entry.concept.title,
+      href: routes.concept(entry.concept.domain, entry.concept.id),
+      level: entry.level,
+      done: done.has(conceptKey(entry.concept.id)),
+      locked,
+    })),
+  }));
+}
+
+/** `syllabus` adds Block 3's concept groups; without it Block 3 lists only its items. */
+export function buildNavBlocks(
+  blocks: BlockView[],
+  plan: Plan,
+  doneItems: string[],
+  syllabus: RoleSyllabus | null = null,
+): NavBlock[] {
   const done = new Set(doneItems);
   return blocks.map((block) => ({
     slug: block.slug,
@@ -62,7 +101,19 @@ export function buildNavBlocks(blocks: BlockView[], plan: Plan, doneItems: strin
       locked: !canAccess({ plan }, item),
       done: done.has(itemKey(block.slug, item.slug)),
     })),
+    ...(block.slug === "upskilling" && syllabus
+      ? { groups: conceptGroups(syllabus, !canAccess({ plan }, { access: block.tier }), done) }
+      : {}),
   }));
+}
+
+/** A concept in a block's groups, with the domain it sits in. */
+export function findConcept(block: NavBlock, conceptId: string) {
+  for (const group of block.groups ?? []) {
+    const concept = group.concepts.find((entry) => entry.id === conceptId);
+    if (concept) return { group, concept };
+  }
+  return null;
 }
 
 /** True for the link itself and anything below it. */
@@ -72,7 +123,15 @@ export function isActivePath(pathname: string, href: string): boolean {
 
 export type SidebarContext =
   | { kind: "home" }
-  | { kind: "block"; block: NavBlock; activeItem: string | null };
+  | {
+      kind: "block";
+      block: NavBlock;
+      activeItem: string | null;
+      /** Block 3: the concept being viewed (its page or one of its lessons). */
+      activeConcept: string | null;
+      /** Block 3: the domain to show expanded. */
+      activeDomain: DomainId | null;
+    };
 
 function segments(pathname: string): string[] {
   return pathname.split("?")[0].split("/").filter(Boolean).map((part) => {
@@ -90,12 +149,20 @@ function segments(pathname: string): string[] {
  * block (such as the concept map), keeps the home context.
  */
 export function sidebarContext(pathname: string, blocks: NavBlock[] | null): SidebarContext {
-  const [root, blockSlug, itemSlug] = segments(pathname);
+  const [root, blockSlug, itemSlug, conceptId] = segments(pathname);
   if (root !== "roadmap" || !blockSlug || !blocks) return { kind: "home" };
   const block = blocks.find((entry) => entry.slug === blockSlug);
   if (!block) return { kind: "home" };
   const item = itemSlug ? block.items.find((entry) => entry.slug === itemSlug) : undefined;
-  return { kind: "block", block, activeItem: item?.slug ?? null };
+  // Concept URLs are /roadmap/upskilling/<domain>/<concept>[/<lesson>].
+  const found = !item && conceptId ? findConcept(block, conceptId) : null;
+  return {
+    kind: "block",
+    block,
+    activeItem: item?.slug ?? null,
+    activeConcept: found?.concept.id ?? null,
+    activeDomain: found?.group.domain.id ?? null,
+  };
 }
 
 export interface Crumb {
@@ -111,7 +178,7 @@ export type SectionLabels = Record<"dashboard" | "roadmap" | "jobs" | "explore" 
  * The last crumb is the current page.
  */
 export function breadcrumbFor(pathname: string, blocks: NavBlock[] | null, labels: SectionLabels): Crumb[] {
-  const [root, second, third] = segments(pathname);
+  const [root, second, third, fourth] = segments(pathname);
   const home: Crumb = { label: labels.dashboard, href: routes.dashboard };
   if (!root || root === "dashboard" || !(root in labels)) return [home];
 
@@ -124,5 +191,7 @@ export function breadcrumbFor(pathname: string, blocks: NavBlock[] | null, label
 
   const item = third ? block.items.find((entry) => entry.slug === third) : undefined;
   if (item) crumbs.push({ label: item.title, href: item.href });
+  const concept = !item && fourth ? findConcept(block, fourth) : null;
+  if (concept) crumbs.push({ label: concept.concept.title, href: concept.concept.href });
   return crumbs;
 }

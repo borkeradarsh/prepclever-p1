@@ -66,4 +66,10 @@ export const navCopy = {
   notStarted: "Not started",
   comingSoon: "Coming soon",
   soon: "Soon",
+  conceptsHeading: "Your concepts",
+  /** Same words as levelLabels in content/concepts.ts, kept here so the client bundle skips the concept map. */
+  levels: { 2: "Core", 1: "Good to know" } as Record<1 | 2, string>,
+  lessonsLocked: "lessons in Pro",
+  groupCount: (done: number, total: number) => `${done}/${total}`,
+  groupCountLabel: (done: number, total: number) => `${done} of ${total} done`,
 };

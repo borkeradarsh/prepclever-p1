@@ -3,7 +3,8 @@ import { blocks as blockConfigs } from "@/content/blocks.config";
 import { sectionLabels, sidebarNav, tabNav } from "@/content/nav.config";
 import { buildBlockViews, resolveBlocks } from "@/lib/journey";
 import { breadcrumbFor, buildNavBlocks, isActivePath, sidebarContext } from "@/lib/nav";
-import { emptyProgress, itemKey } from "@/lib/progress";
+import { conceptKey, emptyProgress, itemKey } from "@/lib/progress";
+import { buildSyllabus } from "@/lib/syllabus";
 import type { Plan } from "@/types/domain";
 
 const navFor = (plan: Plan, doneItems: string[] = []) =>
@@ -108,5 +109,52 @@ describe("shell nav lists", () => {
   it("matches a link and its children only", () => {
     expect(isActivePath("/roadmap/market", "/roadmap")).toBe(true);
     expect(isActivePath("/roadmaps", "/roadmap")).toBe(false);
+  });
+});
+
+describe("Block 3 concept groups", () => {
+  const syllabus = buildSyllabus("genai_llm", {});
+  const withGroups = (plan: Plan, doneItems: string[] = []) =>
+    buildNavBlocks(buildBlockViews(resolveBlocks(), plan, { ...emptyProgress(), doneItems }, syllabus.order), plan, doneItems, syllabus);
+  const upskilling = (plan: Plan, doneItems: string[] = []) => withGroups(plan, doneItems).find((block) => block.slug === "upskilling")!;
+
+  it("lists the role's domains and concepts in learning order, only in Block 3", () => {
+    const block = upskilling("free");
+    expect(block.groups?.map((group) => group.domain.id)).toEqual(syllabus.domains.map((group) => group.domain.id));
+    const ids = block.groups!.flatMap((group) => group.concepts.map((concept) => concept.id));
+    expect(new Set(ids)).toEqual(new Set(syllabus.order));
+    for (const group of block.groups!) {
+      const positions = group.concepts.map((concept) => syllabus.order.indexOf(concept.id));
+      expect(positions).toEqual([...positions].sort((a, b) => a - b));
+    }
+    expect(withGroups("free").filter((block) => block.groups).map((block) => block.slug)).toEqual(["upskilling"]);
+  });
+
+  it("badges core and good to know, ticks done concepts, and locks lessons for free users only", () => {
+    const first = syllabus.order[0];
+    const free = upskilling("free", [conceptKey(first)]).groups!.flatMap((group) => group.concepts);
+    expect(free.find((concept) => concept.id === first)?.done).toBe(true);
+    expect(free.every((concept) => concept.level === 1 || concept.level === 2)).toBe(true);
+    expect(free.every((concept) => concept.locked)).toBe(true);
+    expect(upskilling("pro").groups!.flatMap((group) => group.concepts).some((concept) => concept.locked)).toBe(false);
+  });
+
+  it("opens the concept's domain and marks it current, on the concept and its lessons", () => {
+    const nav = withGroups("free");
+    const group = upskilling("free").groups![1];
+    const concept = group.concepts[0];
+    for (const path of [concept.href, `${concept.href}/practice-project`]) {
+      const context = sidebarContext(path, nav);
+      expect(context).toMatchObject({ kind: "block", activeConcept: concept.id, activeDomain: group.domain.id, activeItem: null });
+    }
+    expect(sidebarContext("/roadmap/upskilling/track-plan", nav)).toMatchObject({ activeItem: "track-plan", activeConcept: null });
+  });
+
+  it("names the concept in the breadcrumb", () => {
+    const concept = upskilling("free").groups![0].concepts[0];
+    expect(breadcrumbFor(concept.href, withGroups("free"), sectionLabels).at(-1)).toEqual({
+      label: concept.title,
+      href: concept.href,
+    });
   });
 });

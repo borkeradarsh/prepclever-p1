@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import {
   ArrowLeft,
   Check,
+  ChevronDown,
   Circle,
   CircleCheck,
   CircleDot,
@@ -18,7 +19,15 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { ProgressBar } from "@/components/ui/Progress";
 import { navCopy, sidebarNav } from "@/content/nav.config";
-import { isActivePath, sidebarContext, type NavBlock, type NavBlockItem, type ShellData } from "@/lib/nav";
+import {
+  isActivePath,
+  sidebarContext,
+  type NavBlock,
+  type NavBlockItem,
+  type NavConceptGroup,
+  type ShellData,
+} from "@/lib/nav";
+import type { DomainId } from "@/types/domain";
 import { routes } from "@/lib/routes";
 
 type SidebarContentProps = {
@@ -197,15 +206,108 @@ function itemHint(item: NavBlockItem): string | undefined {
   return hint || undefined;
 }
 
+/**
+ * Block 3's concepts, one collapsible group per domain, each in learning order.
+ * The domain being viewed starts open; any group can be toggled.
+ */
+function ConceptGroups({
+  groups,
+  activeConcept,
+  activeDomain,
+  onNavigate,
+}: {
+  groups: NavConceptGroup[];
+  activeConcept: string | null;
+  activeDomain: DomainId | null;
+  onNavigate?: () => void;
+}) {
+  const [toggled, setToggled] = useState<Partial<Record<DomainId, boolean>>>({});
+  const isOpen = (id: DomainId) => toggled[id] ?? id === activeDomain;
+
+  return (
+    <div className="grid gap-px border-t border-border-soft pt-[var(--space-sm)]">
+      <p className="px-[var(--space-sm)] pb-[var(--space-xs)] text-[length:var(--font-size-small)] font-medium uppercase tracking-[0.08em] text-text-subtle">
+        {navCopy.conceptsHeading}
+      </p>
+      {groups.map((group) => {
+        const open = isOpen(group.domain.id);
+        const done = group.concepts.filter((concept) => concept.done).length;
+        const listId = `sidebar-domain-${group.domain.id}`;
+        return (
+          <div key={group.domain.id}>
+            <button
+              type="button"
+              aria-expanded={open}
+              aria-controls={listId}
+              onClick={() => setToggled((state) => ({ ...state, [group.domain.id]: !open }))}
+              className={`${rowBase} ${rowIdle} w-full px-[var(--space-sm)] text-left`}
+            >
+              <ChevronDown
+                size={16}
+                strokeWidth={1.8}
+                aria-hidden="true"
+                className={`shrink-0 transition-transform duration-150 ease-out motion-reduce:transition-none ${open ? "" : "-rotate-90"}`}
+              />
+              <span className="min-w-0 flex-1 truncate font-medium text-text-primary">{group.domain.title}</span>
+              <span aria-hidden="true" className="shrink-0">
+                {navCopy.groupCount(done, group.concepts.length)}
+              </span>
+              <span className="sr-only">, {navCopy.groupCountLabel(done, group.concepts.length)}</span>
+            </button>
+            <ul id={listId} hidden={!open} className="grid gap-px">
+              {group.concepts.map((concept) => {
+                const active = concept.id === activeConcept;
+                return (
+                  <li key={concept.id}>
+                    <Link
+                      href={concept.href}
+                      onClick={onNavigate}
+                      aria-current={active ? "page" : undefined}
+                      className={`${rowBase} ${active ? rowActive : rowIdle} py-[var(--space-xs)] pl-[var(--space-lg)] pr-[var(--space-sm)]`}
+                    >
+                      <span className="grid size-5 shrink-0 place-items-center" aria-hidden="true">
+                        {concept.done ? (
+                          <Check size={16} strokeWidth={2} className="text-accent-ink" />
+                        ) : (
+                          <Circle size={8} strokeWidth={2} />
+                        )}
+                      </span>
+                      <span className="grid min-w-0 flex-1 leading-tight">
+                        <span className="truncate">{concept.title}</span>
+                        <span className="text-text-subtle font-normal">{navCopy.levels[concept.level]}</span>
+                      </span>
+                      {concept.done ? <span className="sr-only">, {navCopy.done}</span> : null}
+                      {concept.locked ? (
+                        <>
+                          <LockMark />
+                          <span className="sr-only">, {navCopy.lessonsLocked}</span>
+                        </>
+                      ) : null}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function BlockContext({
   block,
   activeItem,
+  activeConcept,
+  activeDomain,
   collapsed,
   pathname,
   onNavigate,
 }: {
   block: NavBlock;
   activeItem: string | null;
+  activeConcept: string | null;
+  activeDomain: DomainId | null;
   collapsed: boolean;
   pathname: string;
   onNavigate?: () => void;
@@ -285,6 +387,18 @@ function BlockContext({
           </li>
         ))}
       </ul>
+
+      {/* The 72px rail has no room for concept titles: the overview lists them. */}
+      {block.groups && !collapsed ? (
+        <ConceptGroups
+          // Remount per domain, so following a link into another domain opens it.
+          key={activeDomain ?? "none"}
+          groups={block.groups}
+          activeConcept={activeConcept}
+          activeDomain={activeDomain}
+          onNavigate={onNavigate}
+        />
+      ) : null}
     </div>
   );
 }
@@ -326,6 +440,8 @@ export function SidebarContent({ data, collapsed, onNavigate }: SidebarContentPr
           <BlockContext
             block={context.block}
             activeItem={context.activeItem}
+            activeConcept={context.activeConcept}
+            activeDomain={context.activeDomain}
             collapsed={collapsed}
             pathname={pathname}
             onNavigate={onNavigate}

@@ -34,7 +34,8 @@ export function LessonRow({ lesson, href, completed = false, locked = false }: L
         aria-hidden="true"
         className="shrink-0 text-text-subtle"
       />
-      <span className="min-w-0 flex-1 truncate text-text-primary">{lesson.title}</span>
+      {/* Wraps rather than truncates: subtopic titles are long and all of them matter. */}
+      <span className="min-w-0 flex-1 text-text-primary">{lesson.title}</span>
       <span className="shrink-0 text-[length:var(--font-size-small)] text-text-subtle">
         <span className="sr-only">{typeLabels[lesson.type]}, </span>
         {lesson.durationMin} min

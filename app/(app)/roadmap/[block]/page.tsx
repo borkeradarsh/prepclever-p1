@@ -15,7 +15,8 @@ import { BlockChips } from "@/features/roadmap/BlockChips";
 import { BlockInside } from "@/features/roadmap/BlockInside";
 import { ItemList } from "@/features/roadmap/ItemList";
 import { ItemPager } from "@/features/roadmap/ItemPager";
-import { getBlocks, getProgress, getUser } from "@/lib/data";
+import { SyllabusList } from "@/features/roadmap/SyllabusList";
+import { getBlocks, getProgress, getRoleSyllabus, getUser } from "@/lib/data";
 import { itemKey } from "@/lib/progress";
 import { routes } from "@/lib/routes";
 import type { BlockView, ItemLink } from "@/types/domain";
@@ -47,6 +48,8 @@ export default async function BlockPage({ params }: BlockParams) {
   if (index === -1) notFound();
 
   const block = blocks[index];
+  // Block 3 also lists the role's concepts from the concept map.
+  const syllabus = block.slug === "upskilling" ? await getRoleSyllabus() : null;
   const live = block.items.filter((item) => item.status === "available");
   const firstOpen = live.find((item) => !progress.doneItems.includes(itemKey(block.slug, item.slug)));
   const started = block.progress.state !== "not_started";
@@ -98,6 +101,8 @@ export default async function BlockPage({ params }: BlockParams) {
           </h2>
           <ItemList block={block} plan={user.plan} doneItems={progress.doneItems} />
         </section>
+
+        {syllabus ? <SyllabusList syllabus={syllabus} doneItems={progress.doneItems} lessonsLocked={block.locked} /> : null}
       </div>
 
       <ItemPager previous={pager.previous} next={pager.next} />
